@@ -1,0 +1,114 @@
+#appInput {
+
+}
+
+.blorm-form-newpost select {
+    width:100%;
+}
+
+.blorm-form-newpost .helper-text {
+    color:red;
+}
+
+.blorm-userlist select {
+    width:75%;
+}
+
+.blog-form-newpost label {
+    font-weight: bold;
+    line-height: 1.5rem;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.postbox {
+
+}
+
+.hndle.ui-sortable-handle {
+    background-color: #23282d;
+    color:#fff;
+}
+
+.Blorm_following_blogs .card {
+    padding: 0;
+}
+
+.FollowingBlogList_Blog {
+    width: 7.5rem;
+    height: 2.5rem;
+    /*border: 1px solid #e5e5e5;*/
+    margin: 1px 5px 5px 1px;
+    padding: 5px 0rem 5px 5px;
+    float: left;
+    word-wrap: break-word;
+    word-break: break-all;
+    cursor: pointer;
+    background-color: #f6f6f6;
+    color:#555;
+}
+
+.FollowingBlogList_Blog .name {
+
+}
+
+.FollowingBlogList_Blog .url {
+    font-size: xx-small;
+}
+
+.Blorm_Blormfeed_Post {
+    margin-bottom: 2rem;
+}
+
+.Blorm_Blormfeed_Post.sharedpost {
+    background-color: darkgrey;
+}
+
+.Blorm_Blormfeed_Image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.Blorm_Blormfeed_URL {
+    text-align: right;
+}
+
+.Blorm_Blormfeed_Edit--Date,
+.Blorm_Blormfeed_Edit--Mod {
+    display: inline-block;
+}
+
+.Blorm_Blormfeed_Edit--Mod {
+    float: right;
+}
+
+.Blorm_Blormfeed_Postcomment {
+    background-color: rgb(246, 246, 246);;
+    color:black;
+    padding: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.Blorm_Blormfeed_Action--comment {
+
+}
+
+.Blorm_Blormfeed_Action--comment-textbox {
+    /*padding: 0.25rem;*/
+    margin-top: 0.5rem;
+}
+
+.Blorm_Blormfeed_Action--comment-textbox {
+    width:98%;
+    min-height:2rem;
+    border:1px solid #ccc;
+    color: #ccc;
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.Blorm_Blormfeed_Action button {
+    color:rgb(0, 133, 186);
+}
