@@ -100,10 +100,16 @@ class SetupActions
         wp_enqueue_script('blorm-admin-theme-axios', plugins_url('../assets/js/axios.min.js', __FILE__));
         wp_enqueue_script('blorm-admin-theme-vue', plugins_url('../assets/js/vue.js', __FILE__));
         wp_enqueue_script('blorm-admin-theme-materialize', plugins_url('../assets/js/jquery-ui-1.12.1/jquery-ui.min.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-index', plugins_url('../assets/js/index.js', __FILE__));
+        wp_enqueue_script('blorm-admin-theme-index', plugins_url('../assets/js/app.js', __FILE__));
 
         /* Wordpress API backbone.js */
         wp_enqueue_script('wp-api');
+
+        // Register custom variables for the AJAX script.
+        wp_localize_script( 'blorm-admin-theme-index', 'restapiVars', [
+            'root'  => esc_url_raw( rest_url() ),
+            'nonce' => wp_create_nonce( 'wp_rest' ),
+        ] );
 
         wp_add_inline_script('blorm-admin-theme-index',self::getconfigjs(),'before');
     }
@@ -123,7 +129,8 @@ class SetupActions
 
         //https://codex.wordpress.org/Dashboard_Widgets_API
         add_meta_box( 'id1', 'BLORM - New Post', array( __CLASS__, 'dashboard_widget_blorm_newpost' ), 'dashboard', 'side', 'high' );
-        /*add_meta_box( 'id2', 'BLORM - Blogs to follow', array( __CLASS__, 'dashboard_widget_blorm_bloglist' ), 'dashboard', 'side', 'high' );
+        /*
+        add_meta_box( 'id2', 'BLORM - Blogs to follow', array( __CLASS__, 'dashboard_widget_blorm_bloglist' ), 'dashboard', 'side', 'high' );
         add_meta_box( 'id3', 'BLORM - i am following', array( __CLASS__, 'dashboard_widget_blorm_followingbloglist' ), 'dashboard', 'side', 'high' );*/
         add_meta_box( 'id3', 'BLORM - User and blogs', array( __CLASS__, 'dashboard_widget_blorm_usermodule' ), 'dashboard', 'side', 'high' );
 
@@ -134,7 +141,8 @@ class SetupActions
         $jsdata =   "var blogurl = '".CONFIG_BLORM_BLOGURL."';";
         $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';";
         $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;";
-        $jsdata .= "var blormapp = {};";
+        $jsdata .=  "var blormapp = {};";
+        $jsdata .=  "var templateUrl = '".plugins_url()."';";
 
         return $jsdata;
     }
@@ -144,16 +152,19 @@ class SetupActions
         require_once plugin_dir_path( __FILE__ )  . '../templates/blorm_usermodule.php';
     }
 
-
     static function dashboard_widget_blorm_newpost() {
         // echo form for new post
         require_once plugin_dir_path( __FILE__ )  . '../templates/blorm_newpost.php';
     }
 
     static function dashboard_widget_blorm_feed() {
-
         // echo the blorm feed
         require_once plugin_dir_path( __FILE__ )  . '../templates/blorm_feed.php';
+    }
+
+    static function add_vue_templates() {
+        // echo the vue js stuff
+        require_once plugin_dir_path( __FILE__ )  .'../templates/blorm_vue_templates.php';
     }
 
     static function add_dashboard_blorm_feed_widget() {
@@ -163,22 +174,5 @@ class SetupActions
             array( 'SetupActions', 'dashboard_widget_blorm_feed' ) // Display function.
         );
     }
-
-    /*
-     *
-     * Frontend
-     *
-     */
-
-    function render_blorm_post_action( $post_object ) {
-        // modify post object here
-        $args = array();
-        echo "<h5>";
-        //var_dump($post_object);
-        var_dump(wp_get_post_categories($post_object->id, $args));
-        echo "</h5";
-
-    }
-
 
 }

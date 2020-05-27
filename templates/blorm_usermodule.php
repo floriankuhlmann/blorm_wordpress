@@ -1,3 +1,6 @@
+<?php
+
+?>
 <script type="application/javascript">
     jQuery(document).ready(function(){
 
@@ -44,7 +47,7 @@
         var ajaxapi = blogdomain+ajaxurl;
 
 
-        blormapp.usermodule = new Vue({
+        /*blormapp.usermodule = new Vue({
             el: '#Blorm_usermodule',
             mounted() {
                 axios.get(ajaxapi+'?action=blorm&todo=getListOfFollowingBlogs')
@@ -139,18 +142,6 @@
                     }
                     return null;
                 },
-                /*changeBlogs: function(array1,array2,id) {
-                    var blogtofollow = blormapp.usermodule.findObjectByKey(this.availableBlogs, 'id', this.selected);
-                    this.followingBlogs.push(blogtofollow);
-                    console.log(blogtofollow);
-
-                    var index = blormapp.usermodule.findObjectIndexByKey(this.availableBlogs, 'id', this.selected);
-                    console.log("index"+index);
-                    console.log(this.availableBlogs);
-                    console.log(this.availableBlogs.splice(index,1));
-                    //console.log(this.availableBlogs);
-                    this.selected = "firstentry";
-                },*/
                 followBlog: function() {
 
                     if (this.selected == "firstentry") {
@@ -194,7 +185,7 @@
                     }
                 }
             }
-        });
+        });*/
     });
 </script>
 

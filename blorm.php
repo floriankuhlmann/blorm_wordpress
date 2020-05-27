@@ -21,6 +21,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+
+//$config = (require_once 'config.php');
+
+//$basicauth64 = base64_encode($config['username'].":".$config['password']);
+
+
 /**
  * Main Blorm Class
  *
@@ -45,7 +51,6 @@ class Blorm {
         // NON
         $this->a_config = require_once __DIR__.'/config.php';
 
-
     }
 
     /**
@@ -60,10 +65,6 @@ class Blorm {
 
         // Setup Constants.
         $this->constants();
-
-        // Setup Translation.
-        //add_action( 'plugins_loaded', array( __CLASS__, 'translation' ) );
-
 
         // Include Files.
         $this->includes();
@@ -82,21 +83,20 @@ class Blorm {
     private function constants() {
 
 
-        //echo "<h1>".self::$config['blogdomain']."</h1>";
-
         // Definee Configs
         define( 'CONFIG_BLORM_BLOGDOMAIN', $this->a_config['blogdomain']);
 
         define( 'CONFIG_BLORM_BLOGURL', get_bloginfo('wpurl'));
 
-        define( 'CONFIG_BLORM_WRITEAPI', $this->a_config['writeapi']);
-
-        define( 'CONFIG_BLORM_READAPI', $this->a_config['readapi']);
+        define( 'CONFIG_BLORM_APIURL', $this->a_config['api']);
 
         define( 'CONFIG_BLORM_USERNAME', $this->a_config['username']);
 
         define( 'CONFIG_BLORM_USERPASS', $this->a_config['password']);
 
+        define( 'CONFIG_BLORM_APIKEY', $this->a_config['apikey']);
+
+        define( 'CONFIG_BLORM_APIURL', $this->a_config['readapi']);
 
         // Define Plugin Name.
         define( 'PLUGIN_BLORM_NAME', 'Plugin Blorm' );
@@ -148,341 +148,141 @@ class Blorm {
 
         // init add the blorm post type
         add_action( 'init',  array( 'SetupActions', 'create_post_type_blorm' ) );
+        add_action( 'init',  array( 'SetupActions', 'ah_custom_post_type' ), 0 );
         add_post_type_support( 'blorm_reblog', 'post-formats' );
-        add_action( 'init', array( 'SetupActions', 'ah_custom_post_type' ), 0 );
 
-        // Enqueue Stylesheet.
-        //add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_styles' ) );
+        // Enqueue Stylesheet and Js.
         add_action( 'admin_enqueue_scripts', array( 'SetupActions', 'enqueue_blorm_admin_theme_style' ));
+        add_action( 'vue_templates', array( 'SetupActions', 'add_vue_templates' ));
+
 
         // remove dashboard widgets
         add_action( 'admin_init', array( 'SetupActions', 'prepare_dashboard_meta') );
         add_action( 'wp_dashboard_setup', array( 'SetupActions', 'add_dashboard_blorm_feed_widget'));
 
         // add ajax methods
-        add_action( 'wp_ajax_blorm', array( __CLASS__, 'blorm_ajax_api' ));
 
         // add modified rendering of blorm posts
-        add_action( 'the_post', array( 'SetupActions', 'render_blorm_post_action'));
+        // add_action( 'the_post', array( 'SetupActions', 'render_blorm_post_action'));
+
+        add_action( 'rest_api_init', array($this, 'rest_blorm_api_endpoint' ));
 
     }
 
-    /**
-     * Enqueue Stylesheet
-     *
-     * @return void
-     */
-    /*static function enqueue_styles() {
-
-        // Enqueue Plugin Stylesheet.
-        wp_enqueue_style( 'plugin-blorm', PLUGIN_BLORM_PLUGIN_URL . 'assets/css/blorm.css', array(), PLUGIN_BLORM_VERSION );
-
-    }*/
-
-    static function blorm_ajax_api() {
-
-        //global $wpdb; // this is how you get access to the database
-
-        $basicauth64 = base64_encode(CONFIG_BLORM_USERNAME.":".CONFIG_BLORM_USERPASS);
-
-
-        //$_POST = json_encode(file_get_contents('php://input'), true);
-       /*
-        $_POSTjson = json_encode($_POST);
-        echo "post".$_POST['headline'];
-        wp_die();
-                if($_SERVER['REQUEST_METHOD']==='POST' ) {
-                    //$_POST = json_decode(file_get_contents('php://input'), true);
-                    status_header(200);
-                    header('Content-Type: application/json');
-                    //echo json_encode(file_get_contents('php://input'));
-                    //echo file_get_contents('php://input');
-                    //$_POST = file_get_contents('php://input');
-
-                    echo file_get_contents('php://input')." POST headline".$_POST->headline;
-                    wp_die();
-                }
-
-                echo file_get_contents('php://input')." POST headline".$_POST->headline;
-                wp_die();
-                
-      */
-        switch ($_GET['todo']) {
-
-            case "getUserFeed":
-
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic ' . $basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request(CONFIG_BLORM_READAPI . "/content/userfeed", $args);
-                break;
-
-            case "getUserData":
-
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic ' . $basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request(CONFIG_BLORM_READAPI . "/user/profile", $args);
-                break;
-
-            case "new_post":
-
-                //$target_dir = get_home_path() . "wp-content/uploads/";
-                //$target_file = $target_dir . basename($_FILES["file"]["name"]);
-                //$imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
-                //if (move_uploaded_file($_FILES["file"], $target_file)) {
-
-
-                $uploadedfile = $_FILES['file'];
-
-                $upload_overrides = array( 'test_form' => false );
-
-                $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
-
-                if ( $movefile && ! isset( $movefile['error'] ) ) {
-                    echo "File is valid, and was successfully uploaded to: ".$movefile['file'];
-                    //var_dump( $movefile );
-                } else {
-                    /**
-                     * Error generated by _wp_handle_upload()
-                     * @see _wp_handle_upload() in wp-admin/includes/file.php
-                     */
-                    $error_message = "file upload error for file: ".$movefile['error'];
-                }
-
-                $file = @fopen( $movefile['file'], 'r' );
-                $file_size = filesize( $movefile['file'] );
-                $file_data = fread( $file, $file_size );
-
-                    $response = wp_remote_post(CONFIG_BLORM_WRITEAPI . "/content", array(
-                            'method' => 'POST',
-                            'timeout' => 45,
-                            'redirection' => 5,
-                            'httpversion' => '1.0',
-                            'blocking' => true,
-                            'headers' => array(
-                                'Authorization' => 'Basic ' . $basicauth64
-                                ),
-                            'body' => array(
-                                'headline' => $_POST['headline'],
-                                'content' => $_POST['text'],
-                                'url' => $_POST['url'],
-                                'file' => $movefile['url']),
-                            'cookies' => array()
-                        )
-                    );
-                //} else {
-                  //  $error_message = "file upload error for file: ".$target_file;
-                //}
-
-                break;
-
-            case "post_share":
-
-
-                $response = wp_remote_post(CONFIG_BLORM_WRITEAPI . "/content/share", array(
-                        'method' => 'POST',
-                        'timeout' => 45,
-                        'redirection' => 5,
-                        'httpversion' => '1.0',
-                        'blocking' => true,
-                        'headers' => array(
-                            'Authorization' => 'Basic ' . $basicauth64
-                        ),
-                        'body' => array(
-                            'id' => $_POST['id'],
-                            'headline' => $_POST['headline'],
-                            'content' => $_POST['text'],
-                            'url' => $_POST['url'],
-                            'file' => $_POST['filepath']),
-                        'cookies' => array()
-                    )
-                );
-                //} else {
-                //  $error_message = "file upload error for file: ".$target_file;
-                //}
-
-                break;
-
-            case "post_reblog":
-
-                $content = "<a href='".$_POST['url']."'><img src='".$_POST['filepath']."'><p>". $_POST['text']."</p></a>";
-
-
-                $post_id = wp_insert_post( array(
-                    'post_title'        => '<span class=\'blorm_reblog\'>'.$_POST['headline'].'</span>',
-                    'post_content'      => $content,
-                    'post_status'       => 'publish',
-                    'post_category'     => 'Blorm',
-                    'post_type'         => 'blorm_reblog'
-                ) );
-
-                if ( $post_id != 0 )
-                {
-                    $response = '*Post Added | ';
-
-                    $response .= wp_remote_post( CONFIG_BLORM_WRITEAPI."/reaction/reblogPost", array(
-                            'method' => 'POST',
-                            'timeout' => 45,
-                            'redirection' => 5,
-                            'httpversion' => '1.0',
-                            'blocking' => true,
-                            'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                            'body' => array(
-                                'id' => $_POST['id']
-                            ),
-                            'cookies' => array()
-                        )
-                    );
-
-
-                }
-                else {
-                    $response = '*Error occurred while adding the post';
-                }
-                // Return the String
-
-                break;
-
-            case "delete_post":
-
-
-                $contentId = "0d7415dc-c5d7-11e8-8080-80015de642d5";
-
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'DELETE'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_WRITEAPI."/content/".$contentId, $args );
-                break;
-
-            case "new_post_comment":
-
-                $response = wp_remote_post( CONFIG_BLORM_WRITEAPI."/comment", array(
-                        'method' => 'POST',
-                        'timeout' => 45,
-                        'redirection' => 5,
-                        'httpversion' => '1.0',
-                        'blocking' => true,
-                        'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                        'body' => array(
-                            'text' => $_POST['text'],
-                            'id' => $_POST['id']
-                        ),
-                        'cookies' => array()
-                    )
-                );
-
-                break;
-
-            case "delete_comment":
-
-                $contentId = "0d7415dc-c5d7-11e8-8080-80015de642d5";
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'DELETE'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_WRITEAPI."/comment/".$contentId, $args );
-                break;
-
-            case "follow_user":
-
-                if ($_GET['blogId'] == "") {
-                    $error_message = "noid";
-                    break;
-                }
-
-                $blogId = $_GET['blogId'];
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_WRITEAPI."/blog/follow/this/".$blogId, $args );
-                break;
-
-            case "unfollow_user":
-
-                if ($_GET['blogId'] == "") {
-                    $error_message = "noid";
-                    break;
-                }
-
-                $blogId = $_GET['blogId'];                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_WRITEAPI."/blog/unfollow/this/".$blogId, $args );
-                break;
-
-            case "getListOfFollowableBlogs":
-
-                $blogId = "user_perisphere_com";
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_READAPI."/blog/listfollowablefeeds", $args );
-                break;
-
-            case "getListOfAllBlogs":
-
-                $blogId = "user_perisphere_com";
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_READAPI."/blog/listallfeeds", $args );
-                break;
-
-            case "getListOfFollowingBlogs":
-
-                $blogId = "user_perisphere_com";
-                $args = array(
-                    'headers' => array('Authorization' => 'Basic '.$basicauth64),
-                    'method' => 'GET'
-                );
-
-                $response = wp_remote_request( CONFIG_BLORM_READAPI."/blog/listfollowedfeeds", $args );
-                break;
-
-
-            default:
-
-                break;
-        }
-
-
-        if (is_wp_error($response)) {
-            status_header(404);
-            $error_message = $response->get_error_message();
-            echo "{ blormerror,".$error_message."}";
-        }
-
-        if (!empty($error_message)) {
-            status_header(404);
-            echo "{ blormerror,".$error_message."}";
-        }
-
-        status_header(200);
-        header('Content-Type: application/json');
-        echo $response['body'];
-
-        //echo "blorm_ajax_request_ok_".$_POST->headline;
-        wp_die(); // this is required to terminate immediately and return a proper response
+    function rest_blorm_api_endpoint() {
+
+        // http://blog1.blorm/wp-json/blormapi/v1/
+
+        // Register the GET route
+        register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'rest_blormapi_handler'),
+        ));
+
+        // Register the POST route
+        /*register_rest_route( 'blormapi/v1', '/file/upload', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'rest_blormapi_handler_file_upload'),
+        ));*/
+
+        // Register the POST route
+        register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'rest_blormapi_handler'),
+        ));
+
+        // Register the PUT route
+        register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
+            'methods' => 'PUT',
+            'callback' => array($this, 'rest_blormapi_handler'),
+        ));
+
+        // Register the DELETE route
+        register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
+            'methods' => 'DELETE',
+            'callback' => array($this, 'rest_blormapi_handler'),
+        ));
 
     }
 
+    function rest_blormapi_handler(WP_REST_Request $request) {
 
+        if ( !is_user_logged_in() ) {
+            return new WP_REST_Response(array("message" =>"user not logged in"),200 ,array('Content-Type' => 'application/json'));
+        }
+
+        if(!empty($_FILES['uploadfile'])) {
+            //error_log("_FILES 'file': ".$_FILES['file']);
+
+            /*if(!empty($_FILES['file'])) {
+                return new WP_REST_Response(array("message" => "no_file_data"),200 ,array('Content-Type' => 'application/json'));
+            }*/
+
+            if ( ! function_exists( 'wp_handle_upload' ) ) require_once( ABSPATH . 'wp-admin/includes/file.php' );
+
+
+            $uploadFile = $_FILES['uploadfile'];
+            $upload_overrides = array( 'test_form' => false );
+            $movedFile = wp_handle_upload( $uploadFile, $upload_overrides );
+
+            error_log("movefile: ".$movedFile['url']);
+
+
+            if ( $movedFile && ! isset( $movdFile['error'] ) ) {
+                return new WP_REST_Response(array("message" => "success", "url" => $movedFile['url']),200 ,array('Content-Type' => 'application/json'));
+
+            }
+            return new WP_REST_Response(array("message" => "upload_error"),200 ,array('Content-Type' => 'application/json'));
+        }
+
+
+
+        $params = $request->get_params();
+        error_log("api url: ".CONFIG_BLORM_APIURL ."/".$params['restparameter']);
+        // error_log("body : ".$request->get_body());
+
+        $args = array(
+            'headers' => array('Authorization' => 'Bearer '.$this->a_config['apikey'], 'Content-type' => 'application/json'),
+            'method' => $request->get_method(),
+            'body' => $request->get_body(),
+            'data_format' => 'body',
+        );
+
+        $response = wp_remote_request(CONFIG_BLORM_APIURL ."/". $params['restparameter'], $args);
+        //error_log("response: ".wp_remote_retrieve_body($response));
+
+        return new WP_REST_Response(json_decode(wp_remote_retrieve_body($response)),200 ,array('Content-Type' => 'application/json'));
+
+    }
+
+    function rest_blormapi_file_upload(WP_REST_Request $request) {
+
+        if ( !is_user_logged_in() ) {
+            return new WP_REST_Response(array("message" =>"user not logged in"),200 ,array('Content-Type' => 'application/json'));
+        }
+
+        error_log("_FILES 'file': ".$_FILES['file']);
+
+        if(!empty($_FILES['file'])) {
+            return new WP_REST_Response(array("message" => "no_file_data"),200 ,array('Content-Type' => 'application/json'));
+        }
+
+        $uploadedfile = $_FILES['file'];
+        $upload_overrides = array( 'test_form' => false );
+        $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+
+        error_log("movefile: ".$movefile);
+
+
+        if (isset( $movefile['error'])) {
+            return new WP_REST_Response(array("message" => "upload_error"),200 ,array('Content-Type' => 'application/json'));
+        }
+
+        return new WP_REST_Response(array("message" => "success", "url" => $movefile['file']),200 ,array('Content-Type' => 'application/json'));
+        /*$file = @fopen( $movefile['file'], 'r' );
+        $file_size = filesize( $movefile['file'] );
+        $file_data = fread( $file, $file_size );*/
+    }
 
 }
 
@@ -490,3 +290,118 @@ $blormapp = new Blorm();
 
 // Run Plugin.
 $blormapp->setup();
+
+
+/*add_action( 'wp_enqueue_scripts', 'rest_site_scripts', 999 );
+function rest_site_scripts() {
+    // Enqueue our JS file
+    wp_enqueue_script( 'rest_appjs',
+        get_template_directory_uri() . '/assets/js/app.js',
+        array( 'jquery' ),  get_template_directory() . '/assets/js/app.js', true
+    );
+
+    // Provide a global object to our JS file contaning our REST API endpoint, and API nonce
+    // Nonce must be 'wp_rest' !
+    wp_localize_script( 'rest_appjs', 'rest_object',
+        array(
+            'api_nonce' => wp_create_nonce( 'wp_rest' ),
+            'api_url'   => site_url('/wp-json/rest/v1/')
+        )
+    );
+}
+
+
+add_action( 'rest_api_init', 'rest_validate_email_endpoint' );
+function rest_validate_email_endpoint() {
+    // Declare our namespace
+    $namespace = 'rest/v1';
+
+    // Register the route
+    register_rest_route( $namespace, '/email/', array(
+        'methods'   => 'POST',
+        'callback'  => 'rest_validate_email_handler',
+        'args'      => array(
+            'email'  => array( 'required' => true ), // This is where we could do the validation callback
+        )
+    ) );
+}
+*/
+// The callback handler for the endpoint
+/*function rest_validate_email_handler( $request ) {
+    // We don't need to specifically check the nonce like with admin-ajax. It is handled by the API.
+    $params = $request->get_params();
+
+    // Check if email is valid
+    if ( is_email( $params['email']) ) {
+        return new WP_REST_Response( array('message' => 'Valid email.'), 200 );
+    }
+
+    // Previous check didn't pass, email is invalid.
+    return new WP_REST_Response( array('message' => 'Not a valid email.'), 200 );
+}*/
+
+/*
+add_action( 'wp_ajax_nopriv_blormAjaxApi', 'blormAjaxApi');
+
+
+function blormAjaxApi() {
+
+
+
+    /*$args = array(
+             'headers' => array('Authorization' => 'Bearer thWO90Lbfw1M19MbjkmEIhkgwm0URKkwlJgenolCwxNs9HCnjo9Amwohm5zb', 'Content-type' => 'application/json'),
+             'method' => 'GET',
+             'body' => json_encode(
+                 array(
+                  '@context' => 'https://www.w3.org/ns/activitystreams',
+                  'summary' => 'user gets his timeline',
+                     'type' => 'read')
+             ),
+    );
+
+    $response = wp_remote_request(CONFIG_BLORM_APIURL . "/user/timeline", $args);
+
+    status_header(200);
+
+    echo json_encode("hello blorm");
+
+    //$result = file_get_contents(CONFIG_BLORM_APIURL, 0, $ctx);
+
+    //echo $result;
+    wp_die(); // this is required to terminate immediately and return a proper response
+}
+
+
+add_action( 'wp_ajax_my_action', 'my_action' );
+
+function my_action() {
+    global $wpdb; // this is how you get access to the database
+
+    $whatever = intval( $_POST['whatever'] );
+
+    $whatever += 10;
+
+    echo $whatever;
+
+    wp_die(); // this is required to terminate immediately and return a proper response
+}
+
+add_action( 'admin_footer', 'my_action_javascript' ); // Write our JS below here
+
+function my_action_javascript() { ?>
+    <script type="text/javascript" >
+        jQuery(document).ready(function($) {
+
+            var data = {
+                'action': 'my_action',
+                'whatever': 1234
+            };
+
+            // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+            jQuery.post(ajaxurl, data, function(response) {
+                alert('Got this from the server: ' + response);
+            });
+        });
+    </script> <?php
+}*/
+
