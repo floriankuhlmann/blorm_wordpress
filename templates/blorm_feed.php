@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * Created by PhpStorm.
  * User: florian
@@ -7,7 +9,27 @@
  */ ?>
 
 <script type="application/javascript">
-
+    jQuery(document).ready(function() {
+        blormapp.feedmodule = new Vue({
+            el: '#Blorm_feedmodule',
+            created() {
+                this.posts[0] = {
+                    teaser: false,
+                    object: {
+                        type: "init"
+                    },
+                };
+                blormapp.core.feedTimeline();
+            },
+            data: {
+                postsx: [],
+                posts: [],
+                blormusername: null,
+                newcomment: blormapp.core.data.initCommentText,
+            },
+            methods: {}
+        });
+    });
 
 </script>
 

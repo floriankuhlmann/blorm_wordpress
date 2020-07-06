@@ -64,7 +64,7 @@
 
 .Blorm_Blormfeed_Post {
     margin-bottom: 3rem;
-    padding:1rem 0.5rem 1rem 0.5rem;
+    padding:0.5rem 0.5rem 1rem 0.5rem;
     border:1px solid #eee;
     background-color: rgb(252, 252, 252);
 }
@@ -92,15 +92,35 @@
     float: right;
 }
 
-.Blorm_Blormfeed_Postcomment {
-    background-color: rgb(246, 246, 246);;
-    color:black;
+.Blorm_Blormfeed_Postcomment_Content {
     padding: 0.25rem;
     margin-top: 0.5rem;
+    display: inline-block;
+    width:90%;
+}
+.Blorm_Blormfeed_Postcomment_Content_Text{
+    display: block;
+    padding: 0.5rem;
+    border-radius: 5px;
+    background-color: rgb(246, 246, 246);
+    font-style: italic;
+}
+.Blorm_Blormfeed_Postcomment_Content_Date{
+    display: block;
+}
+.Blorm_Blormfeed_Postcomment_User {
+    display: inline-block;
+    width:5%;
+    padding: 0.25rem;
+    margin-top: 0.5rem;
+    font-weight: bold;
+    float: left;
 }
 
-.Blorm_Blormfeed_Action--comment {
-
+.Blorm_Blormfeed_Postcomment_Date {
+    display: block;
+    text-align: left;
+    margin-left: 2rem;
 }
 
 .Blorm_Blormfeed_Action--comment-textbox {

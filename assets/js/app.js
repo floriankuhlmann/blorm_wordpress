@@ -1,38 +1,125 @@
 jQuery(document).ready(function() {
 
     blormapp.core = {
+        data: {
+            initCommentText: "Leave a comment. Please remember, be nice!"
+        },
         feedTimeline: function() {
 
-            axios.get(restapiVars.root+'blormapi/v1/feed/timeline',
+            axios.get(
+                restapiVars.root+'blormapi/v1/feed/timeline',
                 {
                     headers: {
                         'Content-Type': 'application/json',
                         'X-WP-Nonce': restapiVars.nonce,
                     }
                 }).then(response => {
-                    blormapp.feedmodule.posts = response.data;
+                    var postData = {};
+                    console.log(JSON.stringify(response));
 
-                    console.log('blormfeed:');
-                    console.log(JSON.stringify(response.data));
+                    /*if (response.data.length == 0) {
+                        console.log("response.data 0");
+                        var data = {};
+                        data.teaser = false;
+                        data.error = false;
+                        data.object = {
+                            type: "init",
+                        };
 
-                    blormapp.feedmodule.posts = JSON.parse(JSON.stringify(response.data));
+                        blormapp.feedmodule.postsx[0] = data;
+                        //return;
+                    //};*/
+                    console.log("response.data");
+                    console.log(response.data);
+                    postData = response.data.map(function (value) {
+                        var data = {};
+                        // check for errors in the data
+                        if (value.object.data.error) {
+                            data.error = true;
+                            return data;
+                        }
+                        // if we have an referenced object
+                        if (value.object) {
+                            data.error = false;
+                            data.teaser = true;
+                            data.activityId = value.id;
+                            data.object = {
+                                iri: value.object.id,
+                                type: "teaser",
+                                verb: value.verb,
+                                time: value.time,
+                                headline: value.object.data.data.headline,
+                                text: value.object.data.data.text,
+                                image: value.object.data.data.image,
+                                url: value.object.data.data.url,
+                            };
+                            data.actor = {
+                                id: value.actor.id,
+                                name: value.actor.data.data.name,
+                                userName: value.actor.data.data.username,
+                                photoUrl: value.actor.data.data.photoUrl,
+                                website: value.actor.data.data.website,
+                            };
+                            data.ownReactions = value.own_reactions;
+                            data.reactionCounts = value.reaction_counts;
+                            data.latestReactions = value.latest_reactions;
+
+                            return data;
+                        }
+                        if (value.teaser) {
+                            data.error = false;
+                            data.teaser = true;
+                            data.activityId = value.id;
+                            data.object = {
+                                iri: value.object.id,
+                                type: "teaser",
+                                verb: value.verb,
+                                time: value.time,
+                                headline: value.teaser.headline,
+                                text: value.teaser.text,
+                                image: value.teaser.image,
+                                url: value.teaser.url,
+                            };
+                            data.actor = {
+                                id: value.actor.id,
+                                userName: ":-)",
+                                photoUrl: "",
+                                website: "",
+                            };
+                            data.ownReactions = value.own_reactions;
+                            data.reactionCounts = value.reaction_counts;
+                            data.latestReactions = value.latest_reactions;
+
+                            return data;
+                        }
+
+                    });
+                    if ( postData.length > 0) {
+                        blormapp.feedmodule.posts = postData;
+                    }
                 })
                 .catch(error => {
                     console.log(error)
                 });
         },
-        postShare: function(source, event) {
+        postShare: function(verb, event, post) {
 
             var shareJSONObj = {
                 "@context": "https://www.w3.org/ns/activitystreams",
-                "summary": "userX "+source+"d a post from userY",
-                "type": source,
+                "verb": post.object.verb,
+                "type": $(event.target).parent().data('objecttype'),
                 "origin_post": {
-                    "activity_id": $(event.target).parent().data('id')
+                    "object_iri": $(event.target).parent().data('objectiri'),
+                    "activity_id": $(event.target).parent().data('activityid')
+                },
+                "origin_post_data": {
+                    "headline": post.object.headline,
+                    "text": post.object.text,
+                    "image": post.object.image,
+                    "url": post.object.url,
                 }
             };
-
-            // update the feed
+            console.log(post);
             axios.post(
                 restapiVars.root+'blormapi/v1/blogpost/share',
                 shareJSONObj,
@@ -42,23 +129,17 @@ jQuery(document).ready(function() {
                         'X-WP-Nonce': restapiVars.nonce,
                     }
                 }).then(function (response) {
-                    console.log(response);
+
                     // update the feed
                     blormapp.core.feedTimeline();
 
                     // reset interface status
                     jQuery("#selectblogpost").val(0).prop('selected', true);
-                    console.log(blormapp.feedmodule.posts);
-
                 }).catch(function (error) {
                     console.log(error);
                 });
         },
         postCreate: function(createJSONObj) {
-
-            console.log(JSON.stringify(createJSONObj));
-
-
             axios.post(
                 restapiVars.root+'blormapi/v1/blogpost/create',
                 createJSONObj,
@@ -69,23 +150,24 @@ jQuery(document).ready(function() {
                     }
                 }).then(function (response) {
 
+                    if (response.data.message == "api.error: teaser with given ID already exists") {
+                        alert("Sorry, not possible. You already shared this post.");
+                        return;
+                    }
+
                     // update the feed
                     blormapp.core.feedTimeline();
-                    console.log(response);
+
                     return true;
 
                 }).catch(function (error) {
                     console.log(error);
+
                     return false;
                 });
         },
         postFileUpload: function(file) {
-
-            console.log("postFileUpload");
             var promiseObj = new Promise(function(fullfill, reject){
-                //Add ajax code here.
-                console.log("file");
-                console.log(file);
                 bodyFormData = new FormData();
                 bodyFormData.append('uploadfile', file)
                 axios.post(
@@ -98,16 +180,11 @@ jQuery(document).ready(function() {
                         }
                     }).then(function (response) {
                         // on success, call fullfill method, to resolve
-                        console.log(response.data);
                         fullfill(response);
-                        //return response.data;
                     }).catch(function (response) {
-                        console.log(response.data);
                         reject(response);
                         //return response.data;
                 });
-
-                // on error, call reject method, to reject
             });
             //Returns Promise object
             return promiseObj;
@@ -129,182 +206,222 @@ jQuery(document).ready(function() {
                     console.log("error:");
                     console.log(error)
                 });
-        }
+        },
+        postDelete: function (activityId) {
+            blormapp.core.feedTimeline();
+            axios.get(restapiVars.root+'blormapi/v1/blogpost/delete/'+activityId,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,
+                    }
+                }).then(function (response) {
+                    console.log(response);
+                    // update the feed
+                    blormapp.core.feedTimeline();
+                    return true;
+
+                })
+                .catch(error => {
+                    console.log(error)
+                });
+
+        },
+        postComment: function (commentText, activityId) {
+            // `this` inside methods points to the Vue instance
+
+            if (commentText == "" ||activityId == "") {
+                return;
+            }
+
+            var shareJSONObj = {
+                "@context": "https://www.w3.org/ns/activitystreams",
+                "parent_post": {
+                    "activity_id": activityId,
+                },
+                "comment": {
+                    "text": commentText,
+                }
+            };
+
+            jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","0.5");
+            jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', true);
+
+            axios.post(
+                restapiVars.root+'blormapi/v1/comment/create',
+                shareJSONObj,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,
+                    }
+                }).then(function (response) {
+                    jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","1");
+                    jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', false);
+
+                    // update the feed
+                    blormapp.core.feedTimeline();
+                })
+                .catch(function (error) {
+                    console.log(error);y
+                });
+        },
     };
 
     Vue.component('blorm-feed-comment', {
         props: ['latest_reactions'],
         methods: {
             showdate: function (ISOdate) {
-                var date = new Date(ISOdate);
-                var timeString = date.toUTCString();
-                return timeString;
+                var date = new Date(ISOdate   );
+                //var timeString = date.toUTCString();
+
+                return moment(date.getTime() + 60*60*1000*2).fromNow();
+            },
+            getUrl: function (url) {
+                return "http://"+url;
             }
         },
         template: //'<div v-if="latest_reactions.comment">' +
-            '<div>' +
+            '<div class="Blorm_Blormfeed_Postcomments>">' +
             '<template v-for="commentitem in latest_reactions.comment">' +
             '<div :data-id="commentitem.id" class="Blorm_Blormfeed_Postcomment">' +
-            '<b>{{commentitem.user_id}} </b> <span v-html="commentitem.data.text">{{commentitem.data.text}}</span> <br>' +
+            '<div class="Blorm_Blormfeed_Postcomment_User"><img :src="commentitem.user.data.data.photo_url" style="width:100%; height: auto;"></div>' +
+            '<div class="Blorm_Blormfeed_Postcomment_Content">' +
+            '<div class="Blorm_Blormfeed_Postcomment_Content_Text">' +
+            '<b><a :href="getUrl(commentitem.user.data.data.website)">{{commentitem.user.data.data.name}}</a></b> ' +
+            '<span v-html="commentitem.data.text"> {{commentitem.data.text}}</span></div>' +
+            '<div class="Blorm_Blormfeed_Postcomment_Content_Date"><small>{{showdate(commentitem.updated_at)}}</small><br></div>' +
             '</div>' +
-            '<small>{{showdate(commentitem.updated_at)}}</small><br>' +
+            '</div>' +
             '</template>' +
             '</div>'
     });
 
-
     Vue.component('blorm-feed-post-actions', {
         props: ['post','blormapp.core'],
         methods: {
-            postShare: function (source, event) {
-                blormapp.core.postShare(source, event);
+            postShare: function (verb, event) {
+                blormapp.core.postShare(verb, event, this.post);
             }
         },
         template:
-            '<div class="Blorm_Blormfeed_Action" :data-id="post.id" :data-headline="post.teaser.headline" :data-teaser="post.teaser.text" :data-url="post.teaser.url" :data-teaserimage="post.image">\n' +
+            '<div class="Blorm_Blormfeed_Action" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
             '<hr>\n' +
             '<button v-on:click="postShare(\'share\', $event)">share in timline</button> | <button v-on:click="postShare(\'reblog\', $event)">reblog</button>\n' +
             '</div>\n'
     });
 
-
-    // Define a new component called button-counter
     Vue.component('blorm-feed-post', {
         props: ['post','blormusername','newcomment'],
         computed: {
             postHeadline: function() {
-                switch (this.post.verb) {
+                switch (this.post.object.verb) {
                     case "share":
-                        statusline = "<img src='"+templateUrl+"/blorm/assets/icons/circle-sync-backup-1-glyph.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                            "You shared this post on " + this.showdate(this.post.time);
+                        statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
+                            "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/circle-sync-backup-1-glyph.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
+                            "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> shared this</b></div>";
                         break;
                     case "reblog":
-                        statusline = "<img src='"+templateUrl+"/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                            "You reblogged this post on " + this.showdate(this.post.time);
+                        statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
+                            "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
+                            "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> reblogged this</b></div>";
                         break;
                     case "create":
-                        statusline = "<img src='"+templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                            "You posted this on " + this.showdate(this.post.time);
+                        statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
+                            "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
+                            "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> posted this</b></div>";
                         break;
                     default:
-                        statusline = "<span>error sending post</span>";
+                        statusline = "<span>Welcome to BLORM</span>";
                         break;
                 }
+
                 return statusline;
             },
             postImage: function() {
-
-                if (this.post.teaser.image === "non" || this.post.teaser.image == null ) {
+                if (this.post.object.image === "non" || this.post.object.image == null ) {
                     return "";
                 }
 
-                return '<div class="Blorm_Blormfeed_Image"><img src="'+this.post.teaser.image+'"></div>';
-
+                return '<div class="Blorm_Blormfeed_Image"><img src="'+this.post.object.image+'"></div>';
             }
         },
         methods: {
             showdate: function (ISOdate) {
-                var date = new Date(ISOdate);
-                var timeString = date.toUTCString();
-                return timeString;
+                var date = new Date(ISOdate   );
+                //var timeString = date.toUTCString();
+
+                return moment(date.getTime() + 60*60*1000*2).fromNow();
             },
             getUserFromActor: function() {
                 return "username[1]";
             },
             commentchanged: function(event) {
+                if ($(event.target).html() == blormapp.core.data.initCommentText ) {
+                    console.log($(event.target).html());
+                    $(event.target).html("");
+                }
                 blormapp.commentdata_text = $(event.target).html().trim();
                 blormapp.commentdata_id = $(event.target).parent().data('id');
-
-                console.log($(event.target).parent().data('id'));
-                console.log(blormapp.commentdata_text);
             },
             postComment: function (event) {
-                // `this` inside methods points to the Vue instance
-                console.log('Lets comment now: '+blormapp.commentdata_text);
-
-                var bodyFormData = new FormData();
-                bodyFormData.set('text',blormapp.commentdata_text);
-                bodyFormData.set('id',blormapp.commentdata_id);
-
-                jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","0.5");
-                jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', true);
-
-                axios.post(ajaxapi+'?action=blorm&todo=new_post_comment',bodyFormData,{withCredentials: "true"})
-                    .then(function (response) {
-                        console.log(response);
-                        jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","1");
-                        jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', false);
-
-                        // update the feed
-                        blormapp.core.feedTimeline();
-
-                    })
-                    .catch(function (error) {
-                        console.log(error);y
-                    });
+                blormapp.core.postComment(
+                    blormapp.commentdata_text,
+                    blormapp.commentdata_id
+                );
             },
             postDelete: function (event) {
-                // `this` inside methods points to the Vue instance
-                alert('Lets delete !')
-                // `event` is the native DOM event
-                if (event) {
-                    alert(event.target.tagName)
-                }
+                blormapp.core.postDelete(
+                    $(event.target).data('activityid')
+                );
+                blormapp.core.feedTimeline();
             }
-
         },
-        template: '<div class="Blorm_Blormfeed_Post" :class="post.verb" :data-id="post.id">\n' +
+        template: '<span v-if="post.error === false">' +
+            '           <span v-if="post.teaser === true">' +
+            '           <div class="Blorm_Blormfeed_Post" :class="post.object.verb" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
             '                <div class="Blorm_Blormfeed_Edit">' +
             '                    <div class="Blorm_Blormfeed_Edit--Date">' +
-            '                       <b><span v-html="postHeadline"></span></b>' +
+            '                       <span v-html="postHeadline"></span>' +
             '                       <template>'  +
             '                           <div class="Blorm_Blormfeed_Edit--Mod">' +
-            '                               <button v-on:click="postDelete">delete</button>' +
+            '                               <button v-on:click="postDelete" :data-activityid="post.activityId">delete</button>' +
             '                           </div>\n' +
             '                       </template>\n' +
             '                       <hr class="Blorm_Blormfeed_Border">\n' +
             '                   </div>' +
             '                </div>\n' +
             '                <div class="Blorm_Blormfeed_Title">\n' +
-            '                    <h2 class="Blorm_Blormfeed_Title"><a :href="post.teaser.url">{{ post.teaser.headline }}</a></h2>\n' +
+            '                    <h2 class="Blorm_Blormfeed_Title"><a :href="post.object.url">{{ post.object.headline }}</a></h2>\n' +
             '                </div>\n' +
             '                <span v-html="postImage"></span>' +
             '                <div class="Blorm_Blormfeed_Content">\n' +
-            '                    <p>{{ post.teaser.text }}</p>\n' +
+            '                    <p>{{ post.object.text }}</p>\n' +
             '                </div>\n' +
             '                <div class="Blorm_Blormfeed_URL">\n' +
-            '                    <a :href="post.teaser.url"><i>read this</i></a>\n' +
+            '                    <a :href="post.object.url"><i>read this</i></a>\n' +
             '                </div>\n' +
             '                <blorm-feed-post-actions' +
             '                   v-bind:post="post">\n'+
             '                </blorm-feed-post-actions>'+
             '               <blorm-feed-comment' +
-            '               v-bind:latest_reactions="post.latest_reactions">\n' +
+            '               v-bind:latest_reactions="post.latestReactions">\n' +
             '               </blorm-feed-comment>\n' +
-            '               <div class="Blorm_Blormfeed_Action--comment" :data-id="post.id">            ' +
+            '               <div class="Blorm_Blormfeed_Action--comment" :data-id="post.activityId">            ' +
             '               <div contenteditable class="Blorm_Blormfeed_Action--comment-textbox" v-html="newcomment" v-on:keyup="commentchanged" v-on:blur="commentchanged" v-on:paste="commentchanged" v-on:delete="commentchanged" v-on:focus="commentchanged">' +
             '               </div>\n' +
             '                   <div class="Blorm_Blormfeed_Action">\n' +
             '                       <button v-on:click="postComment">comment</button>' +
             '                   </div>\n' +
             '               </div>\n' +
-            '            </div>\n'
-    });
+            '            </div>' +
+            '           </span>' +
+            '           <span v-else>' +
+            '           <div class="Blorm_Blormfeed_Post">' +
+            '               There is no post in your timeline.<br>Why dont you share something or follow someone?' +
+            '           </div>' +
+            '           </span>' +
+            '</span>'
 
-
-
-    blormapp.feedmodule = new Vue({
-        el: '#Blorm_feedmodule',
-        created() {
-            blormapp.core.feedTimeline();
-        },
-        data: {
-            posts: [],
-            blormusername: null,
-            newcomment: "Leave a comment. Please remember, be nice!"
-        },
-        methods: {
-
-        }
     });
 });

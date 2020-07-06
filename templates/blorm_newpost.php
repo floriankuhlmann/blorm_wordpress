@@ -48,7 +48,8 @@
 
                     var headline = this.headline;
                     var text = this.text;
-                    var posturl = jQuery("#selectblogpost").val();
+                    var posturl = "";
+                    var postid = jQuery("#selectblogpost").val();
 
                     jQuery( ".blorm-form-newpost" ).css("opacity","0.5");
                     jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', true);
@@ -72,7 +73,8 @@
                                 "text": text,
                                 "headline": headline,
                                 "url": posturl,
-                                "image": imageUrl
+                                "image": imageUrl,
+                                "postid": postid
                             }
                         };
 
@@ -120,9 +122,20 @@
                     <select id="selectblogpost">
                         <option value="0" disabled selected>Available Blogposts</option>
                     <?php
-                    $recent_posts = wp_get_recent_posts( $args );
-                    foreach( $recent_posts as $recent ){
-                    echo '<option value="' . get_permalink($recent["ID"]) . '">' .   $recent["post_title"].'</option>';
+                    $recent_posts = wp_get_recent_posts();
+                    $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1',));
+                    $i = 0;
+                    foreach ($recent_posts as $recent_post) {
+                        foreach ($recent_posts_with_meta as $rpm) {
+                            if ($recent_post["ID"] == $rpm["ID"]) {
+                                unset($recent_posts[$i]);
+                                continue;
+                            }
+                        }
+                        $i++;
+                    }
+                    foreach( $recent_posts as $recent_post ){
+                        echo '<option value="' . $recent_post["ID"] . '">' . $recent_post["post_title"].'</option>';
                     }
                     wp_reset_query();
                     ?>
@@ -133,6 +146,9 @@
                     <label for="teasertext" >Your teasertext</label>
                     <textarea v-model="text" id="teasertext" class="mceEditor" rows="3" cols="15" autocomplete="off"></textarea>
                     <span class="helper-text comment" data-error="wrong"></span>
+                    <?php
+
+                    ?>
                 </div>
                 <div class="file-field input-field">
                     <div class="btn-small">
