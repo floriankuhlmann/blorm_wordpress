@@ -104,6 +104,35 @@ function preRequestLocalPostsUpdate(&$request) {
             //error_log(json_encode($bodyObj));
 
             break;
+
+        // UNDO REBLOG
+        case (preg_match('/^(blogpost\/undo\/reblog)\/[a-z0-9-]+$/', $parameter["restparameter"]) ? true : false) :
+
+            $parameter = explode('/', $parameter["restparameter"]);
+
+            $delparameter = end($parameter);
+            error_log("postRequestLocalPostsUpdate blogpost\/undo\/reblog delparameter");
+            error_log("delparameter:".$delparameter);
+
+            $args = array('post_type' => 'blormpost', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
+            $the_query = get_posts( $args );
+            error_log("the_query: ".json_encode($the_query));
+
+            error_log($the_query[0]->ID);
+            //$recent_posts_with_meta = wp_get_recent_posts();
+
+            error_log("reblogged post to delete");
+           // error_log(json_encode($recent_posts_with_meta));
+
+           if (isset($the_query[0])) {
+                delete_post_meta($the_query[0]->ID,"blorm_reblog_teaser_image");
+                delete_post_meta($the_query[0]->ID,"blorm_reblog_teaser_url");
+                delete_post_meta($the_query[0]->ID,"blorm_reblog_object_iri");
+                delete_post_meta($the_query[0]->ID,"blorm_reblog_activity_id");
+                wp_delete_post($the_query[0]->ID);
+           }
+
+            break;
     }
 }
 
@@ -137,27 +166,49 @@ function postRequestLocalPostsUpdate($request, $response) {
             break;
 
         // REBLOG
-        case (preg_match('/^(blogpost\/share)\/?$/', $parameter["restparameter"]) ? true : false) :
+        case (preg_match('/^(blogpost\/reblog)\/?$/', $parameter["restparameter"]) ? true : false) :
             error_log("postRequestLocalPostsUpdate restparameter REBLOG");
 
-            $bodyObj = json_decode($body);
-            // save custom post
-            $post_id = wp_insert_post( array(
-                "post_title"        => "<span class=\'blorm_reblog\'>".$bodyObj->{'origin_post_data'}->{'headline'}."</span>",
-                "post_content"      => $bodyObj->{'origin_post_data'}->{'text'},
-                "post_status"       => "publish",
-                "post_category"     => array("Blorm"),
-                "post_type"         => "blormpost"
-            ));
+            if (!is_a($response, 'WP_Error' )){
 
-            add_post_meta($post_id,"blorm_reblog_teaser_image",$bodyObj->{'origin_post_data'}->{'image'});
-            add_post_meta($post_id,"blorm_reblog_teaser_url",$bodyObj->{'origin_post_data'}->{'url'});
-            add_post_meta($post_id,"blorm_reblog_object_iri",$bodyObj->{'origin_post'}->{'object_iri'});
-            add_post_meta($post_id,"blorm_reblog_activity_id",$bodyObj->{'origin_post'}->{'activity_id'});
+                $requestBodyObj = json_decode($body);
+                $responseBodyObj = json_decode($response["body"]);
 
-            error_log("postRequestLocalPostsUpdate restparameter CREATED: ".$post_id);
+                $content = "<span data-blorm-id=\"".$responseBodyObj->{'data'}->{'activity_id'}."\"><a href=\"".$requestBodyObj->{'origin_post_data'}->{'url'}."\">
+                            ".$requestBodyObj->{'origin_post_data'}->{'text'}."</a></span>";
+
+
+                // save custom post
+                $post_id = wp_insert_post(array(
+                    "post_title" => "<span class=\'blorm_reblog\'>" . $requestBodyObj->{'origin_post_data'}->{'headline'} . "</span>",
+                    "post_content" => $content,
+                    "post_status" => "publish",
+                    "post_category" => array("Blorm"),
+                    "post_type" => "blormpost"
+                ));
+
+                add_post_meta($post_id, "blorm_reblog_teaser_image", $requestBodyObj->{'origin_post_data'}->{'image'});
+                add_post_meta($post_id, "blorm_reblog_teaser_url", $requestBodyObj->{'origin_post_data'}->{'url'});
+                add_post_meta($post_id, "blorm_reblog_object_iri", $requestBodyObj->{'origin_post'}->{'object_iri'});
+
+                add_post_meta($post_id, "blorm_reblog_activity_id", $responseBodyObj->{'data'}->{'activity_id'});
+
+                error_log(json_encode($response["body"]));
+                error_log("postRequestLocalPostsUpdate restparameter CREATED: " . $post_id);
+            }
+            break;
+
+        // SHARE
+        case (preg_match('/^(blogpost\/share)\/?$/', $parameter["restparameter"]) ? true : false) :
+            error_log("postRequestLocalPostsUpdate restparameter share");
+
+            error_log(json_encode($body));
+
+            error_log("postRequestLocalPostsUpdate restparameter SHARED: ");
 
             break;
+
+
 
         // DELETE
         case (preg_match('/^(blogpost\/delete\/)[a-z0-9-]+$/', $parameter["restparameter"]) ? true : false) :

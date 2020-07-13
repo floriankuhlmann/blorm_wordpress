@@ -45,7 +45,9 @@ define( 'PLUGIN_BLORM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Plugin Root File.
 define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
-require_once plugin_dir_path( __FILE__ ) . '/classes/SetupActions.php';
+
+
+//require_once plugin_dir_path( __FILE__ ) . '/classes/SetupActions.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/settings.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';

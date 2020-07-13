@@ -19,10 +19,10 @@
                         type: "init"
                     },
                 };
+                blormapp.core.getUserData();
                 blormapp.core.feedTimeline();
             },
             data: {
-                postsx: [],
                 posts: [],
                 blormusername: null,
                 newcomment: blormapp.core.data.initCommentText,

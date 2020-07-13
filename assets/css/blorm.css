@@ -41,17 +41,36 @@
 }
 
 .FollowingBlogList_Blog {
-    width: 7.5rem;
-    height: 2.5rem;
-    /*border: 1px solid #e5e5e5;*/
+    width: 5rem;
     margin: 1px 5px 5px 1px;
-    padding: 5px 0rem 5px 5px;
+    padding: 5px 5px 0px 5px;
     float: left;
     word-wrap: break-word;
     word-break: break-all;
     cursor: pointer;
     background-color: #f6f6f6;
     color:#555;
+    overflow:hidden;
+    border-bottom: #f6f6f6 5px solid;
+
+}
+
+.FollowingBlogList_Blog_Img {
+    width: 5rem;
+    height: 5rem;
+    /*border: 1px solid #e5e5e5;*/
+
+    background-color: #f6f6f6;
+    color:#555;
+    overflow:hidden;
+    border-bottom: #f6f6f6 5px solid;
+
+}
+
+
+.FollowingBlogList_Blog_Img img {
+    width:100%;
+    height: auto;
 }
 
 .FollowingBlogList_Blog .name {

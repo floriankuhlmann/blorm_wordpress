@@ -29,7 +29,7 @@ function enqueue_blorm_admin_theme_style() {
         wp_enqueue_script('blorm-admin-theme-materialize', plugins_url('../assets/js/jquery-ui-1.12.1/jquery-ui.min.js', __FILE__));
 
         wp_enqueue_script('blorm-admin-theme-index', plugins_url('../assets/js/app.js', __FILE__));
-
+        wp_enqueue_script('blorm-admin-theme-index-feed', plugins_url('../assets/js/blorm/feed.js', __FILE__));
         /* Wordpress API backbone.js */
         wp_enqueue_script('wp-api');
 
@@ -61,15 +61,21 @@ function prepare_dashboard_meta() {
     //https://codex.wordpress.org/Dashboard_Widgets_API
     add_meta_box( 'id1', 'BLORM - New Post', 'dashboard_widget_blorm_newpost', 'dashboard', 'side', 'high' );
     /*
-    add_meta_box( 'id2', 'BLORM - Blogs to follow', array( __CLASS__, 'dashboard_widget_blorm_bloglist' ), 'dashboard', 'side', 'high' );
-    add_meta_box( 'id3', 'BLORM - i am following', array( __CLASS__, 'dashboard_widget_blorm_followingbloglist' ), 'dashboard', 'side', 'high' );*/
-    add_meta_box( 'id3', 'BLORM - User and blogs', 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'high' );
+    add_meta_box( 'id2', 'BLORM - Blogs to follow', array( __CLASS__, 'dashboard_widget_blorm_bloglist' ), 'dashboard', 'side', 'high' );*/
+    add_meta_box( 'id3', 'BLORM - User and blogs', 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'low' );
+    add_meta_box( 'id4', 'BLORM - i am following', 'dashboard_widget_blorm_followinglist' , 'dashboard', 'side', 'low' );
+
 }
 
 
 function dashboard_widget_blorm_usermodule() {
     // echo get list of blogusers
     require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_usermodule.php';
+}
+
+function dashboard_widget_blorm_followinglist() {
+    // echo get list of blogusers
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_followinglist.php';
 }
 
 function dashboard_widget_blorm_newpost() {
@@ -97,11 +103,36 @@ function add_dashboard_blorm_feed_widget() {
 
 function getConfigJs() {
 
-    $jsdata =   "var blogurl = '".CONFIG_BLORM_BLOGURL."';";
-    $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';";
-    $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;";
-    $jsdata .=  "var blormapp = {};";
-    $jsdata .=  "var templateUrl = '".plugins_url()."';";
+    global $a_config;
+
+    // prepare the request
+    $args = array(
+        'headers' => array('Authorization' => 'Bearer '.$a_config['apikey'], 'Content-type' => 'application/json'),
+        'method' => 'GET',
+        'body' => '',
+        'data_format' => 'body',
+    );
+
+    // @return array|WP_Error Array containing 'headers', 'body', 'response', 'cookies', 'filename'.
+    $response = wp_remote_request(CONFIG_BLORM_APIURL ."/user/data", $args);
+
+    //var_dump($response["body"]);
+    $jsonObjResponse = json_decode($response["body"]);
+
+
+    $jsdata =  "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
+    $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';\n";
+    $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;\n";
+    $jsdata .=  "var blormapp = {
+                user : {
+                    \"name\": \"".$jsonObjResponse->name."\",
+                    \"blormhandle\": \"".$jsonObjResponse->blormhandle."\",
+                    \"id\": \"".$jsonObjResponse->id."\",
+                    \"website\": \"".$jsonObjResponse->website."\",
+                    \"photo_url\": \"".$jsonObjResponse->photo_url."\",
+                },
+        };\n";
+    $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
 
     return $jsdata;
 }
