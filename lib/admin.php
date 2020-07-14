@@ -1,5 +1,6 @@
 <?php
 
+
 // Enqueue Stylesheet and Js for admin area.
 add_action( 'admin_enqueue_scripts', 'enqueue_blorm_admin_theme_style');
 add_action( 'vue_templates', 'add_vue_templates');
@@ -94,30 +95,19 @@ function add_vue_templates() {
 }
 
 function add_dashboard_blorm_feed_widget() {
+
+    global $blormUser;
+
     wp_add_dashboard_widget(
         'wpexplorer_dashboard_widget_feed', // Widget slug.
-        'Blorm - Newsfeed', // Title.
+        'Hello '. $blormUser->name.' this is your Blormfeed:', // Title.
         'dashboard_widget_blorm_feed' // Display function.
     );
 }
 
 function getConfigJs() {
 
-    global $a_config;
-
-    // prepare the request
-    $args = array(
-        'headers' => array('Authorization' => 'Bearer '.$a_config['apikey'], 'Content-type' => 'application/json'),
-        'method' => 'GET',
-        'body' => '',
-        'data_format' => 'body',
-    );
-
-    // @return array|WP_Error Array containing 'headers', 'body', 'response', 'cookies', 'filename'.
-    $response = wp_remote_request(CONFIG_BLORM_APIURL ."/user/data", $args);
-
-    //var_dump($response["body"]);
-    $jsonObjResponse = json_decode($response["body"]);
+    global $blormUser;
 
 
     $jsdata =  "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
@@ -125,11 +115,11 @@ function getConfigJs() {
     $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;\n";
     $jsdata .=  "var blormapp = {
                 user : {
-                    \"name\": \"".$jsonObjResponse->name."\",
-                    \"blormhandle\": \"".$jsonObjResponse->blormhandle."\",
-                    \"id\": \"".$jsonObjResponse->id."\",
-                    \"website\": \"".$jsonObjResponse->website."\",
-                    \"photo_url\": \"".$jsonObjResponse->photo_url."\",
+                    \"name\": \"".$blormUser->name."\",
+                    \"blormhandle\": \"".$blormUser->blormhandle."\",
+                    \"id\": \"".$blormUser->id."\",
+                    \"website\": \"".$blormUser->website."\",
+                    \"photo_url\": \"".$blormUser->photo_url."\",
                 },
         };\n";
     $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
