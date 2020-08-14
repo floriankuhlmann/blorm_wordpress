@@ -90,6 +90,8 @@ blormapp.core = {
                     }
                 });
                 if ( postData.length > 0) {
+                    console.log(postData);
+
                     blormapp.feedmodule.posts = postData;
                 }
             }).catch(error => {
@@ -404,8 +406,6 @@ blormapp.core = {
                     'Content-Type': 'application/json',
                     'X-WP-Nonce': restapiVars.nonce,}
             }).then(response => {
-                console.log("follower response:");
-                console.log(response);
                 blormapp.user.followers = response.data;
                 blormapp.blormFollowerListing.followingblogs = response.data;
                 return response.data;
@@ -432,5 +432,5 @@ blormapp.core = {
             }).catch(error => {
                     console.log(error)
             });
-        },
+        }
 };

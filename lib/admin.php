@@ -1,6 +1,5 @@
 <?php
 
-
 // Enqueue Stylesheet and Js for admin area.
 add_action( 'admin_enqueue_scripts', 'enqueue_blorm_admin_theme_style');
 add_action( 'vue_templates', 'add_vue_templates');
@@ -84,7 +83,7 @@ function dashboard_widget_blorm_newpost() {
     require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_newpost.php';
 }
 
-function dashboard_widget_blorm_feed() {
+function blorm_dashboard_widget_feed_function() {
     // echo the blorm feed
     require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_feed.php';
 }
@@ -96,33 +95,54 @@ function add_vue_templates() {
 
 function add_dashboard_blorm_feed_widget() {
 
-    global $blormUser;
+    $blormUserName = "*";
+
+    global $blormUserData;
+    if ($blormUserData->error == null) {
+        $blormUserName = $blormUserData->user->name;
+    }
 
     wp_add_dashboard_widget(
-        'wpexplorer_dashboard_widget_feed', // Widget slug.
-        'Hello '. $blormUser->name.' this is your Blormfeed:', // Title.
-        'dashboard_widget_blorm_feed' // Display function.
+        'blorm_dashboard_widget_feed', // Widget slug.
+        'Hello '. $blormUserName.' this is your Blormfeed:', // Title.
+        'blorm_dashboard_widget_feed_function' // Display function.
     );
 }
 
 function getConfigJs() {
 
-    global $blormUser;
-
-
-    $jsdata =  "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
+    $jsdata =   "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
     $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';\n";
     $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;\n";
-    $jsdata .=  "var blormapp = {
+    $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
+
+    // user data
+
+    $userdata =  "var blormapp = {
                 user : {
-                    \"name\": \"".$blormUser->name."\",
-                    \"blormhandle\": \"".$blormUser->blormhandle."\",
-                    \"id\": \"".$blormUser->id."\",
-                    \"website\": \"".$blormUser->website."\",
-                    \"photo_url\": \"".$blormUser->photo_url."\",
+                    \"name\": \"*\",
+                    \"blormhandle\": \"*\",
+                    \"id\": \"*\",
+                    \"website\": \"*\",
+                    \"photo_url\": \"*\",
                 },
         };\n";
-    $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
+
+    global $blormUserData;
+    if ($blormUserData->error == null) {
+        $userdata =  "var blormapp = {
+                user : {
+                    \"name\": \"".$blormUserData->user->name."\",
+                    \"blormhandle\": \"".$blormUserData->user->blormhandle."\",
+                    \"id\": \"".$blormUserData->user->id."\",
+                    \"website\": \"".$blormUserData->user->website."\",
+                    \"photo_url\": \"".$blormUserData->user->photo_url."\",
+                },
+        };\n";
+    }
+
+    $jsdata .= $userdata;
+
 
     return $jsdata;
 }

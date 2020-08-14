@@ -21,20 +21,19 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$a_config = require_once __DIR__.'/config.php';
-$options_r = get_option("blorm_plugin_options");
+require_once __DIR__.'/config.php';
 
 // Definee Configs
 define( 'CONFIG_BLORM_BLOGDOMAIN', get_bloginfo('wpurl'));
 define( 'CONFIG_BLORM_BLOGURL', get_bloginfo('wpurl'));
-define( 'CONFIG_BLORM_APIURL', $a_config['api']);
-define( 'CONFIG_BLORM_APIKEY', $options_r['api_key']);
+define( 'CONFIG_BLORM_APIURL', get_blorm_config_param('api'));
+define( 'CONFIG_BLORM_APIKEY', get_blorm_config_param('api_key'));
 
 // Define Plugin Name.
 define( 'PLUGIN_BLORM_NAME', 'Plugin Blorm' );
 
 // Define Version Number.
-define( 'PLUGIN_BLORM_VERSION', $a_config['version'] );
+define( 'PLUGIN_BLORM_VERSION', get_blorm_config_param('version') );
 
 // Plugin Folder Path.
 define( 'PLUGIN_BLORM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -50,6 +49,9 @@ define( 'PLUGIN_BLORM_FILE', __FILE__ );
 //require_once plugin_dir_path( __FILE__ ) . '/classes/SetupActions.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/settings.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
+
+$blormUserData = getUserDataFromBlorm();
+
 require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';

@@ -1,5 +1,7 @@
 jQuery(document).ready(function() {
 
+    console.log("feed.js loaded");
+
     Vue.component('blorm-feed-comment', {
     props: ['latest_reactions'],
     methods: {
@@ -27,7 +29,7 @@ jQuery(document).ready(function() {
         '</div>' +
         '</template>' +
         '</div>'
-});
+    });
 
     Vue.component('blorm-feed-post-actions', {
     props: ['post','blormapp.core'],
@@ -190,6 +192,6 @@ jQuery(document).ready(function() {
         '           </span>' +
         '</span>'
 
-});
+    });
 
 });

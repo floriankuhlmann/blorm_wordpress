@@ -55,9 +55,18 @@
                     jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', true);
 
                     responsePromise = blormapp.core.postFileUpload(this.file);
-                    responsePromise.then(handleUploadSuccess, handleUploadError);
+                    responsePromise.then(handleUploadResponse, handleUploadError);
 
-                    function handleUploadSuccess(response) {
+                    function handleUploadResponse(response) {
+
+                        if (response.data.error) {
+                            jQuery( ".helper-text.image" ).html(response.data.error);
+                            jQuery("#selectblogpost").val(0).prop('selected', true);
+                            jQuery( ".blorm-form-newpost" ).css("opacity","1");
+                            jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', false);
+
+                            return;
+                        }
 
                         var imageUrl = "non";
 
@@ -79,20 +88,24 @@
                         };
 
                         blormapp.core.postCreate(createJSONObj);
+                        // reset the filed data
+                        blormapp.appInput.headline = null;
+                        blormapp.appInput.text = null;
+                        blormapp.appInput.file = null;
 
                         jQuery("#selectblogpost").val(0).prop('selected', true);
                         jQuery( ".blorm-form-newpost" ).css("opacity","1");
                         jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', false);
+
+
                     }
 
-                    function handleUploadError() {
-                        jQuery( ".helper-text.image" ).html( "file uplaod is not possible. is file type jpg or png?" );
+                    function handleUploadError(response) {
+                        jQuery( ".helper-text.image" ).html( "file upload is not possible. is file type jpg or png?" );
                     }
 
-                    // reset the filed data
-                    blormapp.appInput.headline = null;
-                    blormapp.appInput.text = null;
-                    blormapp.appInput.file = null;
+
+
                 },
                 /*
                     Handles a change on the file upload
@@ -121,24 +134,24 @@
                     <label for="selectblogpost">Select a Blogpost to share</label>
                     <select id="selectblogpost">
                         <option value="0" disabled selected>Available Blogposts</option>
-                    <?php
-                    $recent_posts = wp_get_recent_posts();
-                    $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1',));
-                    $i = 0;
-                    foreach ($recent_posts as $recent_post) {
-                        foreach ($recent_posts_with_meta as $rpm) {
-                            if ($recent_post["ID"] == $rpm["ID"]) {
-                                unset($recent_posts[$i]);
-                                continue;
+                        <?php
+                        $recent_posts = wp_get_recent_posts();
+                        $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1',));
+                        $i = 0;
+                        foreach ($recent_posts as $recent_post) {
+                            foreach ($recent_posts_with_meta as $rpm) {
+                                if ($recent_post["ID"] == $rpm["ID"]) {
+                                    unset($recent_posts[$i]);
+                                    continue;
+                                }
                             }
+                            $i++;
                         }
-                        $i++;
-                    }
-                    foreach( $recent_posts as $recent_post ){
-                        echo '<option value="' . $recent_post["ID"] . '">' . $recent_post["post_title"].'</option>';
-                    }
-                    wp_reset_query();
-                    ?>
+                        foreach( $recent_posts as $recent_post ){
+                            echo '<option value="' . $recent_post["ID"] . '">' . $recent_post["post_title"].'</option>';
+                        }
+                        wp_reset_query();
+                        ?>
                     </select>
                     <span class="helper-text posturl" data-error="wrong"></span>
                 </div>
@@ -154,7 +167,7 @@
                     <div class="btn-small">
                         <span>Preview Image</span>
                         <input type="file" name="file"  id="file" ref="file" v-on:change="handleFileUpload()" accept="image/png, image/jpeg">
-                        <span class="helper-text image" data-error="wrong"></span>
+                        <div class="helper-text image" data-error="wrong"></div>
                     </div>
                 </div>
                 <div class="alignright">

@@ -29,6 +29,9 @@
                 },
                 followBlog: function() {
                     console.log(this.usernamefollow);
+                    //jQuery("#Blorm_usermodule_follow").val(0).prop('selected', true);
+                    $( "#Blorm-usermodule-follow" ).css("opacity","1");
+                    //jQuery( "#Blorm-usermodule-follow" ).prop('disabled', false);
                     blormapp.core.userFollowing(this.usernamefollow);
                 },
             }
@@ -39,7 +42,7 @@
 
 <!-- App -->
 <div id="Blorm_usermodule">
-    <div id="Blorm_available_blogs">
+    <div id="Blorm-usermodule-follow">
         <div id="appFeed" class="blorm-bloglist margin-bottom-10">
             <form @submit.prevent="followBlog">
                 <div id="title-wrap" class="input-text-wrap margin-bottom-10">

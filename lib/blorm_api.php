@@ -36,11 +36,13 @@ function rest_blorm_api_endpoint() {
 
 function rest_blormapi_handler(WP_REST_Request $request) {
 
-    global $a_config;
-
     if ( !is_user_logged_in() ) {
         return new WP_REST_Response(array("message" =>"user not logged in"),200 ,array('Content-Type' => 'application/json'));
     }
+
+    error_log("request:");
+    error_log($request->get_method());
+
 
     if(!empty($_FILES['uploadfile'])) {
 
@@ -63,13 +65,16 @@ function rest_blormapi_handler(WP_REST_Request $request) {
 
     // prepare the request
     $args = array(
-        'headers' => array('Authorization' => 'Bearer '.$a_config['apikey'], 'Content-type' => 'application/json'),
+        'headers' => array('Authorization' => 'Bearer '.get_blorm_config_param('api_key'), 'Content-type' => 'application/json'),
         'method' => $request->get_method(),
         'body' => $request->get_body(),
         'data_format' => 'body',
     );
     $params = $request->get_params();
     $response = wp_remote_request(CONFIG_BLORM_APIURL ."/". $params['restparameter'], $args);
+
+    error_log("response:");
+    //error_log(json_encode($response));
 
     // check after wp_remote_request (delete)
     postRequestLocalPostsUpdate($request,$response);
@@ -84,24 +89,21 @@ function preRequestLocalPostsUpdate(&$request) {
     $body = $request->get_body();
 
     switch($parameter["restparameter"]) {
+        //READ
+        case (preg_match('/^(user\/data)\/?$/', $parameter["restparameter"]) ? true : false) :
+
+            error_log($parameter["restparameter"]);
+            error_log(json_encode("hier user/data"));
+
+            break;
         // CREATE
         case (preg_match('/^(blogpost\/create)\/?$/', $parameter["restparameter"]) ? true : false) :
-
-            error_log("preRequestLocalPostsUpdate CREATE body:");
-            error_log(json_encode($body));
 
             // we need to modify the body, add the irl to the json-object in the body
             $bodyObj = json_decode($body);
 
-            error_log("postid ".$bodyObj->teaser->postid);
-            error_log("get_permalink ". get_permalink($bodyObj->teaser->postid));
             $bodyObj->teaser->url = get_permalink($bodyObj->teaser->postid);
             $request->set_body(json_encode($bodyObj));
-
-            error_log("preRequestLocalPostsUpdate CREATE body update url:");
-            error_log(json_encode($request->get_body()));
-
-            //error_log(json_encode($bodyObj));
 
             break;
 
@@ -111,26 +113,17 @@ function preRequestLocalPostsUpdate(&$request) {
             $parameter = explode('/', $parameter["restparameter"]);
 
             $delparameter = end($parameter);
-            error_log("postRequestLocalPostsUpdate blogpost\/undo\/reblog delparameter");
-            error_log("delparameter:".$delparameter);
 
             $args = array('post_type' => 'blormpost', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
             $the_query = get_posts( $args );
-            error_log("the_query: ".json_encode($the_query));
 
-            error_log($the_query[0]->ID);
-            //$recent_posts_with_meta = wp_get_recent_posts();
-
-            error_log("reblogged post to delete");
-           // error_log(json_encode($recent_posts_with_meta));
-
-           if (isset($the_query[0])) {
+            if (isset($the_query[0])) {
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_teaser_image");
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_teaser_url");
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_object_iri");
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_activity_id");
                 wp_delete_post($the_query[0]->ID);
-           }
+            }
 
             break;
     }
@@ -148,18 +141,14 @@ function postRequestLocalPostsUpdate($request, $response) {
         // CREATE
         case (preg_match('/^(blogpost\/create)\/?$/', $parameter["restparameter"]) ? true : false) :
 
-            error_log("postRequestLocalPostsUpdate CREATE");
-
             $bodyObj = json_decode($body);
 
-            error_log(json_encode($response));
             if ($response["response"]["code"] == "200") {
                 // we want to save the state of the post tp prevent reposting it later again (the content-object in getstream-database is unique)
                 add_post_meta($bodyObj->{'teaser'}->{'postid'},"blorm_create",true);
 
                 $rBody = json_decode($response["body"]);
                 add_post_meta($bodyObj->{'teaser'}->{'postid'},"blorm_create_activity_id",$rBody->data->activity_id);
-                error_log("activity_id: ".$rBody->data->activity_id);
 
             }
 
@@ -193,21 +182,17 @@ function postRequestLocalPostsUpdate($request, $response) {
 
                 add_post_meta($post_id, "blorm_reblog_activity_id", $responseBodyObj->{'data'}->{'activity_id'});
 
-                error_log(json_encode($response["body"]));
-                error_log("postRequestLocalPostsUpdate restparameter CREATED: " . $post_id);
             }
             break;
 
         // SHARE
         case (preg_match('/^(blogpost\/share)\/?$/', $parameter["restparameter"]) ? true : false) :
+
             error_log("postRequestLocalPostsUpdate restparameter share");
-
             error_log(json_encode($body));
-
             error_log("postRequestLocalPostsUpdate restparameter SHARED: ");
 
             break;
-
 
 
         // DELETE
@@ -215,16 +200,13 @@ function postRequestLocalPostsUpdate($request, $response) {
             $delparameter = explode('/', $parameter["restparameter"]);
 
             if ($response) {
-                //error_log("localFeeedUpdate restparameter DELETE: ".end($delparameter));
                 $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_activity_id', 'meta_value' => $delparameter));
-                //error_log(json_encode($recent_posts_with_meta));
-                //error_log("id".$recent_posts_with_meta[0]["ID"]);
                 delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create_activity_id");
                 delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create");
             }
             break;
 
         default:
-            error_log("localFeeedUpdate restparameter: no matches");
+            //error_log("localFeeedUpdate restparameter: no matches");
     }
 }

@@ -12,18 +12,9 @@
     jQuery(document).ready(function() {
         blormapp.feedmodule = new Vue({
             el: '#Blorm_feedmodule',
-            created() {
-                this.posts[0] = {
-                    teaser: false,
-                    object: {
-                        type: "init"
-                    },
-                };
-                blormapp.core.getUserData();
-                blormapp.core.feedTimeline();
-            },
+            created() {},
             data: {
-                posts: [],
+                posts: blormapp.core.feedTimeline(),
                 blormusername: null,
                 newcomment: blormapp.core.data.initCommentText,
             },
