@@ -21,77 +21,79 @@ blormapp.core = {
                     'X-WP-Nonce': restapiVars.nonce,}
             }).then(response => {
                 var postData = {};
-                postData = response.data.map(function (value) {
-                    var data = {};
-                    // check for errors in the data
-                    if (value.object.data.error) {
-                        data.error = true;
-                        data.errortype = value.object.data.error;
-                        return data;
-                    }
-                    if (typeof(value.object.data.data) == "undefined") {
-                        data.error = true;
-                        data.errortype = "data_undefined";
-                        return data;
-                    }
-                    // if we have an referenced object
-                    if (value.object) {
-                        data.error = false;
-                        data.teaser = true;
-                        data.activityId = value.id;
-                        data.object = {
-                            iri: value.object.id,
-                            type: "teaser",
-                            verb: value.verb,
-                            time: value.time,
-                            headline: value.object.data.data.headline,
-                            text: value.object.data.data.text,
-                            image: value.object.data.data.image,
-                            url: value.object.data.data.url,
-                        };
-                        data.actor = {
-                            id: value.actor.id,
-                            name: value.actor.data.data.name,
-                            userName: value.actor.data.data.username,
-                            photoUrl: value.actor.data.data.photoUrl,
-                            website: value.actor.data.data.website,
-                        };
-                        data.ownReactions = value.own_reactions;
-                        data.reactionCounts = value.reaction_counts;
-                        data.latestReactions = value.latest_reactions;
+                console.log(response);
+                if (response.data.length > 0) {
+                    postData = response.data.map(function (value) {
+                        var data = {};
+                        // check for errors in the data
+                        if (value.object.data.error) {
+                            data.error = true;
+                            data.errortype = value.object.data.error;
+                            return data;
+                        }
+                        if (typeof(value.object.data.data) == "undefined") {
+                            data.error = true;
+                            data.errortype = "data_undefined";
+                            return data;
+                        }
+                        // if we have an referenced object
+                        if (value.object) {
+                            data.error = false;
+                            data.teaser = true;
+                            data.activityId = value.id;
+                            data.object = {
+                                iri: value.object.id,
+                                type: "teaser",
+                                verb: value.verb,
+                                time: value.time,
+                                headline: value.object.data.data.headline,
+                                text: value.object.data.data.text,
+                                image: value.object.data.data.image,
+                                url: value.object.data.data.url,
+                            };
+                            data.actor = {
+                                id: value.actor.id,
+                                name: value.actor.data.data.name,
+                                userName: value.actor.data.data.username,
+                                photoUrl: value.actor.data.data.photoUrl,
+                                website: value.actor.data.data.website,
+                            };
+                            data.isOwner = (blormapp.user.id === value.actor.id);
+                            data.ownReactions = value.own_reactions;
+                            data.reactionCounts = value.reaction_counts;
+                            data.latestReactions = value.latest_reactions;
 
-                        return data;
-                    }
-                    if (value.teaser) {
-                        data.error = false;
-                        data.teaser = true;
-                        data.activityId = value.id;
-                        data.object = {
-                            iri: value.object.id,
-                            type: "teaser",
-                            verb: value.verb,
-                            time: value.time,
-                            headline: value.teaser.headline,
-                            text: value.teaser.text,
-                            image: value.teaser.image,
-                            url: value.teaser.url,
-                        };
-                        data.actor = {
-                            id: value.actor.id,
-                            userName: ":-)",
-                            photoUrl: "",
-                            website: "",
-                        };
-                        data.ownReactions = value.own_reactions;
-                        data.reactionCounts = value.reaction_counts;
-                        data.latestReactions = value.latest_reactions;
+                            return data;
+                        }
+                        if (value.teaser) {
+                            data.error = false;
+                            data.teaser = true;
+                            data.activityId = value.id;
+                            data.object = {
+                                iri: value.object.id,
+                                type: "teaser",
+                                verb: value.verb,
+                                time: value.time,
+                                headline: value.teaser.headline,
+                                text: value.teaser.text,
+                                image: value.teaser.image,
+                                url: value.teaser.url,
+                            };
+                            data.actor = {
+                                id: value.actor.id,
+                                userName: ":-)",
+                                photoUrl: "",
+                                website: "",
+                            };
+                            data.ownReactions = value.own_reactions;
+                            data.reactionCounts = value.reaction_counts;
+                            data.latestReactions = value.latest_reactions;
 
-                        return data;
-                    }
-                });
+                            return data;
+                        }
+                    });
+                }
                 if ( postData.length > 0) {
-                    console.log(postData);
-
                     blormapp.feedmodule.posts = postData;
                 }
             }).catch(error => {
@@ -189,16 +191,36 @@ blormapp.core = {
      */
     postShare: function(verb, event, post) {
 
-        var shareJSONObj = {
-            "@context": "https://www.w3.org/ns/activitystreams",
-            "verb": verb,
-            "type": $(event.target).parent().data('objecttype'),
-            "origin_post": {
-                "object_iri": $(event.target).parent().data('objectiri'),
-                "activity_id": $(event.target).parent().data('activityid')
-            }
-        };
-        console.log(post);
+
+        promiseObj = new Promise(function(fullfill, reject){
+            var shareJSONObj = {
+                "@context": "https://www.w3.org/ns/activitystreams",
+                "verb": verb,
+                "type": $(event.target).parent().data('objecttype'),
+                "origin_post": {
+                    "object_iri": $(event.target).parent().data('objectiri'),
+                    "activity_id": $(event.target).parent().data('activityid')
+                }
+            };
+            console.log(post);
+            console.log(shareJSONObj);
+            axios.post(
+                restapiVars.root+'blormapi/v1/blogpost/share',
+                shareJSONObj,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,}
+                }).then(response => {
+                fullfill(response);
+            }).catch(error => {
+                console.log(error);
+                reject(error);
+            });
+        });
+        //Returns Promise object
+        return promiseObj;
+        /*
         axios.post(
             restapiVars.root+'blormapi/v1/blogpost/share',
             shareJSONObj,
@@ -212,10 +234,9 @@ blormapp.core = {
             blormapp.core.feedTimeline();
 
             // reset interface status
-            jQuery("#selectblogpost").val(0).prop('selected', true);
         }).catch(function (error) {
             console.log(error);
-        });
+        });*/
     },
 
     /**
@@ -352,67 +373,89 @@ blormapp.core = {
     /**
      * userFollowing
      * @param blormhandle
+     * @returns {Promise<any>}
      */
     userFollowing: function (blormhandle) {
-        axios.get(
-            restapiVars.root+'blormapi/v1/blog/follow/blormhandle/'+blormhandle,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': restapiVars.nonce,}
-            }).then(response => {
-                console.log("response:");
-                console.log(response);
-                console.log(JSON.stringify(response.data));
-                this.getFollowersOfUser();
-            })
-            .catch(error => {
-                    console.log("error:");
-                    console.log(error)
+        console.log("userFollowing");
+        console.log(blormhandle);
+        promiseObj = new Promise(function(fullfill, reject){
+            axios.get(
+                restapiVars.root+'blormapi/v1/blog/follow/blormhandle/'+blormhandle,
+                {
+                    headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': restapiVars.nonce,
+                    },
+                }).then(response => {
+                    fullfill(response);
+                }).catch(error => {
+                    reject(error);
+                });
             });
-        },
+        //Returns Promise object
+        return promiseObj;
+    },
 
     /**
      * userUnFollowing
      * @param blormhandle
      */
     userUnFollowing: function (blormhandle) {
-        axios.get(
-            restapiVars.root+'blormapi/v1/blog/unfollow/blormhandle/'+blormhandle,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': restapiVars.nonce,}
-            }).then(response => {
-                console.log("response:");
-                console.log(response);
-                console.log(JSON.stringify(response.data));
-                this.getFollowersOfUser();
-            })
-            .catch(error => {
-                    console.log("error:");
-                    console.log(error)
-            });
-        },
 
+        promiseObj = new Promise(function(fullfill, reject){
+            axios.get(
+                restapiVars.root+'blormapi/v1/blog/unfollow/blormhandle/'+blormhandle,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,
+                    },
+                }).then(response => {
+                fullfill(response);
+            }).catch(error => {
+                reject(error);
+            });
+        });
+
+        //Returns Promise object
+        return promiseObj;
+    },
     /**
      * getFollowersOfUser
      */
     getFollowersOfUser: function() {
-        axios.get(
+        promiseObj = new Promise(function(fullfill, reject){
+            axios.get(
+                restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,
+                    },
+                }).then(response => {
+                fullfill(response);
+            }).catch(error => {
+                reject(error);
+            });
+        });
+        //console.log(promiseObj);
+        //Returns Promise object
+        return promiseObj;
+        /*axios.get(
             restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
             {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-WP-Nonce': restapiVars.nonce,}
             }).then(response => {
+                console.log(response.data);
                 blormapp.user.followers = response.data;
-                blormapp.blormFollowerListing.followingblogs = response.data;
+                //blormapp.blormFollowerListing.followingblogs = response.data;
                 return response.data;
             }).catch(error => {
              console.log("error:");
              console.log(error)
-            });
+            });*/
         },
 
     /**

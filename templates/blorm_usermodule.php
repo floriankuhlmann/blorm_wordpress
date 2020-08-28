@@ -10,29 +10,28 @@
                 usernamefollow: ''
             },
             methods: {
-                findObjectByKey: function (array, key, value) {
-                    for (var i = 0; i < array.length; i++) {
-                        if (array[i][key] === value) {
-                            return array[i];
-                        }
-                    }
-                    return null;
-                },
-                findObjectIndexByKey: function (array, key, value) {
-                    for (var i = 0; i < array.length; i++) {
-                        if (array[i][key] === value) {
-                            //return array[i];
-                            return i;
-                        }
-                    }
-                    return null;
-                },
                 followBlog: function() {
-                    console.log(this.usernamefollow);
-                    //jQuery("#Blorm_usermodule_follow").val(0).prop('selected', true);
-                    $( "#Blorm-usermodule-follow" ).css("opacity","1");
-                    //jQuery( "#Blorm-usermodule-follow" ).prop('disabled', false);
-                    blormapp.core.userFollowing(this.usernamefollow);
+
+                    responsePromise = blormapp.core.userFollowing(this.usernamefollow);
+                    responsePromise.then(this.handleFollowUserSuccess, this.handleFollowUserError);
+
+                },
+                handleFollowUserSuccess: function (response) {
+                    if (response.data.message == "NoUserData") {
+                        //jQuery( ".helper-text.followuser" ).html( "Cant find userhandle '"+this.usernamefollow+"'" );
+                        jQuery(".BlormFeedbackBox").css('display','inline');
+                        jQuery( ".BlormFeedbackBoxText" ).html( "Cant find userhandle '"+this.usernamefollow+"'" );
+                        jQuery( "#usernamefollow" ).val("");
+                    } else {
+                        jQuery( "#usernamefollow" ).val("");
+                        jQuery(".BlormFeedbackBox").css('display','inline');
+                        jQuery( ".BlormFeedbackBoxText" ).html( "You are following <br>'"+this.usernamefollow+"' now." );
+                        blormapp.core.getFollowersOfUser();
+                    }
+                },
+                handleFollowUserError: function (response) {
+                    console.log("error:");
+                    console.log(response);
                 },
             }
         });
@@ -41,14 +40,14 @@
 
 
 <!-- App -->
-<div id="Blorm_usermodule">
+<div id="Blorm_usermodule" class="BlormUserModule">
     <div id="Blorm-usermodule-follow">
         <div id="appFeed" class="blorm-bloglist margin-bottom-10">
             <form @submit.prevent="followBlog">
                 <div id="title-wrap" class="input-text-wrap margin-bottom-10">
                     <label for="usernamefollow">Insert account name to follow</label>
                     <input v-model="usernamefollow" id="usernamefollow" type="text" class="validate">
-                    <span data-error="wrong" class="helper-text headline"></span>
+                    <span data-error="wrong" class="helper-text followuser"></span>
                 </div>
                 <div class="alignright">
                     <?php submit_button( $text = 'Follow blog', $type = 'primary', $name = 'submit', $wrap = false, $other_attributes = null );?>
@@ -57,5 +56,10 @@
             </form>
         </div>
     </div>
+</div>
+
+<div class="BlormFeedbackBox" onclick="this.style.display = 'none'">
+    <span class="BlormFeedbackBoxText"></span>
+    <!-- <p><i>click to close this window</i></p>-->
 </div>
 <!-- ende App -->

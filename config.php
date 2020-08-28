@@ -16,7 +16,12 @@
 
 function get_blorm_config() {
 
+
     $options = get_option("blorm_plugin_options");
+
+    if ($options == false) {
+        $options = array();
+    }
 
     $returnArray = array_merge(
         $options,

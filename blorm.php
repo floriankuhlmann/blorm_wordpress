@@ -20,7 +20,7 @@ Copyright(C) 2016, Thomas Weichselbaumer - kontakt@themecoder.de
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
+require_once plugin_dir_path( __FILE__ ) . '/lib/helper.php';
 require_once __DIR__.'/config.php';
 
 // Definee Configs
@@ -52,26 +52,21 @@ require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
 
 $blormUserData = getUserDataFromBlorm();
 
-require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/admin.php';
+if ($blormUserData->error == null) {
 
+    require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
+    require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
+    require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';
+    require_once plugin_dir_path( __FILE__ ) . '/lib/admin.php';
 
-load_plugin_textdomain( 'plugin-blorm', false, dirname( plugin_basename( PLUGIN_BLORM_FILE ) ) . '/languages/' );
+} else {
 
-function blorm_multi_diff($arr1,$arr2){
-    $result = array();
-    foreach ($arr1 as $k=>$v){
-        if(!isset($arr2[$k])){
-            $result[$k] = $v;
-        } else {
-            if(is_array($v) && is_array($arr2[$k])){
-                $diff = blorm_multi_diff($v, $arr2[$k]);
-                if(!empty($diff))
-                    $result[$k] = $diff;
-            }
-        }
-    }
-    return $result;
+    require_once plugin_dir_path( __FILE__ ) . '/lib/admin_error.php';
+
 }
+
+
+
+
+
+//load_plugin_textdomain( 'plugin-blorm', false, dirname( plugin_basename( PLUGIN_BLORM_FILE ) ) . '/languages/' );

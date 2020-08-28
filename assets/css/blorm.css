@@ -2,6 +2,22 @@
 
 }
 
+.BlormFeedbackBox {
+    position: fixed;
+    width: 20%;
+    min-height: 5%;
+    border: 1px solid #0073aa;
+    background-color: white;
+    left: 40%;
+    top: 40%;
+    z-index: 9999999;
+    padding: 1rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: none;
+    cursor:pointer;
+    text-align: center;
+}
+
 .blorm-form-newpost select {
     width:100%;
 }
@@ -34,6 +50,15 @@
 .hndle.ui-sortable-handle {
     background-color: #23282d;
     color:#fff;
+}
+
+.BlormUserModule {}
+
+.BlormUserModule .helper-text.followuser {
+    color:red;
+    padding-top: 0.25rem;
+    margin-bottom:  0.25rem;
+    float: left;
 }
 
 .Blorm_following_blogs .card {

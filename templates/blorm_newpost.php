@@ -57,13 +57,14 @@
                     responsePromise = blormapp.core.postFileUpload(this.file);
                     responsePromise.then(handleUploadResponse, handleUploadError);
 
+                    // responsePromise success
                     function handleUploadResponse(response) {
 
                         if (response.data.error) {
-                            jQuery( ".helper-text.image" ).html(response.data.error);
+                            jQuery(".helper-text.image" ).html(response.data.error);
                             jQuery("#selectblogpost").val(0).prop('selected', true);
-                            jQuery( ".blorm-form-newpost" ).css("opacity","1");
-                            jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', false);
+                            jQuery(".blorm-form-newpost" ).css("opacity","1");
+                            jQuery("#blorm-form-newpost-enabler" ).prop('disabled', false);
 
                             return;
                         }
@@ -100,6 +101,7 @@
 
                     }
 
+                    // responsePromise error
                     function handleUploadError(response) {
                         jQuery( ".helper-text.image" ).html( "file upload is not possible. is file type jpg or png?" );
                     }

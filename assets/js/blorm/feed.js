@@ -2,6 +2,11 @@ jQuery(document).ready(function() {
 
     console.log("feed.js loaded");
 
+    /*
+    * component
+    * 'blorm-feed-comment'
+    *
+    */
     Vue.component('blorm-feed-comment', {
     props: ['latest_reactions'],
     methods: {
@@ -31,23 +36,44 @@ jQuery(document).ready(function() {
         '</div>'
     });
 
+    /*
+    * component
+    * 'blorm-feed-post-actions'
+    *
+    */
     Vue.component('blorm-feed-post-actions', {
     props: ['post','blormapp.core'],
     methods: {
         postShare: function (verb, event) {
-            blormapp.core.postShare(verb, event, this.post);
+
+            responsePromise = blormapp.core.postShare(verb, event, this.post);
+            responsePromise.then(this.handleShareSuccess, this.handleShareError);
         },
         postReblog: function (verb, event) {
             blormapp.core.postReblog(verb, event, this.post);
-        }
+        },
+        handleShareSuccess: function (response) {
+            console.log("success error:");
+            console.log(response);
+            blormapp.core.feedTimeline();
+        },
+        handleShareError: function (response) {
+            console.log("sharing error:");
+            console.log(response);
+        },
     },
     template:
         '<div class="Blorm_Blormfeed_Action" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
         '<hr>\n' +
         '<button v-on:click="postShare(\'share\', $event)">share in timline</button> | <button v-on:click="postReblog(\'reblog\', $event)">reblog</button>\n' +
         '</div>\n'
-});
+    });
 
+    /*
+    * component
+    * 'blorm-feed-post'
+    *
+    */
     Vue.component('blorm-feed-post', {
     props: ['post','blormusername','newcomment'],
     computed: {
@@ -56,39 +82,41 @@ jQuery(document).ready(function() {
                 case "share":
                     imgsrc = "/blorm/assets/icons/circle-sync-backup-1-glyph.png";
                     action = "shared this";
-                    /*statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
-                        "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/circle-sync-backup-1-glyph.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                        "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> shared this</b></div>";*/
                     break;
                 case "reblog":
                     imgsrc = "/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png";
                     action = "reblogged this";
-                    /*statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
-                        "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                        "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> reblogged this</b></div>";*/
                     break;
                 case "create":
                     imgsrc = "/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
                     action = "posted this";
-                    /*statusline = "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
-                        "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                        "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> posted this</b></div>";*/
                     break;
                 default:
                     statusline = "<span>Welcome to BLORM</span>";
                     break;
             }
 
-            return "<div style=\"margin-bottom: 0.5rem\";><i style='color:grey'>"+this.showdate(this.post.object.time)+"</i></div>" +
-                "<div style=\"width:75%;display: inline-block;\"'><img src='"+templateUrl+imgsrc+"' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                "<b><a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a> "+action+"</b></div>";
+            if (this.post.isOwner) {
+                userlink = "You";
+            } else {
+                userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
+            }
+
+            return "<div style=\"margin-bottom: 0.5rem\";>" +
+                    "<i style='color:grey'>"+this.showdate(this.post.object.time)+"</i>" +
+                    "</div>" +
+                    "<div style=\"width:75%;display: inline-block;\"'>" +
+                    "<img src='"+templateUrl+imgsrc+"' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
+                    "<b>"+userlink+" "+action+"</b>" +
+                    "</div>";
         },
         postImage: function() {
             if (this.post.object.image === "non" || this.post.object.image == null ) {
                 return "";
             }
-
-            return '<div class="Blorm_Blormfeed_Image"><img src="'+this.post.object.image+'"></div>';
+            return  "<div class=\"Blorm_Blormfeed_Image\">" +
+                    "<img src=\""+this.post.object.image+"\">" +
+                    "</div>";
         }
     },
     methods: {
@@ -142,6 +170,7 @@ jQuery(document).ready(function() {
         '                <div class="Blorm_Blormfeed_Edit">' +
         '                    <div class="Blorm_Blormfeed_Edit--Date">' +
         '                       <span v-html="postHeadline"></span>' +
+        '                       <span v-if="post.isOwner === true">' +
         '                       <template v-if="post.object.verb === \'create\'">'  +
         '                           <div class="Blorm_Blormfeed_Edit--Mod">' +
         '                               <button v-on:click="postDelete(post.activityId)">delete</button>' +
@@ -157,6 +186,7 @@ jQuery(document).ready(function() {
         '                               <button v-on:click="shareUndo(post.activityId)">undo</button>' +
         '                           </div>\n' +
         '                       </template>\n' +
+        '                       </span>' +
         '                       <hr class="Blorm_Blormfeed_Border">\n' +
         '                   </div>' +
         '                </div>\n' +
@@ -170,9 +200,11 @@ jQuery(document).ready(function() {
         '                <div class="Blorm_Blormfeed_URL">\n' +
         '                    <a :href="post.object.url"><i>read this</i></a>\n' +
         '                </div>\n' +
-        '                <blorm-feed-post-actions' +
+        '                <span v-if="post.isOwner === false">' +
+        '                   <blorm-feed-post-actions' +
         '                   v-bind:post="post">\n'+
-        '                </blorm-feed-post-actions>'+
+        '                   </blorm-feed-post-actions>' +
+        '                </span>'+
         '               <blorm-feed-comment' +
         '               v-bind:latest_reactions="post.latestReactions">\n' +
         '               </blorm-feed-comment>\n' +

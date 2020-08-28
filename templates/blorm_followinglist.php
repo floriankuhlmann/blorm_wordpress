@@ -9,37 +9,76 @@
 <script type="application/javascript">
     jQuery(document).ready(function(){
 
-    var ajaxapi = blogdomain+ajaxurl;
+        var ajaxapi = blogdomain+ajaxurl;
 
         // Define a new component called button-counter
-    Vue.component('blorm-followingbloglist', {
-        props: ['followingblog'],
-        methods:  {
-        confirmUnfollow: function(id,blormhandle) {
-        if (confirm("Do you really want to UNFOLLOW this account?\nPlease click 'OK' to unfollow.")) {
-            // Save it!
-            console.log('unfollow:'+id);
-            blormapp.core.userUnFollowing(blormhandle);
+        Vue.component('blorm-followerlist', {
+            data: function() {
+                    return {
+                        usernameunfollow: '',
+                    }
+            },
+            props: ['follower'],
+            methods:  {
+                confirmUnfollow: function(id,blormhandle) {
+                    if (confirm("Do you really want to UNFOLLOW this account?\nPlease click 'OK' to unfollow.")) {
+                        // Save it!
+                        this.usernameunfollow = blormhandle;
+                        responsePromise = blormapp.core.userUnFollowing(blormhandle);
+                        responsePromise.then(this.handleUnfollowSuccess, this.handleUnfollowError);
 
-        } else {
-            console.log("nothing will change");
-        }
-            }
-        },
-        template:   '<div v-on:click="confirmUnfollow(followingblog.id,followingblog.blormhandle)" class="FollowingBlogList_Blog">' +
-                    '<div class="FollowingBlogList_Blog_Img">' +
-                    '<img v-bind:src="followingblog.photo_url">'+
-                    '</div>' +
-                    '<div class="name">{{followingblog.name}}</div>'+
-                    '</div>\n',
+                    } else {
+                        console.log("nothing will change");
+                    }
+                },
+                handleUnfollowSuccess: function (response) {
+
+                        jQuery( "#usernamefollow" ).val("");
+                        jQuery(".BlormFeedbackBox").css('display','inline');
+                        jQuery( ".BlormFeedbackBoxText" ).html( "You unfollowed <br>'"+this.usernameunfollow+"'." );
+
+                        blormapp.core.getFollowersOfUser();
+
+                },
+                handleUnfollowError: function (response) {
+                    console.log("error:");
+                    console.log(response);
+                },
+
+            },
+            template:   '<div v-on:click="confirmUnfollow(follower.Person.id,follower.Person.blormhandle)" class="FollowingBlogList_Blog">' +
+                '<div class="FollowingBlogList_Blog_Img">' +
+                '<span v-if="follower.Person.photo_url.length">' +
+                '<img v-bind:src="follower.Person.photo_url">'+
+                '</span>' +
+                '</div>' +
+                '<div class="name">{{follower.Person.name}}</div>'+
+                '</div>\n',
         });
 
         blormapp.blormFollowerListing = new Vue({
             el: '#blormfollowerlisting',
-            data: function() {
-                return {
-                    followingblogs: blormapp.core.getFollowersOfUser(),
-                }
+            mounted() {
+                console.log("blormfollowinglist mounted");
+                this.getFollowers();
+            },
+            methods: {
+                getFollowers: function() {
+                    responsePromise = blormapp.core.getFollowersOfUser();
+                    console.log("responsePromise");
+                    responsePromise.then(this.handleGetFollowersUserSuccess, this.handleGetFollowersUserError);
+                },
+                handleGetFollowersUserSuccess: function (response) {
+                    console.log(response);
+                    this.followers = response.data;
+                },
+                handleGetFollowersUserError: function (response) {
+                    console.log("error:");
+                    console.log(response);
+                },
+            },
+            data: {
+                followers: '',
             },
         });
     });
@@ -47,10 +86,10 @@
 
 
 <div class="FollowingBlogList" id="blormfollowerlisting">
-    <blorm-followingbloglist
-            v-for="followingblog in followingblogs"
-            v-bind:key="followingblog.id"
-            v-bind:followingblog="followingblog"
-    ></blorm-followingbloglist>
+    <blorm-followerlist
+            v-for="follower in followers"
+            v-bind:key="follower.id"
+            v-bind:follower="follower"
+    ></blorm-followerlist>
     <div style="clear: both"></div>
 </div>
