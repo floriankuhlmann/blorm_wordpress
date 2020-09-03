@@ -6,7 +6,7 @@
  * Time: 15:16
  */
 ?>
-
+<!-- include summernote css/js -->
 <script type="application/javascript">
 
     jQuery(document).ready(function(){
@@ -100,19 +100,27 @@
 
 
                     }
-
                     // responsePromise error
                     function handleUploadError(response) {
                         jQuery( ".helper-text.image" ).html( "file upload is not possible. is file type jpg or png?" );
                     }
 
-
+                },
+                insertPostValues: function() {
+                    id = $("#selectblogpost option:selected").val();
+                    Object.keys(blormapp.recentPosts).forEach(key => {
+                        // the name of the current key.
+                        if (id == blormapp.recentPosts[key].id ) {
+                            this.headline = blormapp.recentPosts[key].headline;
+                            this.text = blormapp.recentPosts[key].teasertext;
+                        }
+                    });
 
                 },
                 /*
                     Handles a change on the file upload
                 */
-                handleFileUpload(){
+                handleFileUpload: function(){
                     this.file = this.$refs.file.files[0];
                     console.log("handleFileUpload:");
                 }
@@ -126,21 +134,17 @@
     <div id="Blorm_appInput" class="blorm-form-newpost">
         <form @submit.prevent="submit_new_post" enctype="multipart/form-data">
             <fieldset id="blorm-form-newpost-enabler">
-                <div class="input-text-wrap margin-bottom-10" id="title-wrap">
-                    <label for="headline">Headline</label>
-                    <input v-model="headline" id="headline" type="text" class="validate">
-                    <span class="helper-text headline" data-error="wrong"></span>
-
-                </div>
                 <div class="margin-bottom-10">
-                    <label for="selectblogpost">Select a Blogpost to share</label>
-                    <select id="selectblogpost">
-                        <option value="0" disabled selected>Available Blogposts</option>
-                        <?php
+                    <?php
                         $recent_posts = wp_get_recent_posts();
                         $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1',));
+                        wp_reset_query();
                         $i = 0;
+                        $AJSONPost = [];
                         foreach ($recent_posts as $recent_post) {
+
+                            //echo  "<code>".$recent_post["post_content"]."</code>";
+
                             foreach ($recent_posts_with_meta as $rpm) {
                                 if ($recent_post["ID"] == $rpm["ID"]) {
                                     unset($recent_posts[$i]);
@@ -149,13 +153,27 @@
                             }
                             $i++;
                         }
+
+
+                    ?>
+                    <label for="selectblogpost">Select a Blogpost to share</label>
+                    <select id="selectblogpost" @change="insertPostValues()">
+                        <option value="0" disabled selected>Available Blogposts</option>
+                        <?php
+
                         foreach( $recent_posts as $recent_post ){
                             echo '<option value="' . $recent_post["ID"] . '">' . $recent_post["post_title"].'</option>';
                         }
-                        wp_reset_query();
+
                         ?>
                     </select>
                     <span class="helper-text posturl" data-error="wrong"></span>
+                </div>
+                <div class="input-text-wrap margin-bottom-10" id="title-wrap">
+                    <label for="headline">Headline</label>
+                    <input v-model="headline" id="headline" type="text" class="validate">
+                    <span class="helper-text headline" data-error="wrong"></span>
+
                 </div>
                 <div class="textarea-wrap margin-bottom-10" id="description-wrap">
                     <label for="teasertext" >Your teasertext</label>
@@ -168,7 +186,7 @@
                 <div class="file-field input-field">
                     <div class="btn-small">
                         <span>Preview Image</span>
-                        <input type="file" name="file"  id="file" ref="file" v-on:change="handleFileUpload()" accept="image/png, image/jpeg">
+                        <input type="file" name="file"  id="file" ref="file" @change="handleFileUpload()" accept="image/png, image/jpeg">
                         <div class="helper-text image" data-error="wrong"></div>
                     </div>
                 </div>
@@ -182,3 +200,34 @@
     </div>
     <br class="clear">
 </div>
+
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+
+        blormapp.recentPosts = <?php
+            $z=0;
+            foreach ($recent_posts as $recent_post) {
+                $SanitizedPost = [];
+
+                $SanitizedPost["id"] = $recent_post["ID"];
+                $SanitizedPost["headline"] = $recent_post["post_title"];
+                $SanitizedPost["post_date_gmt"] = $recent_post["post_date_gmt"];
+                $SanitizedPost["teasertext"] = "";
+                $blocks = parse_blocks( $recent_post["post_content"] );
+                if (isset($blocks[0])){
+                    $SanitizedPost["teasertext"] = filter_var($blocks[0]['innerHTML'], FILTER_SANITIZE_STRING);
+                }
+
+                $SanitizedPost["image"] = "nothumb";
+                if (get_the_post_thumbnail($recent_post["ID"])) {
+                    $SanitizedPost["image"] = get_the_post_thumbnail($recent_post["ID"]);
+                };
+
+                $AJSONPost[$z] = $SanitizedPost;
+                $z++;
+            }
+
+            echo json_encode($AJSONPost, JSON_PRETTY_PRINT);
+        ?>;
+    });
+</script>

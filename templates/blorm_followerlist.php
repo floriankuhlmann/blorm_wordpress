@@ -12,7 +12,7 @@
         var ajaxapi = blogdomain+ajaxurl;
 
         // Define a new component called button-counter
-        Vue.component('blorm-followinglist', {
+        Vue.component('blorm-followerlist', {
             data: function() {
                     return {
                         usernameunfollow: '',
@@ -37,7 +37,7 @@
                         jQuery(".BlormFeedbackBox").css('display','inline');
                         jQuery( ".BlormFeedbackBoxText" ).html( "You unfollowed <br>'"+this.usernameunfollow+"'." );
 
-                        blormapp.blormFollowingListing.getFollowingUser();
+                        blormapp.core.getFollowersOfUser();
 
                 },
                 handleUnfollowError: function (response) {
@@ -46,7 +46,7 @@
                 },
 
             },
-            template:   '<div v-on:click="confirmUnfollow(follower.Person.id,follower.Person.blormhandle)" class="FollowingBlogList_Blog">' +
+            template:   '<div class="FollowersBlogList_Blog">' +
                 '<div class="FollowingBlogList_Blog_Img">' +
                 '<span v-if="follower.Person.photo_url.length">' +
                 '<img v-bind:src="follower.Person.photo_url">'+
@@ -56,16 +56,16 @@
                 '</div>\n',
         });
 
-        blormapp.blormFollowingListing = new Vue({
-            el: '#blormfollowinglisting',
+        blormapp.blormFollowerListing = new Vue({
+            el: '#blormfollowerslisting',
             mounted() {
                 console.log("blormfollowinglist mounted");
-                this.getFollowingUsers();
+                this.getFollowers();
             },
             methods: {
-                getFollowingUsers: function() {
-                    responsePromise = blormapp.core.getFollowingUsers();
-                    console.log("responsePromise");
+                getFollowers: function() {
+                    responsePromise = blormapp.core.getFollowers();
+                    console.log("responsePromise get followers");
                     responsePromise.then(this.handleGetFollowersUserSuccess, this.handleGetFollowersUserError);
                 },
                 handleGetFollowersUserSuccess: function (response) {
@@ -85,11 +85,11 @@
 </script>
 
 
-<div class="FollowingBlogList" id="blormfollowinglisting">
-    <blorm-followinglist
+<div class="FollowingBlogList" id="blormfollowerslisting">
+    <blorm-followerlist
             v-for="follower in followers"
             v-bind:key="follower.id"
             v-bind:follower="follower"
-    ></blorm-followinglist>
+    ></blorm-followerlist>
     <div style="clear: both"></div>
 </div>

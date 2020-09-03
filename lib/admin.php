@@ -70,6 +70,7 @@ function prepare_dashboard_meta() {
     add_meta_box( 'id2', 'BLORM - Blogs to follow', array( __CLASS__, 'dashboard_widget_blorm_bloglist' ), 'dashboard', 'side', 'high' );*/
     add_meta_box( 'id3', 'BLORM - who do you want to follow?', 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'low' );
     add_meta_box( 'id4', 'BLORM - you are following', 'dashboard_widget_blorm_followinglist' , 'dashboard', 'side', 'low' );
+    add_meta_box( 'id5', 'BLORM - your followers', 'dashboard_widget_blorm_followerlist' , 'dashboard', 'side', 'low' );
 
 }
 
@@ -82,6 +83,11 @@ function dashboard_widget_blorm_usermodule() {
 function dashboard_widget_blorm_followinglist() {
     // echo get list of blogusers
     require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_followinglist.php';
+}
+
+function dashboard_widget_blorm_followerlist() {
+    // echo get list of blogusers
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_followerlist.php';
 }
 
 function dashboard_widget_blorm_newpost() {

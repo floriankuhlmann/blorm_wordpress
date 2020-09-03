@@ -179,8 +179,52 @@ function postRequestLocalPostsUpdate($request, $response) {
                 add_post_meta($post_id, "blorm_reblog_teaser_image", $requestBodyObj->{'origin_post_data'}->{'image'});
                 add_post_meta($post_id, "blorm_reblog_teaser_url", $requestBodyObj->{'origin_post_data'}->{'url'});
                 add_post_meta($post_id, "blorm_reblog_object_iri", $requestBodyObj->{'origin_post'}->{'object_iri'});
-
                 add_post_meta($post_id, "blorm_reblog_activity_id", $responseBodyObj->{'data'}->{'activity_id'});
+
+                // prepare the title for the file
+                $filetitle = sanitize_title(
+                    $requestBodyObj->{'origin_post_data'}->{'headline'},
+                    $fallback_title = 'blorm-post-thumbnail-image',
+                    $context = 'save' );
+
+                // load the file from the origin source
+                $dImage = file_get_contents( $requestBodyObj->{'origin_post_data'}->{'image'});
+                $ext = pathinfo($requestBodyObj->{'origin_post_data'}->{'image'}, PATHINFO_EXTENSION);
+
+                // final filename
+                $filename = $filetitle.".".$ext;
+
+                // upload it into wordpress
+                $upload_file = wp_upload_bits(
+                    $filename,
+                    null,
+                    $dImage);
+
+
+                if ( ! $upload_file['error'] ) {
+                    // if succesfull insert the new file into the media library (create a new attachment post type).
+                    $wp_filetype = wp_check_filetype($filename, null );
+
+                    $attachment = array(
+                      'post_mime_type' => $wp_filetype['type'],
+                      'post_parent'    => $post_id,
+                      'post_title'     => preg_replace( '/\.[^.]+$/', '', $filename ),
+                      'post_content'   => '',
+                      'post_status'    => 'inherit'
+                    );
+
+                    $attachment_id = wp_insert_attachment( $attachment, $upload_file['file'], $post_id );
+
+                    if ( ! is_wp_error( $attachment_id ) ) {
+                      // if attachment post was successfully created, insert it as a thumbnail to the post $post_id.
+                      require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+
+                      $attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
+
+                      wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+                      set_post_thumbnail( $post_id, $attachment_id );
+                    }
+                }
 
             }
             break;

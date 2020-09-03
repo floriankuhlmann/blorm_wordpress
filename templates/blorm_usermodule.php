@@ -26,7 +26,8 @@
                         jQuery( "#usernamefollow" ).val("");
                         jQuery(".BlormFeedbackBox").css('display','inline');
                         jQuery( ".BlormFeedbackBoxText" ).html( "You are following <br>'"+this.usernamefollow+"' now." );
-                        blormapp.core.getFollowersOfUser();
+                        //blormapp.core.getFollowersOfUser();
+                        blormapp.blormFollowingListing.getFollowingUsers();
                     }
                 },
                 handleFollowUserError: function (response) {

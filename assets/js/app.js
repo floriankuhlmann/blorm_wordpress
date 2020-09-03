@@ -380,7 +380,7 @@ blormapp.core = {
         console.log(blormhandle);
         promiseObj = new Promise(function(fullfill, reject){
             axios.get(
-                restapiVars.root+'blormapi/v1/blog/follow/blormhandle/'+blormhandle,
+                restapiVars.root+'blormapi/v1/user/follow/blormhandle/'+blormhandle,
                 {
                     headers: {
                             'Content-Type': 'application/json',
@@ -404,7 +404,7 @@ blormapp.core = {
 
         promiseObj = new Promise(function(fullfill, reject){
             axios.get(
-                restapiVars.root+'blormapi/v1/blog/unfollow/blormhandle/'+blormhandle,
+                restapiVars.root+'blormapi/v1/user/unfollow/blormhandle/'+blormhandle,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -423,10 +423,10 @@ blormapp.core = {
     /**
      * getFollowersOfUser
      */
-    getFollowersOfUser: function() {
+    getFollowingUsers: function() {
         promiseObj = new Promise(function(fullfill, reject){
             axios.get(
-                restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
+                restapiVars.root+'blormapi/v1/feed/following/timeline/'+blormapp.user.id,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -457,7 +457,45 @@ blormapp.core = {
              console.log(error)
             });*/
         },
-
+    /**
+     * getFollowersOfUser
+     */
+    getFollowers: function() {
+        promiseObj = new Promise(function(fullfill, reject){
+            uri = restapiVars.root+'blormapi/v1/feed/followers/user/'+blormapp.user.id;
+            console.log(uri);
+            axios.get(uri
+                ,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': restapiVars.nonce,
+                    },
+                }).then(response => {
+                fullfill(response);
+            }).catch(error => {
+                reject(error);
+            });
+        });
+        //console.log(promiseObj);
+        //Returns Promise object
+        return promiseObj;
+        /*axios.get(
+            restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': restapiVars.nonce,}
+            }).then(response => {
+                console.log(response.data);
+                blormapp.user.followers = response.data;
+                //blormapp.blormFollowerListing.followingblogs = response.data;
+                return response.data;
+            }).catch(error => {
+             console.log("error:");
+             console.log(error)
+            });*/
+    },
     /**
      * getUserData
      */
