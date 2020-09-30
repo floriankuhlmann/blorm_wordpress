@@ -73,8 +73,13 @@ function rest_blormapi_handler(WP_REST_Request $request) {
     $params = $request->get_params();
     $response = wp_remote_request(CONFIG_BLORM_APIURL ."/". $params['restparameter'], $args);
 
-    error_log("response:");
-    //error_log(json_encode($response));
+    /*error_log("base64_encode:");
+    error_log(
+        base64_encode(
+            hash_hmac("sha256", get_blorm_config_param('api_key'),$request->get_method()."+".$params['restparameter'])
+        )
+    );*/
+
 
     // check after wp_remote_request (delete)
     postRequestLocalPostsUpdate($request,$response);

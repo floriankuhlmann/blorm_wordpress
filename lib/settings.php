@@ -180,3 +180,28 @@ function  blorm_plugin_setting_blorm_category_show_reblogged() {
     echo "</select>";
 
 }
+
+function  blorm_plugin_setting_blorm_blormbar_position() {
+    $options = get_option( 'blorm_plugin_options' );
+
+    $value = "";
+    if (isset( $options['blorm_blormbar_position'] )) {
+        $value = $options['blorm_blormbar_position'];
+    }
+
+    echo "<select id='blorm_plugin_setting_blorm_blormbar_position' name='blorm_plugin_options[blorm_blormbar_position]'>\n
+            <option value='-'>---</option>\n
+            <option value='header' selected>header</option>\n
+            <option value='content' >content</option>\n
+            <option value='footer' >footer</option>\n
+            </select>";
+    /*foreach( $categories as $category ) {
+        if ($value == $category->cat_ID) {
+            echo "<option value=\"".$category->cat_ID."\" selected>".$category->name."</option>";
+        } else {
+            echo "<option value=\"".$category->cat_ID."\">".$category->name."</option>";
+        }
+    }
+    echo "</select>";*/
+
+}

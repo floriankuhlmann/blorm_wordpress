@@ -2,3 +2,32 @@
 .type-blormpost {
     border: 1px solid black;
 }
+
+.blormMenuBar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+    text-align: right;
+}
+
+.blormMenuBar .blormWidget {
+
+    background-color: #ccc;
+    color: #fff !important;
+    cursor: pointer !important;
+    padding: 1px;
+}
+
+.blormMenuBar .blormWidget .blormWidgetPlus {
+    height: 1rem;
+    line-height: 1rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.blormMenuBar .blormWidget .blormWidgetImagePlus {
+    height: 1rem;
+    width: auto;
+    line-height: 1rem;
+}
