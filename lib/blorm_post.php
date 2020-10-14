@@ -4,7 +4,7 @@
 // init add the blorm post type
 // https://codex.wordpress.org/Function_Reference/register_post_type
 //add_action( 'init',  'create_post_type_blorm');
-function create_post_type_blorm() {
+/*function create_post_type_blorm() {
     register_post_type( 'blormpost',
     array(
         'labels' => array(
@@ -42,9 +42,9 @@ function create_post_type_blorm() {
 
     )
     );
-}
+}*/
 
-function blorm_post_add_meta_irl( $post_id ) {
+/*function blorm_post_add_meta_irl( $post_id ) {
 
     // If this is just a revision, don't send the email.
     if ( wp_is_post_revision( $post_id ) ) {
@@ -56,13 +56,12 @@ function blorm_post_add_meta_irl( $post_id ) {
     }
 
     return $post_id;
-}
+}*/
 //add_action( 'save_post', 'blorm_post_add_meta_irl' );
 
 
 //https://developer.wordpress.org/plugins/post-types/working-with-custom-post-types/
 add_action( 'pre_get_posts', 'blorm_add_custom_post_types_to_query');
-
 function blorm_add_custom_post_types_to_query($query) {
 
     // https://developer.wordpress.org/plugins/post-types/working-with-custom-post-types/
@@ -71,10 +70,10 @@ function blorm_add_custom_post_types_to_query($query) {
     $options = get_option("blorm_plugin_options");
 
 
-        if (checked("show", $options['add_blorm_to_home_loop'], false)) {
+    /*    if (checked("show", $options['add_blorm_to_home_loop'], false)) {
             if ( is_home() && $query->is_main_query() ) {
                 //if ( is_home() ) {
-                $query->set( 'post_type', array(  'post','page', 'blormpost' ) );
+                $query->set( 'post_type', array(  'post', 'blormpost' ) );
             }
             return $query;
         }
@@ -87,21 +86,20 @@ function blorm_add_custom_post_types_to_query($query) {
 }
 
 
-add_action( 'the_post', 'blorm_add_the_posts' );
-function blorm_add_the_posts($post) {
-    if ( get_post_type() == 'blormpost' ) {
-        //var_dump($post);
-        echo'<span data-post-id="hello-vlorm-slug"></span>';
-        /*$obj = get_post_type_object( 'blormpost' );
-        echo "html:".esc_html( $obj->description );
-        var_dump($obj);
-        //$post->post_content = "saddsds";
-        var_dump($post);
-        //get_template_part( PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blormpost_single.php' );
-    */
-    }
-    return $post;
-}
+
+
+/*
+// register custom post type 'my_custom_post_type' with 'supports' parameter
+add_action( 'init', 'create_my_post_type' );
+function create_my_post_type() {
+    register_post_type( 'my_custom_post_type',
+        array(
+            'labels' => array( 'name' => __( 'Products' ) ),
+            'public' => true,
+            'supports' => array('title', 'editor', 'post-formats')
+        )
+    );
+}*/
 
 /*apply_filters('found_posts ','blorm_found_posts');
 function blorm_found_posts($posts) {
@@ -109,4 +107,15 @@ function blorm_found_posts($posts) {
     //var_dump($posts);
 
     return $posts;
+}*/
+/*
+add_filter( 'post_class', 'new_class', 10,3);
+function new_class (array $classes, $class, $id) {
+    $newclass = 'blorm-reblogged';
+
+    if ($id == 21) {
+        $classes[] = esc_attr( $newclass );
+    }
+
+    return $classes;
 }*/

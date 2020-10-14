@@ -17,7 +17,7 @@
 function get_blorm_config() {
 
 
-    $options = get_option("blorm_plugin_options");
+    $options = get_option("blorm_plugin_options_api");
 
     if ($options == false) {
         $options = array();

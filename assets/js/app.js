@@ -263,6 +263,7 @@ blormapp.core = {
             }
         };
         console.log(post);
+        console.log(shareJSONObj);
         axios.post(
             restapiVars.root+'blormapi/v1/blogpost/reblog',
             shareJSONObj,

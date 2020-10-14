@@ -40,8 +40,8 @@ function rest_blormapi_handler(WP_REST_Request $request) {
         return new WP_REST_Response(array("message" =>"user not logged in"),200 ,array('Content-Type' => 'application/json'));
     }
 
-    error_log("request:");
-    error_log($request->get_method());
+    //error_log("request:");
+    //error_log($request->get_method());
 
 
     if(!empty($_FILES['uploadfile'])) {
@@ -73,13 +73,6 @@ function rest_blormapi_handler(WP_REST_Request $request) {
     $params = $request->get_params();
     $response = wp_remote_request(CONFIG_BLORM_APIURL ."/". $params['restparameter'], $args);
 
-    /*error_log("base64_encode:");
-    error_log(
-        base64_encode(
-            hash_hmac("sha256", get_blorm_config_param('api_key'),$request->get_method()."+".$params['restparameter'])
-        )
-    );*/
-
 
     // check after wp_remote_request (delete)
     postRequestLocalPostsUpdate($request,$response);
@@ -92,6 +85,8 @@ function preRequestLocalPostsUpdate(&$request) {
 
     $parameter = $request->get_params();
     $body = $request->get_body();
+
+    $status = "ok";
 
     switch($parameter["restparameter"]) {
         //READ
@@ -119,7 +114,7 @@ function preRequestLocalPostsUpdate(&$request) {
 
             $delparameter = end($parameter);
 
-            $args = array('post_type' => 'blormpost', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
+            $args = array('post_type' => 'post', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
             $the_query = get_posts( $args );
 
             if (isset($the_query[0])) {
@@ -127,11 +122,29 @@ function preRequestLocalPostsUpdate(&$request) {
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_teaser_url");
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_object_iri");
                 delete_post_meta($the_query[0]->ID,"blorm_reblog_activity_id");
+
+                // delete the attached thumbnail in post meta
+                $thumbId = get_post_thumbnail_id($the_query[0]->ID);
+                delete_post_meta($thumbId, "_wp_attached_file");
+                delete_post_meta($thumbId, "_wp_attachment_metadata");
+                delete_post_meta($the_query[0]->I, "_thumbnail_id");
+
+                // delete the thumbnail in post
+                wp_delete_post($thumbId);
+
+                // delete the file in media
+                wp_delete_attachment($the_query[0]->ID, true);
+
+                // finaly delete the post
                 wp_delete_post($the_query[0]->ID);
+            } else {
+                $status = "blorm_reblog_activity_id_is_empty";
             }
 
             break;
     }
+
+    return $status;
 }
 
 
@@ -168,17 +181,19 @@ function postRequestLocalPostsUpdate($request, $response) {
                 $requestBodyObj = json_decode($body);
                 $responseBodyObj = json_decode($response["body"]);
 
-                $content = "<span data-blorm-id=\"".$responseBodyObj->{'data'}->{'activity_id'}."\"><a href=\"".$requestBodyObj->{'origin_post_data'}->{'url'}."\">
-                            ".$requestBodyObj->{'origin_post_data'}->{'text'}."</a></span>";
+                error_log($response["body"]);
+
+                /*$content = "<span data-blorm-id=\"".$responseBodyObj->{'data'}->{'activity_id'}."\"><a href=\"".$requestBodyObj->{'origin_post_data'}->{'url'}."\">
+                            ".$requestBodyObj->{'origin_post_data'}->{'text'}."</a></span>";*/
 
 
                 // save custom post
                 $post_id = wp_insert_post(array(
                     "post_title" => "<span class=\'blorm_reblog\'>" . $requestBodyObj->{'origin_post_data'}->{'headline'} . "</span>",
-                    "post_content" => $content,
+                    "post_content" => $requestBodyObj->{'origin_post_data'}->{'text'},
                     "post_status" => "publish",
                     "post_category" => array("Blorm"),
-                    "post_type" => "blormpost"
+                    "post_type" => "post"
                 ));
 
                 add_post_meta($post_id, "blorm_reblog_teaser_image", $requestBodyObj->{'origin_post_data'}->{'image'});
