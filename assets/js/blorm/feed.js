@@ -12,8 +12,6 @@ jQuery(document).ready(function() {
     methods: {
         showdate: function (ISOdate) {
             var date = new Date(ISOdate   );
-            //var timeString = date.toUTCString();
-
             return moment(date.getTime() + 60*60*1000*2).fromNow();
         },
         getUrl: function (url) {
@@ -21,15 +19,15 @@ jQuery(document).ready(function() {
         }
     },
     template: //'<div v-if="latest_reactions.comment">' +
-        '<div class="Blorm_Blormfeed_Postcomments>">' +
+        '<div class="BlormFeedPostcomments>">' +
         '<template v-for="commentitem in latest_reactions.comment">' +
-        '<div :data-id="commentitem.id" class="Blorm_Blormfeed_Postcomment">' +
-        '<div class="Blorm_Blormfeed_Postcomment_User"><img :src="commentitem.user.data.data.photo_url" style="width:100%; height: auto;"></div>' +
-        '<div class="Blorm_Blormfeed_Postcomment_Content">' +
-        '<div class="Blorm_Blormfeed_Postcomment_Content_Text">' +
+        '<div :data-id="commentitem.id" class="BlormFeedPostcomment">' +
+        '<div class="BlormFeedPostcomment_User"><img :src="commentitem.user.data.data.photo_url" style="width:100%; height: auto;"></div>' +
+        '<div class="BlormFeedPostcomment_Content">' +
+        '<div class="BlormFeedPostcomment_Content_Text">' +
         '<b><a :href="getUrl(commentitem.user.data.data.website)">{{commentitem.user.data.data.name}}</a></b> ' +
         '<span v-html="commentitem.data.text"> {{commentitem.data.text}}</span></div>' +
-        '<div class="Blorm_Blormfeed_Postcomment_Content_Date"><small>{{showdate(commentitem.updated_at)}}</small><br></div>' +
+        '<div class="BlormFeedPostcomment_Content_Date"><small>{{showdate(commentitem.updated_at)}}</small><br></div>' +
         '</div>' +
         '</div>' +
         '</template>' +
@@ -53,21 +51,94 @@ jQuery(document).ready(function() {
             blormapp.core.postReblog(verb, event, this.post);
         },
         handleShareSuccess: function (response) {
-            console.log("success error:");
-            console.log(response);
             blormapp.core.feedTimeline();
         },
         handleShareError: function (response) {
             console.log("sharing error:");
             console.log(response);
         },
+
     },
     template:
-        '<div class="Blorm_Blormfeed_Action" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
+        '<div class="BlormFeedAction" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
         '<hr>\n' +
         '<button v-on:click="postShare(\'share\', $event)">share in timline</button> | <button v-on:click="postReblog(\'reblog\', $event)">reblog</button>\n' +
         '</div>\n'
     });
+
+    Vue.component('blorm-feed-post-headline', {
+        props: ['post','blormapp.core'],
+        methods: {
+            renderDate: function (ISOdate) {
+                var date = new Date(ISOdate   );
+                return moment(date.getTime() + 60*60*1000*2).fromNow();
+            },
+            renderIcon: function(verb) {
+                switch (verb) {
+                    case "share":
+                        imgsrc = templateUrl+"/blorm/assets/icons/circle-sync-backup-1-glyph.png";
+                        break;
+                    case "reblog":
+                        imgsrc = templateUrl+"/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png";
+                        break;
+                    case "create":
+                        imgsrc = templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
+                        break;
+                    default:
+                        imgsrc = templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
+                        break;
+                }
+                return imgsrc;
+            },
+            renderAction: function(verb) {
+                switch (verb) {
+                    case "share":
+                        action = "shared this";
+                        break;
+                    case "reblog":
+                        action = "reblogged this";
+                        break;
+                    case "create":
+                        action = "posted this";
+                        break;
+                    default:
+                        action = "";
+                        break;
+                }
+                return action;
+            },
+            renderUser: function(post) {
+                if (post.isOwner) {
+                    userlink = "You";
+                } else {
+                    //userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
+                    //userlink = "<span v-on:click=\"console.log(this.post.actor.id)\">{{post.actor.name}}</span>";
+                    userlink = post.actor.name;
+                }
+                return userlink;
+            },
+            feedUser: function(id) {
+                console.log(id);
+                blormapp.core.feedUser(id);
+            },
+        },
+        template:
+            '<div>' +
+            '<div style=\"margin-bottom: 0.5rem;\">' +
+            '<i style=\"color:grey\">{{renderDate(post.object.time)}}</i>' +
+            '</div>' +
+            '<div style=\"width:75%;display: inline-block;\">' +
+            '<img :src="renderIcon(post.object.verb)" style=\"height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;\">' +
+            '<span v-if="post.isOwner === true">' +
+                '<b>{{renderUser(post)}} {{renderAction(post.object.verb)}}</b>' +
+            '</span>' +
+            '<span v-else>' +
+                '<b><span v-on:click="feedUser(post.actor.id)">{{renderUser(post)}}</span> {{renderAction(post.object.verb)}}</b>' +
+            '</span>' +
+            '</div>' +
+            '</div>'
+    });
+
 
     /*
     * component
@@ -77,7 +148,7 @@ jQuery(document).ready(function() {
     Vue.component('blorm-feed-post', {
     props: ['post','blormusername','newcomment'],
     computed: {
-        postHeadline: function() {
+        /*postHeadline: function() {
             switch (this.post.object.verb) {
                 case "share":
                     imgsrc = "/blorm/assets/icons/circle-sync-backup-1-glyph.png";
@@ -99,7 +170,8 @@ jQuery(document).ready(function() {
             if (this.post.isOwner) {
                 userlink = "You";
             } else {
-                userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
+                //userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
+                userlink = "<span v-on:click=\"console.log(this.post.actor.id)\">"+this.post.actor.name+"</span>";
             }
 
             return "<div style=\"margin-bottom: 0.5rem\";>" +
@@ -109,12 +181,12 @@ jQuery(document).ready(function() {
                     "<img src='"+templateUrl+imgsrc+"' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
                     "<b>"+userlink+" "+action+"</b>" +
                     "</div>";
-        },
+        },*/
         postImage: function() {
             if (this.post.object.image === "non" || this.post.object.image == null ) {
                 return "";
             }
-            return  "<div class=\"Blorm_Blormfeed_Image\">" +
+            return  "<div class=\"BlormFeedImage\">" +
                     "<img src=\""+this.post.object.image+"\">" +
                     "</div>";
         }
@@ -122,8 +194,6 @@ jQuery(document).ready(function() {
     methods: {
         showdate: function (ISOdate) {
             var date = new Date(ISOdate   );
-            //var timeString = date.toUTCString();
-
             return moment(date.getTime() + 60*60*1000*2).fromNow();
         },
         getUserFromActor: function() {
@@ -143,82 +213,78 @@ jQuery(document).ready(function() {
                 blormapp.commentdata_id
             );
         },
-        postDelete: function (event) {
-            blormapp.core.postDelete(
-                $(event.target).data('activityid')
-            );
+        postDelete: function (activityId) {
+            blormapp.core.postDelete(activityId);
             blormapp.core.feedTimeline();
         },
         reblogUndo: function (activityId) {
             console.log("reblogundo");
             console.log(activityId);
-            blormapp.core.reblogUndo(
-                activityId
-            );
+            blormapp.core.reblogUndo(activityId);
             blormapp.core.feedTimeline();
         },
         shareUndo: function (activityId) {
-            blormapp.core.shareUndo(
-                activityId
-            );
+            blormapp.core.shareUndo(activityId);
             blormapp.core.feedTimeline();
-        }
+        },
+        feedUser: function(id) {
+            console.log(feedUser);
+            blormapp.core.feedUser(id);
+        },
     },
     template: '<span v-if="post.error === false">' +
         '           <span v-if="post.teaser === true">' +
-        '           <div class="Blorm_Blormfeed_Post" :class="post.object.verb" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
-        '                <div class="Blorm_Blormfeed_Edit">' +
-        '                    <div class="Blorm_Blormfeed_Edit--Date">' +
-        '                       <span v-html="postHeadline"></span>' +
+        '           <div class="BlormFeedPost" :class="post.object.verb" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
+        '                <div class="BlormFeedEdit">' +
+        '                   <div class="BlormFeedEdit--Date">' +
+        '                   <blorm-feed-post-headline v-bind:post="post"></blorm-feed-post-headline>' +
         '                       <span v-if="post.isOwner === true">' +
         '                       <template v-if="post.object.verb === \'create\'">'  +
-        '                           <div class="Blorm_Blormfeed_Edit--Mod">' +
+        '                           <div class="BlormFeedEdit--Mod">' +
         '                               <button v-on:click="postDelete(post.activityId)">delete</button>' +
         '                           </div>\n' +
         '                       </template>\n' +
         '                       <template v-if="post.object.verb === \'reblog\'">'  +
-        '                           <div class="Blorm_Blormfeed_Edit--Mod">' +
+        '                           <div class="BlormFeedEdit--Mod">' +
         '                               <button v-on:click="reblogUndo(post.activityId)">undo</button>' +
         '                           </div>\n' +
         '                       </template>\n' +
         '                       <template v-if="post.object.verb === \'share\'">'  +
-        '                           <div class="Blorm_Blormfeed_Edit--Mod">' +
+        '                           <div class="BlormFeedEdit--Mod">' +
         '                               <button v-on:click="shareUndo(post.activityId)">undo</button>' +
         '                           </div>\n' +
         '                       </template>\n' +
         '                       </span>' +
-        '                       <hr class="Blorm_Blormfeed_Border">\n' +
+        '                       <hr class="BlormFeedBorder">\n' +
         '                   </div>' +
         '                </div>\n' +
-        '                <div class="Blorm_Blormfeed_Title">\n' +
-        '                    <h2 class="Blorm_Blormfeed_Title"><a :href="post.object.url">{{ post.object.headline }}</a></h2>\n' +
+        '                <div class="BlormFeedTitle">\n' +
+        '                    <h2 class="BlormFeedTitle"><a :href="post.object.url">{{ post.object.headline }}</a></h2>\n' +
         '                </div>\n' +
         '                <span v-html="postImage"></span>' +
-        '                <div class="Blorm_Blormfeed_Content">\n' +
+        '                <div class="BlormFeedContent">\n' +
         '                    <p>{{ post.object.text }}</p>\n' +
         '                </div>\n' +
-        '                <div class="Blorm_Blormfeed_URL">\n' +
+        '                <div class="BlormFeedURL">\n' +
         '                    <a :href="post.object.url"><i>read this</i></a>\n' +
         '                </div>\n' +
         '                <span v-if="post.isOwner === false">' +
-        '                   <blorm-feed-post-actions' +
-        '                   v-bind:post="post">\n'+
-        '                   </blorm-feed-post-actions>' +
+        '                   <blorm-feed-post-actions v-bind:post="post"></blorm-feed-post-actions>' +
         '                </span>'+
         '               <blorm-feed-comment' +
         '               v-bind:latest_reactions="post.latestReactions">\n' +
         '               </blorm-feed-comment>\n' +
-        '               <div class="Blorm_Blormfeed_Action--comment" :data-id="post.activityId">            ' +
-        '               <div contenteditable class="Blorm_Blormfeed_Action--comment-textbox" v-html="newcomment" v-on:keyup="commentchanged" v-on:blur="commentchanged" v-on:paste="commentchanged" v-on:delete="commentchanged" v-on:focus="commentchanged">' +
+        '               <div class="BlormFeedAction--comment" :data-id="post.activityId">            ' +
+        '               <div contenteditable class="BlormFeedAction--comment-textbox" v-html="newcomment" v-on:keyup="commentchanged" v-on:blur="commentchanged" v-on:paste="commentchanged" v-on:delete="commentchanged" v-on:focus="commentchanged">' +
         '               </div>\n' +
-        '                   <div class="Blorm_Blormfeed_Action">\n' +
+        '                   <div class="BlormFeedAction">\n' +
         '                       <button v-on:click="postComment">comment</button>' +
         '                   </div>\n' +
         '               </div>\n' +
         '            </div>' +
         '           </span>' +
         '           <span v-else>' +
-        '           <div class="Blorm_Blormfeed_Post">' +
+        '           <div class="BlormFeedPost">' +
         '               There is no post in your timeline.<br>Why dont you share something or follow someone?' +
         '           </div>' +
         '           </span>' +

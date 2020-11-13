@@ -14,7 +14,7 @@
 
 
         // Define a new component called button-counter
-        Vue.component('blorm-bloglist', {
+        Vue.component('BlormBlogList', {
             props: ['user'],
             //template: '<li><b><a href="{{user.id}}" class="followuser" :data-userid="user.id">{{user.name}} | {{user.blogurl}</a></b></li>\n'
             template: '<option value="1">hallo</option>\n'
@@ -61,8 +61,8 @@
 </script>
 
 <!-- App -->
-<div id="blormbloglist">
-    <div id="appFeed" class="blorm-bloglist margin-bottom-10">
+<div class="BlormWidgetContainer">
+    <div id="BlormBlogList" class="BlormBlogList margin-bottom-10">
         <form @submit.prevent="submit_follow_blog">
 
 

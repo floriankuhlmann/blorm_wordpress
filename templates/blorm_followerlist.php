@@ -11,7 +11,7 @@
 
         var ajaxapi = blogdomain+ajaxurl;
 
-        // Define a new component called button-counter
+        // Define a new component
         Vue.component('blorm-followerlist', {
             data: function() {
                     return {
@@ -46,8 +46,8 @@
                 },
 
             },
-            template:   '<div class="FollowersBlogList_Blog">' +
-                '<div class="FollowingBlogList_Blog_Img">' +
+            template:   '<div class="BlormFollowListUser">' +
+                '<div class="BlormFollowListUserImg">' +
                 '<span v-if="follower.Person.photo_url.length">' +
                 '<img v-bind:src="follower.Person.photo_url">'+
                 '</span>' +
@@ -57,7 +57,7 @@
         });
 
         blormapp.blormFollowerListing = new Vue({
-            el: '#blormfollowerslisting',
+            el: '#BlormFollowersList',
             mounted() {
                 console.log("blormfollowinglist mounted");
                 this.getFollowers();
@@ -84,12 +84,13 @@
     });
 </script>
 
-
-<div class="FollowingBlogList" id="blormfollowerslisting">
-    <blorm-followerlist
-            v-for="follower in followers"
-            v-bind:key="follower.id"
-            v-bind:follower="follower"
-    ></blorm-followerlist>
-    <div style="clear: both"></div>
+<div class="BlormWidgetContainer">
+    <div class="BlormFollowerList" id="BlormFollowersList">
+        <blorm-followerlist
+                v-for="follower in followers"
+                v-bind:key="follower.id"
+                v-bind:follower="follower"
+        ></blorm-followerlist>
+        <div style="clear: both"></div>
+    </div>
 </div>

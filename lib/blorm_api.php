@@ -261,13 +261,17 @@ function postRequestLocalPostsUpdate($request, $response) {
 
         // DELETE
         case (preg_match('/^(blogpost\/delete\/)[a-z0-9-]+$/', $parameter["restparameter"]) ? true : false) :
-            $delparameter = explode('/', $parameter["restparameter"]);
+
+        	$delparameter = explode('/', $parameter["restparameter"]);
 
             if ($response) {
-                $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_activity_id', 'meta_value' => $delparameter));
-                delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create_activity_id");
-                delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create");
+                $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create_activity_id', 'meta_value' => end($delparameter)));
+	            if (isset($recent_posts_with_meta[0])) {
+		            delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create_activity_id");
+		            delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create");
+	            }
             }
+
             break;
 
         default:

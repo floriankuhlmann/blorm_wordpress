@@ -9,6 +9,78 @@ blormapp.core = {
     data: {
             initCommentText: "Leave a comment. Please remember, be nice!",
     },
+    processFeedData: function(posts) {
+        postData = posts.map(function (value) {
+            var data = {};
+            // check for errors in the data
+            if (value.object.data.error) {
+                data.error = true;
+                data.errortype = value.object.data.error;
+                return data;
+            }
+            if (typeof(value.object.data.data) == "undefined") {
+                data.error = true;
+                data.errortype = "data_undefined";
+                return data;
+            }
+            // if we have an referenced object
+            if (value.object) {
+                data.error = false;
+                data.teaser = true;
+                data.activityId = value.id;
+                data.object = {
+                    iri: value.object.id,
+                    type: "teaser",
+                    verb: value.verb,
+                    time: value.time,
+                    headline: value.object.data.data.headline,
+                    text: value.object.data.data.text,
+                    image: value.object.data.data.image,
+                    url: value.object.data.data.url,
+                };
+                data.actor = {
+                    id: value.actor.id,
+                    name: value.actor.data.data.name,
+                    userName: value.actor.data.data.username,
+                    photoUrl: value.actor.data.data.photoUrl,
+                    website: value.actor.data.data.website,
+                };
+                data.isOwner = (blormapp.user.id === value.actor.id);
+                data.ownReactions = value.own_reactions;
+                data.reactionCounts = value.reaction_counts;
+                data.latestReactions = value.latest_reactions;
+console.log(data);
+                return data;
+            }
+            if (value.teaser) {
+                data.error = false;
+                data.teaser = true;
+                data.activityId = value.id;
+                data.object = {
+                    iri: value.object.id,
+                    type: "teaser",
+                    verb: value.verb,
+                    time: value.time,
+                    headline: value.teaser.headline,
+                    text: value.teaser.text,
+                    image: value.teaser.image,
+                    url: value.teaser.url,
+                };
+                data.actor = {
+                    id: value.actor.id,
+                    userName: ":-)",
+                    photoUrl: "",
+                    website: "",
+                };
+                data.ownReactions = value.own_reactions;
+                data.reactionCounts = value.reaction_counts;
+                data.latestReactions = value.latest_reactions;
+
+                return data;
+            }
+        });
+        return postData;
+    },
     /**
      * get the timeline
      */
@@ -23,75 +95,8 @@ blormapp.core = {
                 var postData = {};
                 console.log(response);
                 if (response.data.length > 0) {
-                    postData = response.data.map(function (value) {
-                        var data = {};
-                        // check for errors in the data
-                        if (value.object.data.error) {
-                            data.error = true;
-                            data.errortype = value.object.data.error;
-                            return data;
-                        }
-                        if (typeof(value.object.data.data) == "undefined") {
-                            data.error = true;
-                            data.errortype = "data_undefined";
-                            return data;
-                        }
-                        // if we have an referenced object
-                        if (value.object) {
-                            data.error = false;
-                            data.teaser = true;
-                            data.activityId = value.id;
-                            data.object = {
-                                iri: value.object.id,
-                                type: "teaser",
-                                verb: value.verb,
-                                time: value.time,
-                                headline: value.object.data.data.headline,
-                                text: value.object.data.data.text,
-                                image: value.object.data.data.image,
-                                url: value.object.data.data.url,
-                            };
-                            data.actor = {
-                                id: value.actor.id,
-                                name: value.actor.data.data.name,
-                                userName: value.actor.data.data.username,
-                                photoUrl: value.actor.data.data.photoUrl,
-                                website: value.actor.data.data.website,
-                            };
-                            data.isOwner = (blormapp.user.id === value.actor.id);
-                            data.ownReactions = value.own_reactions;
-                            data.reactionCounts = value.reaction_counts;
-                            data.latestReactions = value.latest_reactions;
+                    postData = this.processFeedData(response.data);
 
-                            return data;
-                        }
-                        if (value.teaser) {
-                            data.error = false;
-                            data.teaser = true;
-                            data.activityId = value.id;
-                            data.object = {
-                                iri: value.object.id,
-                                type: "teaser",
-                                verb: value.verb,
-                                time: value.time,
-                                headline: value.teaser.headline,
-                                text: value.teaser.text,
-                                image: value.teaser.image,
-                                url: value.teaser.url,
-                            };
-                            data.actor = {
-                                id: value.actor.id,
-                                userName: ":-)",
-                                photoUrl: "",
-                                website: "",
-                            };
-                            data.ownReactions = value.own_reactions;
-                            data.reactionCounts = value.reaction_counts;
-                            data.latestReactions = value.latest_reactions;
-
-                            return data;
-                        }
-                    });
                 }
                 if ( postData.length > 0) {
                     blormapp.feedmodule.posts = postData;
@@ -100,6 +105,31 @@ blormapp.core = {
                 console.log(error)
             });
         },
+
+    /**
+     * get the timeline
+     */
+    feedUser: function(userId) {
+        axios.get(
+            restapiVars.root+'blormapi/v1/feed/user/'+userId,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': restapiVars.nonce,}
+            }).then(response => {
+            var postData = {};
+            console.log(response);
+            if (response.data.length > 0) {
+                postData = this.processFeedData(response.data);
+
+            }
+            if ( postData.length > 0) {
+                blormapp.feedmodule.posts = postData;
+            }
+        }).catch(error => {
+            console.log(error)
+        });
+    },
 
     /**
      * postCreate
@@ -122,12 +152,10 @@ blormapp.core = {
 
                 // update the feed
                 blormapp.core.feedTimeline();
-
                 return true;
 
             }).catch(function (error) {
                 console.log(error);
-
                 return false;
             });
         },
@@ -220,23 +248,6 @@ blormapp.core = {
         });
         //Returns Promise object
         return promiseObj;
-        /*
-        axios.post(
-            restapiVars.root+'blormapi/v1/blogpost/share',
-            shareJSONObj,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': restapiVars.nonce,}
-            }).then(function (response) {
-
-            // update the feed
-            blormapp.core.feedTimeline();
-
-            // reset interface status
-        }).catch(function (error) {
-            console.log(error);
-        });*/
     },
 
     /**
@@ -349,8 +360,8 @@ blormapp.core = {
             }
         };
 
-        jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","0.5");
-        jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', true);
+        jQuery( ".BlormFeed_Action--comment" ).css("opacity","0.5");
+        jQuery( ".BlormFeed_Action--comment button" ).prop('disabled', true);
 
         axios.post(
             restapiVars.root+'blormapi/v1/comment/create',
@@ -360,8 +371,8 @@ blormapp.core = {
                     'Content-Type': 'application/json',
                     'X-WP-Nonce': restapiVars.nonce,}
             }).then(function (response) {
-                jQuery( ".Blorm_Blormfeed_Action--comment" ).css("opacity","1");
-                jQuery( ".Blorm_Blormfeed_Action--comment button" ).prop('disabled', false);
+                jQuery( ".BlormFeed_Action--comment" ).css("opacity","1");
+                jQuery( ".BlormFeed_Action--comment button" ).prop('disabled', false);
 
                 // update the feed
                 blormapp.core.feedTimeline();

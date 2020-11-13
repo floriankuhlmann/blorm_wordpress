@@ -12,7 +12,7 @@
     jQuery(document).ready(function(){
 
         blormapp.appInput = new Vue({
-            el: '#Blorm_appInput',
+            el: '#BlormNewPost',
             data: {
                 headline: '',
                 text: '',
@@ -34,14 +34,14 @@
                         console.log("text: "+this.headline);
                         jQuery( ".helper-text.comment" ).html( "please insert a short teaser text" );
                     }
-                    if (jQuery("#selectblogpost").val() == null) {
-                        console.log("blogpost: "+ jQuery("#selectblogpost").val());
+                    if (jQuery("#BlormWidgetFormSelectBlogPost").val() == null) {
+                        console.log("blogpost: "+ jQuery("#BlormWidgetFormSelectBlogPost").val());
                         jQuery( ".helper-text.posturl" ).html( "please select a blogpost to share" );
                     }
                     if ($('#file').get(0).files.length === 0) {
                         jQuery( ".helper-text.image" ).html( "please select an image for " );
                     }
-                    if (!this.text || !this.headline || jQuery("#selectblogpost").val() == null) {
+                    if (!this.text || !this.headline || jQuery("#BlormWidgetFormSelectBlogPost").val() == null) {
                         console.log("data error");
                         return false;
                     }
@@ -49,10 +49,10 @@
                     var headline = this.headline;
                     var text = this.text;
                     var posturl = "";
-                    var postid = jQuery("#selectblogpost").val();
+                    var postid = jQuery("#BlormWidgetFormSelectBlogPost").val();
 
-                    jQuery( ".blorm-form-newpost" ).css("opacity","0.5");
-                    jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', true);
+                    jQuery( ".BlormWidgetFormNewPost" ).css("opacity","0.5");
+                    jQuery( "#BlormWidgetFormNewPostEnabler" ).prop('disabled', true);
 
                     responsePromise = blormapp.core.postFileUpload(this.file);
                     responsePromise.then(handleUploadResponse, handleUploadError);
@@ -62,9 +62,9 @@
 
                         if (response.data.error) {
                             jQuery(".helper-text.image" ).html(response.data.error);
-                            jQuery("#selectblogpost").val(0).prop('selected', true);
-                            jQuery(".blorm-form-newpost" ).css("opacity","1");
-                            jQuery("#blorm-form-newpost-enabler" ).prop('disabled', false);
+                            jQuery("#BlormWidgetFormSelectBlogPost").val(0).prop('selected', true);
+                            jQuery(".BlormWidgetFormNewPost" ).css("opacity","1");
+                            jQuery("#BlormWidgetFormNewPostEnabler" ).prop('disabled', false);
 
                             return;
                         }
@@ -94,9 +94,9 @@
                         blormapp.appInput.text = null;
                         blormapp.appInput.file = null;
 
-                        jQuery("#selectblogpost").val(0).prop('selected', true);
-                        jQuery( ".blorm-form-newpost" ).css("opacity","1");
-                        jQuery( "#blorm-form-newpost-enabler" ).prop('disabled', false);
+                        jQuery("#BlormWidgetFormSelectBlogPost").val(0).prop('selected', true);
+                        jQuery( ".BlormWidgetFormNewPost" ).css("opacity","1");
+                        jQuery( "#BlormWidgetFormNewPostEnabler" ).prop('disabled', false);
 
 
                     }
@@ -107,7 +107,7 @@
 
                 },
                 insertPostValues: function() {
-                    id = $("#selectblogpost option:selected").val();
+                    id = $("#BlormWidgetFormSelectBlogPost option:selected").val();
                     Object.keys(blormapp.recentPosts).forEach(key => {
                         // the name of the current key.
                         if (id == blormapp.recentPosts[key].id ) {
@@ -130,10 +130,10 @@
 </script>
 
 
-<div class="widget-control-actions">
-    <div id="Blorm_appInput" class="blorm-form-newpost">
+<div class="BlormWidgetContainer">
+    <div id="BlormNewPost" class="BlormWidgetFormNewPost">
         <form @submit.prevent="submit_new_post" enctype="multipart/form-data">
-            <fieldset id="blorm-form-newpost-enabler">
+            <fieldset id="BlormWidgetFormNewPostEnabler">
                 <div class="margin-bottom-10">
                     <?php
                         $recent_posts = wp_get_recent_posts();
@@ -156,8 +156,8 @@
 
 
                     ?>
-                    <label for="selectblogpost">Select a Blogpost to share</label>
-                    <select id="selectblogpost" @change="insertPostValues()">
+                    <label for="BlormWidgetFormSelectBlogPost">Select a Blogpost to share</label>
+                    <select id="BlormWidgetFormSelectBlogPost" @change="insertPostValues()">
                         <option value="0" disabled selected>Available Blogposts</option>
                         <?php
 

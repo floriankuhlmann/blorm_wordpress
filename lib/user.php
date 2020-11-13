@@ -35,6 +35,13 @@ function getUserDataFromBlorm() {
 
     $jsonObjResponse = json_decode($ApiResponse["body"]);
 
+    //var_dump($jsonObjResponse);die();
+
+	if ($jsonObjResponse == null) {
+		$returnObj->error = "Apiresponse is empty";
+		return $returnObj;
+	}
+
     $user = new stdClass();
     $user->name = $jsonObjResponse->name;
     $user->blormhandle = $jsonObjResponse->blormhandle;

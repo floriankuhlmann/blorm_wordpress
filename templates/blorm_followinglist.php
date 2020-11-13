@@ -46,8 +46,8 @@
                 },
 
             },
-            template:   '<div v-on:click="confirmUnfollow(follower.Person.id,follower.Person.blormhandle)" class="FollowingBlogList_Blog">' +
-                '<div class="FollowingBlogList_Blog_Img">' +
+            template:   '<div v-on:click="confirmUnfollow(follower.Person.id,follower.Person.blormhandle)" class="BlormFollowListUser">' +
+                '<div class="BlormFollowListUserImg">' +
                 '<span v-if="follower.Person.photo_url.length">' +
                 '<img v-bind:src="follower.Person.photo_url">'+
                 '</span>' +
@@ -57,7 +57,7 @@
         });
 
         blormapp.blormFollowingListing = new Vue({
-            el: '#blormfollowinglisting',
+            el: '#BlormFollowingList',
             mounted() {
                 console.log("blormfollowinglist mounted");
                 this.getFollowingUsers();
@@ -85,11 +85,13 @@
 </script>
 
 
-<div class="FollowingBlogList" id="blormfollowinglisting">
-    <blorm-followinglist
-            v-for="follower in followers"
-            v-bind:key="follower.id"
-            v-bind:follower="follower"
-    ></blorm-followinglist>
-    <div style="clear: both"></div>
+<div class="BlormWidgetContainer">
+    <div class="BlormFollowingList" id="BlormFollowingList">
+        <blorm-followinglist
+                v-for="follower in followers"
+                v-bind:key="follower.id"
+                v-bind:follower="follower"
+        ></blorm-followinglist>
+        <div style="clear: both"></div>
+    </div>
 </div>

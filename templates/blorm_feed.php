@@ -11,7 +11,7 @@
 <script type="application/javascript">
     jQuery(document).ready(function() {
         blormapp.feedmodule = new Vue({
-            el: '#Blorm_feedmodule',
+            el: '#BlormFeed',
             created() {},
             data: {
                 posts: blormapp.core.feedTimeline(),
@@ -24,10 +24,10 @@
 
 </script>
 
-<div class="widget-control-actions">
+<div class="BlormWidgetContainer">
     <!-- App -->
-    <div id="Blorm_feedmodule" class="Blorm_Blormfeed">
-        <div class="row" id="appFeed">
+    <div id="BlormFeed" class="Blormfeed">
+        <div class="row">
             <div class="col s12">
                 <blorm-feed-post
                         v-for="post in posts"

@@ -5,7 +5,7 @@
     jQuery(document).ready(function(){
 
         blormapp.usermodule = new Vue({
-            el: '#Blorm_usermodule',
+            el: '#BlormUserSearch',
             data: {
                 usernamefollow: ''
             },
@@ -39,11 +39,10 @@
     });
 </script>
 
-
-<!-- App -->
-<div id="Blorm_usermodule" class="BlormUserModule">
-    <div id="Blorm-usermodule-follow">
-        <div id="appFeed" class="blorm-bloglist margin-bottom-10">
+<div class="BlormWidgetContainer">
+    <!-- App -->
+    <div id="BlormUserSearch" class="BlormUserSearch">
+        <div class="margin-bottom-10">
             <form @submit.prevent="followBlog">
                 <div id="title-wrap" class="input-text-wrap margin-bottom-10">
                     <label for="usernamefollow">Insert account name to follow</label>
