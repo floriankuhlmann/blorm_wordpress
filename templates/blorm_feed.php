@@ -1,5 +1,10 @@
 <?php
 
+global $blormUserData;
+if ($blormUserData->error != null) {
+	$blormUserName = $blormUserData->user->name;
+}
+
 
 /**
  * Created by PhpStorm.
@@ -21,10 +26,20 @@
             methods: {}
         });
     });
-
 </script>
 
 <div class="BlormWidgetContainer">
+    <div class="BlormFeedHeader">
+        <div class="row">
+            <div class="col s12">
+                <!-- <form>
+                    <label for="BlormWidgetFormSelectBlogPost">What happened on your Page?</label>
+                    <select id="BlormWidgetFormSelectBlogPost"><option value="0" disabled="disabled" selected="selected">Available Blogposts</option> <option value="1">Hello world!</option></select>
+                </form>-->What happened on your platform? Why don't you share it now?
+                <img src="<?php echo plugins_url( 'blorm/assets/icons/circle-arrow_forward-next-glyph.png' );?>" class="blormIcon">
+            </div>
+        </div>
+    </div>
     <!-- App -->
     <div id="BlormFeed" class="Blormfeed">
         <div class="row">

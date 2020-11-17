@@ -89,6 +89,15 @@ function preRequestLocalPostsUpdate(&$request) {
     $status = "ok";
 
     switch($parameter["restparameter"]) {
+	    case (preg_match('/^(feed\/timeline)\/?$/', $parameter["restparameter"]) ? true : false) :
+
+	    	/*error_log("feed\/timeline - pre request at: ".date("Y-m-d.h:i:sa"));
+		    error_log($parameter["restparameter"]);
+		    error_log(json_encode($body));
+		    error_log(json_encode($request->get_headers()));
+			*/
+		    break;
+
         //READ
         case (preg_match('/^(user\/data)\/?$/', $parameter["restparameter"]) ? true : false) :
 
@@ -156,7 +165,16 @@ function postRequestLocalPostsUpdate($request, $response) {
     error_log("postRequestLocalPostsUpdate restparameter: ".$parameter["restparameter"]);
 
     switch($parameter["restparameter"]) {
-        // CREATE
+	    case (preg_match('/^(feed\/timeline)\/?$/', $parameter["restparameter"]) ? true : false) :
+
+		    /*error_log("feed\/timeline - prposte request at: ".date("Y-m-d.h:i:sa"));
+		    error_log($parameter["restparameter"]);
+		    error_log(json_encode($body));
+		    error_log(json_encode($request->get_headers()));
+			*/
+		    break;
+
+	    // CREATE
         case (preg_match('/^(blogpost\/create)\/?$/', $parameter["restparameter"]) ? true : false) :
 
             $bodyObj = json_decode($body);

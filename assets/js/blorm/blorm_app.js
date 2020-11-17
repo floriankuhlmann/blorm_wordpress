@@ -10,6 +10,10 @@ blormapp.core = {
             initCommentText: "Leave a comment. Please remember, be nice!",
     },
     processFeedData: function(posts) {
+
+        console.log("processData");
+        console.log(posts);
+
         postData = posts.map(function (value) {
             var data = {};
             // check for errors in the data
@@ -49,10 +53,9 @@ blormapp.core = {
                 data.ownReactions = value.own_reactions;
                 data.reactionCounts = value.reaction_counts;
                 data.latestReactions = value.latest_reactions;
-console.log(data);
                 return data;
             }
-            if (value.teaser) {
+            /*if (value.teaser) {
                 data.error = false;
                 data.teaser = true;
                 data.activityId = value.id;
@@ -77,7 +80,7 @@ console.log(data);
                 data.latestReactions = value.latest_reactions;
 
                 return data;
-            }
+            }*/
         });
         return postData;
     },

@@ -13,6 +13,13 @@ class blorm_menue_bar {
 
         this.blormAssets = blormapp.postConfig.blormAssets;
 
+        console.log(blormPostData);
+        this.OriginWebsiteName = blormPostData.OriginWebsiteName;
+        this.OriginWebsiteUrl = blormPostData.OriginWebsiteUrl;
+        console.log("OriginWebsiteName");
+
+        console.log(this.OriginWebsiteName);
+
         // get the activity_id for the post
         this.postId = blormPostData.postid;
 
@@ -267,7 +274,7 @@ class blorm_menue_bar {
                             </div>
                         </div>
                         <div class="blormWidgetPowerText">
-                            Origin: <a href="http://www.de">www.blog3-ist-ghile.de</a>
+                            Origin: <a href="${this.OriginWebsiteUrl}">${this.OriginWebsiteName}</a>
                         </div>`;
 
         this.ContainerDisplay = document.createElement("div");
@@ -400,7 +407,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let id = BlormWidget.dataset.postid;
         post = getPostById(id);
-
+console.log(post);
         if (Object.keys(post).length !== 0) {
             blormMenuBar = new blorm_menue_bar(post)
             //console.log(blormMenuBar);

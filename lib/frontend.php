@@ -93,90 +93,94 @@ function add_getstream_data_to_head() {
     foreach ($bodyObjects as $bodyObject) {
 
 	    $getStreamData = new stdClass();
-    	// CREATED POSTS
-    	// search for the data of the created posts
-        if (array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id")) !== false) {
+	    if (isset($bodyObject->id)) {
 
-            $id = array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id"));
-            $getStreamData->PostId = $aBlormCreatePosts[$id]["post_id"];
+	        // CREATED POSTS
+	        // search for the data of the created posts
+	        if (array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id")) !== false) {
 
-            $getStreamData->ActivityId = $bodyObject->id;
+	            $id = array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id"));
+	            $getStreamData->PostId = $aBlormCreatePosts[$id]["post_id"];
 
-	        $getStreamData->ReblogedCount = 0;
-	        $getStreamData->CommentsCount = 0;
-	        $getStreamData->SharedCount = 0;
+	            $getStreamData->ActivityId = $bodyObject->id;
 
-	        if (isset($bodyObject->reaction_counts->reblog)) {
-		        $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+		        $getStreamData->ReblogedCount = 0;
+		        $getStreamData->CommentsCount = 0;
+		        $getStreamData->SharedCount = 0;
+
+		        if (isset($bodyObject->reaction_counts->reblog)) {
+			        $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+		        }
+
+		        if (isset($bodyObject->latest_reactions->reblog)) {
+			        $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
+		        }
+
+		        if (isset($bodyObject->reaction_counts->comment)) {
+			        $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
+		        }
+
+		        if (isset($bodyObject->latest_reactions->comment)) {
+			        $getStreamData->Comments = $bodyObject->latest_reactions->comment;
+		        }
+
+		        if (isset($bodyObject->reaction_counts->shared)) {
+			        $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+		        }
+
+		        if (isset($bodyObject->latest_reactions->shared)) {
+			        $getStreamData->Shared = $bodyObject->latest_reactions->shared;
+		        }
+
+		        $aGetStreamCreatedData[$getStreamData->PostId] = $getStreamData;
 	        }
 
-	        if (isset($bodyObject->latest_reactions->reblog)) {
-		        $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
-	        }
 
-	        if (isset($bodyObject->reaction_counts->comment)) {
-		        $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
-	        }
+	        // REBLOGED POSTS
+		    if (array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id")) !== false) {
 
-	        if (isset($bodyObject->latest_reactions->comment)) {
-		        $getStreamData->Comments = $bodyObject->latest_reactions->comment;
-	        }
+		        //var_dump($bodyObject->actor->data);
 
-	        if (isset($bodyObject->reaction_counts->shared)) {
-		        $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
-	        }
+			    $id = array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id"));
+			    $getStreamData->PostId = $aBlormReblogedPosts[$id]["post_id"];
+			    $getStreamData->ActivityId = $bodyObject->id;
+			    $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
+			    $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
+			    $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
+			    $getStreamData->OriginWebsiteName = $bodyObject->actor->data->data->website_name;
+			    $getStreamData->OriginWebsiteUrl = $bodyObject->actor->data->data->website_url;
 
-	        if (isset($bodyObject->latest_reactions->shared)) {
-		        $getStreamData->Shared = $bodyObject->latest_reactions->shared;
-	        }
+			    $getStreamData->ReblogedCount = 0;
+			    $getStreamData->CommentsCount = 0;
+			    $getStreamData->SharedCount = 0;
 
-	        $aGetStreamCreatedData[$getStreamData->PostId] = $getStreamData;
-        }
+			    if (isset($bodyObject->reaction_counts->reblog)) {
+				    $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+			    }
 
+			    if (isset($bodyObject->latest_reactions->reblog)) {
+				    $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
+			    }
 
-        // REBLOGED POSTS
-	    if (array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id")) !== false) {
+			    if (isset($bodyObject->reaction_counts->comment)) {
+				    $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
+			    }
 
-	    	//var_dump($bodyObject->actor->data);
+			    if (isset($bodyObject->latest_reactions->comment)) {
+				    $getStreamData->Comments = $bodyObject->latest_reactions->comment;
+			    }
 
-		    $id = array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id"));
-		    $getStreamData->PostId = $aBlormReblogedPosts[$id]["post_id"];
-		    $getStreamData->ActivityId = $bodyObject->id;
-		    $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
-		    $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
-		    $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
-		    $getStreamData->OriginWebsiteName = $bodyObject->actor->data->data->website_name;
-		    $getStreamData->OriginWebsiteUrl = $bodyObject->actor->data->data->website_url;
+			    if (isset($bodyObject->reaction_counts->shared)) {
+				    $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+			    }
 
-		    $getStreamData->ReblogedCount = 0;
-		    $getStreamData->CommentsCount = 0;
-		    $getStreamData->SharedCount = 0;
+			    if (isset($bodyObject->latest_reactions->shared)) {
+				    $getStreamData->Shared = $bodyObject->latest_reactions->shared;
+			    }
 
-		    if (isset($bodyObject->reaction_counts->reblog)) {
-			    $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+			    $aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
 		    }
 
-		    if (isset($bodyObject->latest_reactions->reblog)) {
-			    $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
-		    }
-
-		    if (isset($bodyObject->reaction_counts->comment)) {
-			    $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
-		    }
-
-		    if (isset($bodyObject->latest_reactions->comment)) {
-			    $getStreamData->Comments = $bodyObject->latest_reactions->comment;
-		    }
-
-		    if (isset($bodyObject->reaction_counts->shared)) {
-			    $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
-		    }
-
-		    if (isset($bodyObject->latest_reactions->shared)) {
-			    $getStreamData->Shared = $bodyObject->latest_reactions->shared;
-		    }
-
-		    $aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
 	    }
 
 

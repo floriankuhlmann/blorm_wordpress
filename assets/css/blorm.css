@@ -77,6 +77,28 @@
 
 
 /* blorm feed */
+.blormIcon {
+    height: 1rem;
+    width: auto;
+    margin-bottom: -0.25rem;
+
+}
+
+.blormImage {
+    height: 1rem;
+    width: auto;
+    margin-bottom: -0.2rem;
+    margin-right: 0.25rem;
+}
+
+
+.BlormFeedHeader {
+    margin-bottom: 1rem;
+    padding:0.5rem 0.5rem 0.5rem 0.5rem;
+    border:1px solid #eee;
+    background-color: rgb(252, 252, 252);
+    text-align: right;
+}
 
 .BlormFeedPost {
     margin-bottom: 3rem;
@@ -87,6 +109,16 @@
 
 .BlormFeedPost.sharedpost {
     background-color: darkgrey;
+}
+
+.BlormFeedPost .blorm-feed-post-headline {
+    width:75%;
+    display: inline-block;
+}
+
+.BlormFeedPost .blorm-feed-post-headline span.BlormFeedHeadlineUser {
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .BlormFeedImage img {
@@ -106,6 +138,10 @@
 
 .BlormFeedEdit--Mod {
     float: right;
+}
+
+.BlormFeedEdit--Mod button {
+    margin-top: 1.75rem;
 }
 
 .BlormFeedPostcomment_Content {

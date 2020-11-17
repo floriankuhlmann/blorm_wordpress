@@ -156,7 +156,7 @@
 
 
                     ?>
-                    <label for="BlormWidgetFormSelectBlogPost">Select a Blogpost to share</label>
+                    <label for="BlormWidgetFormSelectBlogPost">Select one of your posts</label>
                     <select id="BlormWidgetFormSelectBlogPost" @change="insertPostValues()">
                         <option value="0" disabled selected>Available Blogposts</option>
                         <?php

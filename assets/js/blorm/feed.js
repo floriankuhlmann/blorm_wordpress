@@ -19,7 +19,7 @@ jQuery(document).ready(function() {
         }
     },
     template: //'<div v-if="latest_reactions.comment">' +
-        '<div class="BlormFeedPostcomments>">' +
+        '<div class="blorm-feed-comment>">' +
         '<template v-for="commentitem in latest_reactions.comment">' +
         '<div :data-id="commentitem.id" class="BlormFeedPostcomment">' +
         '<div class="BlormFeedPostcomment_User"><img :src="commentitem.user.data.data.photo_url" style="width:100%; height: auto;"></div>' +
@@ -66,6 +66,12 @@ jQuery(document).ready(function() {
         '</div>\n'
     });
 
+    /*
+   * component
+   * 'blorm-feed-post-headline'
+   *
+   */
+
     Vue.component('blorm-feed-post-headline', {
         props: ['post','blormapp.core'],
         methods: {
@@ -74,21 +80,23 @@ jQuery(document).ready(function() {
                 return moment(date.getTime() + 60*60*1000*2).fromNow();
             },
             renderIcon: function(verb) {
+                let icon = "";
+                let imgsrc = templateUrl+"/blorm/assets/icons/";
                 switch (verb) {
                     case "share":
-                        imgsrc = templateUrl+"/blorm/assets/icons/circle-sync-backup-1-glyph.png";
+                        icon = "circle-sync-backup-1-glyph.png";
                         break;
                     case "reblog":
-                        imgsrc = templateUrl+"/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png";
+                        icon = "editor-copy-2-duplicate-outline-stroke.png";
                         break;
                     case "create":
-                        imgsrc = templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
+                        icon = "other-arrow-right-other-outline-stroke.png";
                         break;
                     default:
-                        imgsrc = templateUrl+"/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
+                        imgsrc = "other-arrow-right-other-outline-stroke.png";
                         break;
                 }
-                return imgsrc;
+                return imgsrc + icon;
             },
             renderAction: function(verb) {
                 switch (verb) {
@@ -111,8 +119,6 @@ jQuery(document).ready(function() {
                 if (post.isOwner) {
                     userlink = "You";
                 } else {
-                    //userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
-                    //userlink = "<span v-on:click=\"console.log(this.post.actor.id)\">{{post.actor.name}}</span>";
                     userlink = post.actor.name;
                 }
                 return userlink;
@@ -123,18 +129,18 @@ jQuery(document).ready(function() {
             },
         },
         template:
-            '<div>' +
+            '<div class="blorm-feed-post-headline">' +
             '<div style=\"margin-bottom: 0.5rem;\">' +
             '<i style=\"color:grey\">{{renderDate(post.object.time)}}</i>' +
             '</div>' +
-            '<div style=\"width:75%;display: inline-block;\">' +
+            '<div>' +
             '<img :src="renderIcon(post.object.verb)" style=\"height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;\">' +
-            '<span v-if="post.isOwner === true">' +
+            '<template v-if="post.isOwner === true">' +
                 '<b>{{renderUser(post)}} {{renderAction(post.object.verb)}}</b>' +
-            '</span>' +
-            '<span v-else>' +
-                '<b><span v-on:click="feedUser(post.actor.id)">{{renderUser(post)}}</span> {{renderAction(post.object.verb)}}</b>' +
-            '</span>' +
+            '</template>' +
+            '<template v-else>' +
+                '<b><span v-on:click="feedUser(post.actor.id)" class="BlormFeedHeadlineUser">{{renderUser(post)}}</span> {{renderAction(post.object.verb)}}</b>' +
+            '</template>' +
             '</div>' +
             '</div>'
     });
@@ -148,40 +154,6 @@ jQuery(document).ready(function() {
     Vue.component('blorm-feed-post', {
     props: ['post','blormusername','newcomment'],
     computed: {
-        /*postHeadline: function() {
-            switch (this.post.object.verb) {
-                case "share":
-                    imgsrc = "/blorm/assets/icons/circle-sync-backup-1-glyph.png";
-                    action = "shared this";
-                    break;
-                case "reblog":
-                    imgsrc = "/blorm/assets/icons/editor-copy-2-duplicate-outline-stroke.png";
-                    action = "reblogged this";
-                    break;
-                case "create":
-                    imgsrc = "/blorm/assets/icons/other-arrow-right-other-outline-stroke.png";
-                    action = "posted this";
-                    break;
-                default:
-                    statusline = "<span>Welcome to BLORM</span>";
-                    break;
-            }
-
-            if (this.post.isOwner) {
-                userlink = "You";
-            } else {
-                //userlink = "<a href='http://"+this.post.actor.website+"'>"+this.post.actor.name+"</a>";
-                userlink = "<span v-on:click=\"console.log(this.post.actor.id)\">"+this.post.actor.name+"</span>";
-            }
-
-            return "<div style=\"margin-bottom: 0.5rem\";>" +
-                    "<i style='color:grey'>"+this.showdate(this.post.object.time)+"</i>" +
-                    "</div>" +
-                    "<div style=\"width:75%;display: inline-block;\"'>" +
-                    "<img src='"+templateUrl+imgsrc+"' style='height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;'>" +
-                    "<b>"+userlink+" "+action+"</b>" +
-                    "</div>";
-        },*/
         postImage: function() {
             if (this.post.object.image === "non" || this.post.object.image == null ) {
                 return "";
@@ -233,7 +205,7 @@ jQuery(document).ready(function() {
         },
     },
     template: '<span v-if="post.error === false">' +
-        '           <span v-if="post.teaser === true">' +
+        '       <template v-if="post.teaser === true">' +
         '           <div class="BlormFeedPost" :class="post.object.verb" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">\n' +
         '                <div class="BlormFeedEdit">' +
         '                   <div class="BlormFeedEdit--Date">' +
@@ -282,12 +254,12 @@ jQuery(document).ready(function() {
         '                   </div>\n' +
         '               </div>\n' +
         '            </div>' +
-        '           </span>' +
-        '           <span v-else>' +
+        '       </template>' +
+        '       <template v-else>' +
         '           <div class="BlormFeedPost">' +
         '               There is no post in your timeline.<br>Why dont you share something or follow someone?' +
         '           </div>' +
-        '           </span>' +
+        '       </template>' +
         '</span>'
 
     });

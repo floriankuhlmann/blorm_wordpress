@@ -1,5 +1,8 @@
 <?php
 
+//var_dump(admin_url());
+//var_dump(get_dashboard_url());die();
+
 // Enqueue Stylesheet and Js for admin area.
 add_action( 'admin_enqueue_scripts', 'enqueue_blorm_admin_theme_style');
 
@@ -68,10 +71,17 @@ function prepare_dashboard_meta() {
     remove_action('welcome_panel', 'wp_welcome_panel');
 
     //https://codex.wordpress.org/Dashboard_Widgets_API
-    add_meta_box( 'BlormDashboardWidgetNewPost', 'BLORM - post it ', 'dashboard_widget_blorm_newpost', 'dashboard', 'side', 'high' );
-    add_meta_box( 'BlormDashboardWidgetSearchUser', 'BLORM - who do you want to follow?', 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'high' );
-    add_meta_box( 'BlormDashboardWidgetFollowing', 'BLORM - you are following', 'dashboard_widget_blorm_followinglist' , 'dashboard', 'side', 'high' );
-    add_meta_box( 'BlormDashboardWidgetFollowers', 'BLORM - your followers', 'dashboard_widget_blorm_followerlist' , 'dashboard', 'side', 'high' );
+	$newPostTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_bubble.png' )."\" class=\"blormImage\"> share here and now:";
+	add_meta_box( 'BlormDashboardWidgetNewPost', $newPostTitle, 'dashboard_widget_blorm_newpost', 'dashboard', 'side', 'high' );
+
+	$searchUserTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> who do you want to follow? ";
+    add_meta_box( 'BlormDashboardWidgetSearchUser', $searchUserTitle, 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'high' );
+
+	$followingTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> you are following:";
+	add_meta_box( 'BlormDashboardWidgetFollowing', $followingTitle, 'dashboard_widget_blorm_followinglist' , 'dashboard', 'side', 'high' );
+
+	$followerTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> your followers:";
+	add_meta_box( 'BlormDashboardWidgetFollowers', $followerTitle, 'dashboard_widget_blorm_followerlist' , 'dashboard', 'side', 'high' );
 
 }
 
@@ -110,10 +120,10 @@ function add_dashboard_blorm_feed_widget() {
     if ($blormUserData->error == null) {
         $blormUserName = $blormUserData->user->name;
     }
-
+	$title = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_logo_world.png' )."\" class=\"blormImage\"> - ". $blormUserName;
     wp_add_dashboard_widget(
         'BlormDashboardWidgetFeed', // Widget slug.
-        'Hello '. $blormUserName.' this is your Blormfeed:', // Title.
+        $title, // Title.
         'blorm_dashboard_widget_feed_function' // Display function.
     );
 }
