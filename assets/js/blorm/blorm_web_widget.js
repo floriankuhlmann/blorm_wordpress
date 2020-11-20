@@ -11,14 +11,50 @@ class blorm_menue_bar {
 
     constructor(blormPostData) {
 
+        /* setup config */
+
+        // path to the plugin assets
         this.blormAssets = blormapp.postConfig.blormAssets;
 
-        console.log(blormPostData);
+        // config option, float the widget to left or right
+        this.widgetFloat = blormapp.postConfig.float;
+
+        // a class to wrap the widget for better css styling
+        this.classForWidgetPlacement = blormapp.postConfig.classForWidgetPlacement;
+
+        // set the unit for possible position adjustment
+        this.positionUnit = "px";
+        if (blormapp.postConfig.positionUnit === "unit_px") {
+            this.positionUnit = "px";
+        }
+        if (blormapp.postConfig.positionUnit === "unit_percent") {
+            this.positionUnit = "%";
+        }
+
+        // blormapp.postConfig.positionTop
+        this.positionTop = 0;
+        if (blormapp.postConfig.positionTop !== "") {
+            this.positionTop = blormapp.postConfig.positionTop;
+        }
+
+        this.positionRight = 0;
+        if (blormapp.postConfig.positionRight !== "") {
+            this.positionRight = blormapp.postConfig.positionRight;
+        }
+
+        this.positionBottom = 0;
+        if (blormapp.postConfig.positionBottom !== "") {
+            this.positionBottom = blormapp.postConfig.positionBottom;
+        }
+
+        this.positionLeft = 0;
+        if (blormapp.postConfig.positionLeft !== "") {
+            this.positionLeft = blormapp.postConfig.positionLeft;
+        }
+
+        // config for origin link on widget
         this.OriginWebsiteName = blormPostData.OriginWebsiteName;
         this.OriginWebsiteUrl = blormPostData.OriginWebsiteUrl;
-        console.log("OriginWebsiteName");
-
-        console.log(this.OriginWebsiteName);
 
         // get the activity_id for the post
         this.postId = blormPostData.postid;
@@ -136,7 +172,7 @@ class blorm_menue_bar {
                     let h = _this.PowerbarContent.scrollHeight;
                     console.log(h);
 
-                    _this.Powerbar.style.height = h + 10 + "px";
+                    _this.Powerbar.style.height = h + 1 + "px";
                     _this.Powerbar.style.top =  "-" + h + "px";
                     _this.PowerbarContent.style.backgroundColor = "#000";
                     _this.PowerbarContent.style.color = "#fff";
@@ -246,7 +282,9 @@ class blorm_menue_bar {
         this.Powerbar.appendChild(this.PowerbarContent);
 
         const markupContainerDisplay = `
-                        <div class="blormWidgetPlus">
+                            <div class="blormWidgetPlusLogoIcon blormWidgetPlusSocialBarEventHandler">
+                                <img src="${this.blormAssets}/images/blorm_icon.png" class="blormWidgetPlusLogoIconImg">
+                            </div>
                             <div class="blormWidgetPlusSocial">
                                 <ul class="blormWidgetPlusSocialBar">
                                     <li class="blormWidgetPlusSocialBarIcon blormWidgetPlusSocialBarEventHandler blormWidgetPlusSocialBarRebloged">
@@ -269,17 +307,26 @@ class blorm_menue_bar {
                                     </li>
                                 </ul>
                             </div>
-                            <div class="blormWidgetPlusLogoIcon blormWidgetPlusSocialBarEventHandler">
-                                <img src="${this.blormAssets}/images/blorm_icon.png" class="blormWidgetPlusLogoIconImg">
-                            </div>
-                        </div>
-                        <div class="blormWidgetPowerText">
-                            Origin: <a href="${this.OriginWebsiteUrl}">${this.OriginWebsiteName}</a>
-                        </div>`;
+                            <div style="clear: both;"></div>`;
 
         this.ContainerDisplay = document.createElement("div");
         this.ContainerDisplay.classList.add("blormWidgetContainerDisplay");
-        this.ContainerDisplay.innerHTML = markupContainerDisplay;
+
+        this.BlormWidgetPlus = document.createElement("div");
+        this.BlormWidgetPlus.classList.add("blormWidgetPlus");
+        this.BlormWidgetPlus.innerHTML = markupContainerDisplay;
+
+        this.ContainerDisplay.append(this.BlormWidgetPlus)
+
+
+        this.BlormWidgetPowerText = document.createElement("div");
+        this.BlormWidgetPowerText.classList.add("blormWidgetPowerText");
+        let originWebsiteLink = document.createElement("a");
+        originWebsiteLink.href = this.OriginWebsiteUrl;
+        originWebsiteLink.innerText = this.OriginWebsiteName;
+        this.BlormWidgetPowerText.append(originWebsiteLink);
+        this.ContainerDisplay.appendChild(this.BlormWidgetPowerText);
+
 
         /* put it all together */
         this.ContainerMenu.appendChild(this.Powerbar);
@@ -287,8 +334,21 @@ class blorm_menue_bar {
 
         /* a box to float the menue left or right */
         this.ContainerMenuBox = document.createElement("div");
-        this.ContainerMenuBox.classList.add("AlignRight");
+        if (this.widgetFloat === "float_left") {
+            this.ContainerMenuBox.classList.add("FloatLeft");
+            this.BlormWidgetPlus.classList.add("FloatLeft");
+            this.BlormWidgetPowerText.classList.add("FloatLeft");
+            this.BlormWidgetPowerText.classList.add("AlignLeft");
+            this.Powerbar.classList.add("PositionLeft");
+        }
 
+        if (this.widgetFloat === "float_right") {
+            this.ContainerMenuBox.classList.add("FloatRight");
+            this.BlormWidgetPlus.classList.add("FloatRight");
+            this.BlormWidgetPowerText.classList.add("FloatRight");
+            this.BlormWidgetPowerText.classList.add("AlignRight");
+            this.Powerbar.classList.add("PositionRight");
+        }
         this.ContainerMenuBox.appendChild(this.ContainerMenu);
 
         // prepare the widget
@@ -297,7 +357,13 @@ class blorm_menue_bar {
     }
 
     GetWidget() {
-
+        this.setPosition(this.ContainerMenu);
+        if (this.classForWidgetPlacement !== "") {
+            let blormWidgetClassBox = document.createElement("div");
+            blormWidgetClassBox.className = this.classForWidgetPlacement;
+            blormWidgetClassBox.append(this.ContainerMenuBox);
+            return blormWidgetClassBox;
+        }
         return this.blormWidget;
     }
 
@@ -311,7 +377,14 @@ class blorm_menue_bar {
     }
 
     GetMenue() {
-        return this.this.ContainerMenuBox;
+        this.setPosition(this.ContainerMenu);
+        if (this.classForWidgetPlacement !== "") {
+            let ContainerMenuClassBox = document.createElement("div");
+            ContainerMenuClassBox.className = this.classForWidgetPlacement;
+            ContainerMenuClassBox.append(this.ContainerMenuBox);
+            return ContainerMenuClassBox;
+        }
+        return this.ContainerMenuBox;
     }
 
     GetMenueClassBoxed(ClassName) {
@@ -323,23 +396,22 @@ class blorm_menue_bar {
     }
 
     setPosition(element) {
-        if (blormapp.postConfig.positionTop !== 0) {
-            let x = 0 - blormapp.postConfig.positionTop;
-            element.style.marginTop = x + "%";
+        if (this.positionTop !== 0) {
+            let x = 0 - this.positionTop;
+            element.style.marginTop = x + this.positionUnit;
         }
-        if (blormapp.postConfig.positionRight !== 0) {
-            let x = 0 - blormapp.postConfig.positionRight;
-            element.style.marginRight = x + "%";
+        if (this.positionRight !== 0) {
+            let x = 0 - this.positionRight;
+            element.style.marginRight = x + this.positionUnit;
         }
-        if (blormapp.postConfig.positionBottom !== 0) {
-            let x = 0 - blormapp.postConfig.positionBottom;
-            element.style.marginBottom = x + "%";
+        if (this.positionBottom !== 0) {
+            let x = 0 - this.positionBottom;
+            element.style.marginBottom = x + this.positionUnit;
         }
-        if (blormapp.postConfig.positionLeft !== 0) {
-            let x = 0 - blormapp.postConfig.positionLeft;
-            element.style.marginLeft = x + "%";
+        if (this.positionLeft !== 0) {
+            let x = 0 - this.positionLeft;
+            element.style.marginLeft = x + this.positionUnit;
         }
-
     }
 
 }; // end blorm class
@@ -411,7 +483,7 @@ console.log(post);
         if (Object.keys(post).length !== 0) {
             blormMenuBar = new blorm_menue_bar(post)
             //console.log(blormMenuBar);
-            BlormWidget.appendChild(blormMenuBar.GetMenueClassBoxed("entry-content"));
+            BlormWidget.appendChild(blormMenuBar.GetMenue());
         }
     });
 });

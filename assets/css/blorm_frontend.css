@@ -18,7 +18,7 @@
     position: relative;
     width:100%;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.75rem;
+    font-size: 14px;
     color: #000;
 }
 
@@ -26,14 +26,28 @@
     /* border:1px solid green;*/
 }
 
-.blormWidget .AlignRight {
+.blormWidget .FloatRight {
     float:right;
-    margin: 0 !important;
+}
+
+.blormWidget .AlignRight {
+    text-align:right;
+}
+
+.blormWidget .PositionRight {
+    right:0;
+}
+
+.blormWidget .FloatLeft {
+    float:left;
 }
 
 .blormWidget .AlignLeft {
-    float:left;
-    margin: 0 !important;
+    text-align:left;
+}
+
+.blormWidget .PositionLeft {
+    left:0;
 }
 
 .blormWidget .blormWidgetContainerMenu {
@@ -51,14 +65,17 @@
     /*display: inline-block;
     padding: 0 0 3px 0;
     margin: 0;
-*/
-    height: 30px;
+
+    width:160px;*/
+    display: block;
+    height: 25px;
+    border-bottom: 1px solid black;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocial {
-    height: 30px;
-    float: left;
-    padding: 0 0.25rem 0 0;
+    height: 25px;
+    float: right;
+    padding: 0 2px 0 0;
     margin: 0;
 }
 
@@ -78,29 +95,30 @@
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocial ul li.blormWidgetPlusSocialBarIcon img {
-    padding-right: 0.2rem;
-    padding-bottom: 0.2rem;
-    height: 1rem;
+    padding-right: 1px;
+    padding-bottom: 1px;
+    height: 21px;
     width: auto;
     cursor: pointer;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocial ul li.blormWidgetPlusSocialBarText{
     vertical-align: super;
-    padding-right: 0.5rem;
+    padding-right: 5px;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusLogoIcon {
-    height: 30px;
+    height: 25px;
     float: right;
-    padding: 0 0 0.25rem 0;
+    padding: 0;
     margin: 0;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusLogoIcon img {
-    height: 1rem;
+    height: 18px;
+    margin-top: 2px;
     width: auto;
-    line-height: 1rem;
+    line-height: 25px;
     cursor: pointer;
 }
 
@@ -112,7 +130,6 @@
     height:0px;
     /*border:1px solid red;*/
     top: 0px;
-    right: 0px;
     z-index:1000;
     cursor: pointer;
 }
@@ -175,12 +192,10 @@
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText {
-    padding-top: 0.1rem;
-    font-size: 0.6rem;
+    font-size: 14px;
     color: #333;
-    text-align: right;
     width: 100%;
-    border-top: 1px solid #000;
+    /*border-top: 1px solid #000;*/
 }
 
 

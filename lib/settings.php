@@ -15,6 +15,8 @@ function blorm_options_page() {
 }
 add_action( 'admin_menu', 'blorm_options_page' );
 
+
+
 function blorm_plugin_options_page_submit() {
 
 	$blorm_plugin_options_api = array();
@@ -33,9 +35,57 @@ function blorm_plugin_options_page_submit() {
             }
 
 			if (sizeof($_POST['blorm_plugin_options_category']) != 0) {
-				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
+				//update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
 			}
-        }
+
+			// blorm_plugin_options_category[blorm_category_show_reblogged]
+			if (sizeof($_POST['blorm_plugin_options_category']) != 0) {
+
+
+				// get options
+				$options = get_option( 'blorm_plugin_options_category' );
+
+				// get categoryname
+				if (isset( $options['blorm_category_show_reblogged'] )) {
+					$category = get_category( $options['blorm_category_show_reblogged'] );
+				}
+
+				$recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+
+				if (!empty($category)) {
+	                foreach ($recent_posts_with_meta as $post) {
+
+		                // get options
+		                $options = get_option( 'blorm_plugin_options_category' );
+
+		                // get categoryname
+		                if (isset( $options['blorm_category_show_reblogged'] )) {
+			                wp_remove_object_terms( $post['ID'], $category->cat_name, 'category' );
+		                }
+	                }
+                }
+
+				if ($_POST['blorm_plugin_options_category']['blorm_category_show_reblogged'] != 'no-category-selected') {
+
+                    foreach ($recent_posts_with_meta as $post) {
+	                    //error_log(json_encode($post));
+	                    wp_set_post_categories( $post['ID'], array( $_POST['blorm_plugin_options_category']['blorm_category_show_reblogged']), true );
+                    }
+					//$recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+					//error_log(json_encode($recent_posts_with_meta));
+				}
+
+				/*if ($_POST['blorm_plugin_options_category']['blorm_category_show_reblogged'] == 'no-category-selected') {
+
+					$recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+
+				}*/
+
+				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
+
+			}
+
+		}
 	}
 }
 
@@ -54,11 +104,19 @@ function blorm_render_options_page() {
     <?php
 }
 
+
+
 /*
  * https://developer.wordpress.org/reference/functions/add_settings_field/
  */
 
-function blorm_register_settings() {
+/*
+ *  api config
+ */
+
+add_action( 'admin_init', 'blorm_register_settings_api' );
+
+function blorm_register_settings_api() {
 
     //register_setting( 'blorm-plugin-api-section', 'blorm_plugin_options_api', 'blorm_plugin_options_api_validate' );
 
@@ -78,86 +136,10 @@ function blorm_register_settings() {
             'blorm-plugin-api-section' );
 
     add_option("blorm_plugin_options_api", array(), "", "yes");
-
-    // frontend rendering options
-
-    add_settings_section(
-        'blorm-plugin-frontend-section',
-        'Website display settings',
-        'blorm_plugin_frontend_section_text',
-        'blorm-plugin-frontend-section' );
-
-    /*add_settings_field(
-        'blorm_plugin_setting_add_blorm_info_origin',
-        'Origin of post',
-        'blorm_plugin_setting_add_blorm_info_origin',
-        'blorm-plugin-frontend-section',
-        'blorm-plugin-frontend-section' );*/
-
-	add_settings_field(
-		'blorm_plugin_setting_add_blorm_widget',
-		'Blorm widget',
-		'blorm_plugin_setting_add_blorm_widget',
-		'blorm-plugin-frontend-section',
-		'blorm-plugin-frontend-section' );
-
-	add_settings_field(
-	'blorm_plugin_setting_add_blorm_widget_position',
-	'Position of the widget',
-	'blorm_plugin_setting_add_blorm_widget_position',
-	'blorm-plugin-frontend-section',
-	'blorm-plugin-frontend-section' );
-
-	/*add_settings_field(
-		'blorm_plugin_setting_add_blorm_info_reblogged_content',
-		'Reblogged content widget',
-		'blorm_plugin_setting_add_blorm_info_reblogged_content',
-		'blorm-plugin-frontend-section',
-		'blorm-plugin-frontend-section' );*/
-
-	add_option("blorm_plugin_options_frontend", array(), "", "yes");
-
-
-	// display categories
-
-	add_settings_section(
-		'blorm-plugin-category-section',
-		'Category settings',
-		'blorm_plugin_category_section_text',
-		'blorm-plugin-category-section' );
-
-	add_settings_field(
-		'blorm_plugin_setting_category_automatic_post',
-		'Automatic post',
-		'blorm_plugin_setting_category_automatic_post',
-		'blorm-plugin-category-section',
-		'blorm-plugin-category-section' );
-
-	add_settings_field(
-		'blorm_plugin_setting_category_display_reblog',
-		'Show reblogged posts',
-		'blorm_plugin_setting_category_display_reblog',
-		'blorm-plugin-category-section',
-		'blorm-plugin-category-section' );
-
-
-	add_option("blorm_plugin_options_category", array(), "", "yes");
-
-
-}
-add_action( 'admin_init', 'blorm_register_settings' );
-
-
-function blorm_plugin_api_section_text() {
-    echo '<p>Here you can set all the options for using the API</p>';
 }
 
 function blorm_plugin_frontend_section_text() {
     echo '<p>Here you can set all the options for using the Plugin on the web</p>';
-}
-
-function blorm_plugin_category_section_text() {
-	echo '<p>Select categories for showing posts on your page or automatic pushing to blorm</p>';
 }
 
 function blorm_plugin_setting_api_key() {
@@ -168,6 +150,45 @@ function blorm_plugin_setting_api_key() {
         $value = $options['api_key'];
     }
     echo "<input id='blorm_plugin_options_api_key' name='blorm_plugin_options_api[api_key]' type='password' size='60' value='".esc_attr( $value )."' />";
+}
+
+
+/*
+ *  widget rendering
+ */
+
+add_action( 'admin_init', 'blorm_register_settings_frontend_section' );
+
+function blorm_register_settings_frontend_section() {
+
+	// frontend rendering options
+
+	add_settings_section(
+		'blorm-plugin-frontend-section',
+		'Website display settings',
+		'blorm_plugin_frontend_section_text',
+		'blorm-plugin-frontend-section' );
+
+	add_settings_field(
+		'blorm_plugin_setting_add_blorm_widget',
+		'Blorm widget',
+		'blorm_plugin_setting_add_blorm_widget',
+		'blorm-plugin-frontend-section',
+		'blorm-plugin-frontend-section' );
+
+	add_settings_field(
+		'blorm_plugin_setting_add_blorm_widget_position',
+		'Position of the widget',
+		'blorm_plugin_setting_add_blorm_widget_position',
+		'blorm-plugin-frontend-section',
+		'blorm-plugin-frontend-section' );
+
+	add_option("blorm_plugin_options_frontend", array(), "", "yes");
+
+}
+
+function blorm_plugin_api_section_text() {
+	echo '<p>Here you can set all the options for using the API</p>';
 }
 
 function blorm_plugin_setting_add_blorm_widget() {
@@ -269,7 +290,7 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionBottom = $options['position_widget_menue_adjust_positionBottom'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\">Move widget to the right: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\">Move widget to the bottom: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionBottom]\" value=\"".$value_positionBottom."\" maxlength=\"4\" size=\"4\">";
 
     // margin left
@@ -278,12 +299,50 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionLeft = $options['position_widget_menue_adjust_positionLeft'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\">Move widget to the right: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\">Move widget to the left: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionLeft]\" value=\"".$value_positionLeft."\" maxlength=\"4\" size=\"4\">";
 
 
 }
 
+
+/*
+ * category settings
+ */
+
+add_action( 'admin_init', 'blorm_register_settings_category' );
+
+function blorm_plugin_category_section_text() {
+	echo '<p>Select categories for showing posts on your page or automatic pushing to blorm</p>';
+}
+
+function blorm_register_settings_category() {
+
+	// display categories
+
+	add_settings_section(
+		'blorm-plugin-category-section',
+		'Category settings',
+		'blorm_plugin_category_section_text',
+		'blorm-plugin-category-section' );
+
+	/*add_settings_field(
+		'blorm_plugin_setting_category_automatic_post',
+		'Automatic post',
+		'blorm_plugin_setting_category_automatic_post',
+		'blorm-plugin-category-section',
+		'blorm-plugin-category-section' );*/
+
+	add_settings_field(
+		'blorm_plugin_setting_category_display_reblog',
+		'Show reblogged posts',
+		'blorm_plugin_setting_category_display_reblog',
+		'blorm-plugin-category-section',
+		'blorm-plugin-category-section' );
+
+	add_option("blorm_plugin_options_category", array(), "", "yes");
+
+}
 
 function blorm_plugin_setting_category_automatic_post() {
 	$options = get_option( 'blorm_plugin_options_category' );
@@ -301,7 +360,7 @@ function blorm_plugin_setting_category_automatic_post() {
 
 	echo "<p>Posts from this category will be pushed to blorm automatic.<br><br></p>";
 	echo "<select id='blorm_plugin_setting_blorm_category_automatic' name='blorm_plugin_options_category[blorm_category_automatic]'>\n
-            <option value='-'>---</option>";
+            <option value='no-category-selected'>---</option>";
 	foreach( $categories as $category ) {
 		if ($value == $category->cat_ID) {
 			echo "<option value=\"".$category->cat_ID."\" selected>".$category->name."</option>";
@@ -313,7 +372,7 @@ function blorm_plugin_setting_category_automatic_post() {
 
 }
 
-function  blorm_plugin_setting_category_display_reblog() {
+function blorm_plugin_setting_category_display_reblog() {
 	$options = get_option( 'blorm_plugin_options_category' );
 
 	$value = "";
@@ -329,7 +388,7 @@ function  blorm_plugin_setting_category_display_reblog() {
 
 	echo "<p>Select a category to display your reblogged posts.<br>If nothing is selected it will be put in the standard loop wich is shown on home in most cases.<br><br></p>";
 	echo "<select id='blorm_plugin_setting_blorm_category_show_reblogged' name='blorm_plugin_options_category[blorm_category_show_reblogged]'>\n
-            <option value='-'>---</option>";
+            <option value='no-category-selected'>---</option>";
 	foreach( $categories as $category ) {
 		if ($value == $category->cat_ID) {
 			echo "<option value=\"".$category->cat_ID."\" selected>".$category->name."</option>";
@@ -340,6 +399,8 @@ function  blorm_plugin_setting_category_display_reblog() {
 	echo "</select>";
 
 }
+
+
 
 
 /*

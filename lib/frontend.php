@@ -12,13 +12,27 @@ function getBlormFrontendConfigJs() {
 }
 
 function enqueue_blorm_frontend_theme_style() {
-	if (is_home()) {
+
+	$catId = '';
+	$options = get_option( 'blorm_plugin_options_category' );
+	if (isset( $options['blorm_category_show_reblogged'] )) {
+		$catId = $options['blorm_category_show_reblogged'];
+	}
+
+	if (is_home() || is_category($catId)) {
 		wp_enqueue_style ('blorm-theme-style', plugins_url('blorm/assets/css/blorm_frontend.css'));
 	}
 }
 
 function enqueue_blorm_frontend_js() {
-	if (is_home()) {
+
+	$catId = '';
+	$options = get_option( 'blorm_plugin_options_category' );
+	if (isset( $options['blorm_category_show_reblogged'] )) {
+		$catId = $options['blorm_category_show_reblogged'];
+	}
+
+	if (is_home() || is_category($catId)) {
 		wp_enqueue_script( 'blorm-theme-js', plugins_url( 'blorm/assets/js/blorm/blorm_web_widget.js' ) );
 		wp_add_inline_script( 'blorm-theme-js', getBlormFrontendConfigJs(), 'before' );
 	}
@@ -84,7 +98,9 @@ function add_getstream_data_to_head() {
         'data_format' => 'body',
     );
     $response = wp_remote_request(CONFIG_BLORM_APIURL ."/feed/timeline", $args);
-    $bodyObjects = json_decode($response['body']);
+
+	$bodyObjects = json_decode($response['body']);
+	//var_dump($bodyObjects);die();
 
     // blorm data for local usage
     $aGetStreamCreatedData = array();
@@ -147,8 +163,8 @@ function add_getstream_data_to_head() {
 			    $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
 			    $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
 			    $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
-			    $getStreamData->OriginWebsiteName = $bodyObject->actor->data->data->website_name;
-			    $getStreamData->OriginWebsiteUrl = $bodyObject->actor->data->data->website_url;
+			    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
+			    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
 
 			    $getStreamData->ReblogedCount = 0;
 			    $getStreamData->CommentsCount = 0;
@@ -180,10 +196,7 @@ function add_getstream_data_to_head() {
 
 			    $aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
 		    }
-
 	    }
-
-
     }
 
 	$blormPostConfig = new stdClass();
@@ -251,15 +264,34 @@ function blorm_created_class (array $classes, $class, $post_id) {
 }
 
 
-add_action( 'the_posts', 'blorm_add_the_posts' );
-function blorm_add_the_posts($posts) {
+/*
+ *
+ * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
+ */
+
+add_action( 'pre_get_posts', 'wpsites_remove_posts_from_home_page' );
+function wpsites_remove_posts_from_home_page( $query ) {
+
+	$options = get_option( 'blorm_plugin_options_category' );
+
+	if (isset( $options['blorm_category_show_reblogged'] )) {
+		if( $query->is_main_query() && $query->is_home() ) {
+			$query->set( 'cat', '-'.$options['blorm_category_show_reblogged'] );
+		}
+	}
+}
+add_action( 'the_posts', 'blorm_mod_the_posts' );
+
+
+
+function blorm_mod_the_posts($posts) {
 
     $options = get_option("blorm_plugin_options_frontend");
 
-    //var_dump($posts);
     foreach ($posts as $post) {
 
-	    $a = get_post_meta($post->ID);
+    	$a = get_post_meta($post->ID);
+
 	    $acivityId = "";
 	    $post_class = "blorm-post-data";
 	    if (isset($a["blorm_reblog_activity_id"])) {
@@ -269,8 +301,6 @@ function blorm_add_the_posts($posts) {
 
 	    if (isset($a["blorm_create_activity_id"])) {
 		    $post_class= "blorm-create-post-data";
-
-		    //$post->post_content = '<div class="blorm-post-content-container blorm-create-post-data" data-postid="'.$post->ID.'" data-activityid="'.$a['blorm_create_activity_id'][0].'">'.$post->post_content.'</div>';
 		    $acivityId = $a['blorm_create_activity_id'][0];
 	    }
 
@@ -292,21 +322,20 @@ function blorm_add_the_posts($posts) {
 		    // modify content
 		    if ( isset( $options['position_widget_menue']) ) {
 			    if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
-
 				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>'.$post->post_content.'</div>';
-				    //$post->post_content = '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>' . $post->post_content;
+				    $post->post_excerpt = $post->post_content;
 			    }
 		    }
 
 		    if ( isset( $options['position_widget_menue']) ) {
 			    if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
 				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div></div>';
-
-				    //$post->post_content = $post->post_content . '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>';
+				    $post->post_excerpt = $post->post_content;
 			    }
 		    }
 	    }
     }
+
 
 
     //var_dump($post);
