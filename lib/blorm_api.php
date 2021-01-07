@@ -12,24 +12,28 @@ function rest_blorm_api_endpoint() {
     register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
         'methods' => 'GET',
         'callback' =>'rest_blormapi_handler',
+        'permission_callback' => '__return_true',
     ));
 
     // Register the POST route
     register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
         'methods' => 'POST',
         'callback' =>'rest_blormapi_handler',
+        'permission_callback' => '__return_true',
     ));
 
     // Register the PUT route
     register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
         'methods' => 'PUT',
         'callback' =>'rest_blormapi_handler',
+        'permission_callback' => '__return_true',
     ));
 
     // Register the DELETE route
     register_rest_route( 'blormapi/v1', '/(?P<restparameter>[\S]+)', array(
         'methods' => 'DELETE',
         'callback' =>'rest_blormapi_handler',
+        'permission_callback' => '__return_true',
     ));
 
 }

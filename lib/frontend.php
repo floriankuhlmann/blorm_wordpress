@@ -33,6 +33,7 @@ function enqueue_blorm_frontend_js() {
 	}
 
 	if (is_home() || is_category($catId)) {
+		wp_enqueue_script( 'blorm-mobile-detect', plugins_url( 'blorm/assets/js/mobile-detect.min.js' ) );
 		wp_enqueue_script( 'blorm-theme-js', plugins_url( 'blorm/assets/js/blorm/blorm_web_widget.js' ) );
 		wp_add_inline_script( 'blorm-theme-js', getBlormFrontendConfigJs(), 'before' );
 	}
@@ -163,9 +164,12 @@ function add_getstream_data_to_head() {
 			    $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
 			    $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
 			    $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
-			    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
-			    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
-
+			    if (isset($bodyObject->object->data->data->published_on_website_name)) {
+				    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
+			    }
+			    if (isset($bodyObject->object->data->data->published_on_website_url)) {
+				    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
+			    }
 			    $getStreamData->ReblogedCount = 0;
 			    $getStreamData->CommentsCount = 0;
 			    $getStreamData->SharedCount = 0;

@@ -137,7 +137,9 @@
                 <div class="margin-bottom-10">
                     <?php
                         $recent_posts = wp_get_recent_posts();
-                        $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1',));
+                        $recent_posts_with_meta_create = wp_get_recent_posts(array('meta_key' => 'blorm_create'));
+                        $recent_posts_with_meta_reblog = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+                        $recent_posts_with_meta = array_merge($recent_posts_with_meta_create, $recent_posts_with_meta_reblog);
                         wp_reset_query();
                         $i = 0;
                         $AJSONPost = [];

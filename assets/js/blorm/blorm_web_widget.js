@@ -7,6 +7,10 @@ var Xpost = {
 var blormAssets = "assets/";
 var blormplus = "<img src=\""+blormAssets+"icons/circle-add-plus-new-outline-stroke.png\" class='blormWidgetImagePlus'>";
 
+var md = new MobileDetect(window.navigator.userAgent);
+
+
+
 class blorm_menue_bar {
 
     constructor(blormPostData) {
@@ -66,13 +70,8 @@ class blorm_menue_bar {
         // prepare social data
         this.setSocialDataCounters();
 
-
-        // create the html widget
-        this.blormWidget = document.createElement("div");
-        this.blormWidget.className = "blormWidget";
-
-        this.ContainerMenu = document.createElement("div");
-        this.ContainerMenu.className = "blormWidgetContainerMenu";
+        // init status of the social data display
+        this.SocialStatus = "invisible";
 
         // now render the widget
         this.RenderContainerMenu();
@@ -81,7 +80,6 @@ class blorm_menue_bar {
         this.InitHandler();
 
     }
-
 
     setSocialDataCounters() {
 
@@ -101,27 +99,36 @@ class blorm_menue_bar {
         }
     }
 
-    setSocialDataContent(data) {
+    setPowerBarContent(ContentType) {
+
+        this.SocialStatus = ContentType;
 
         let socialData = new Array();
+        let ul = document.createElement("ul");
+        let li = document.createElement("li");
 
-        switch(data) {
+        switch(ContentType) {
             case "rebloged":
                 socialData = this.blormPost.Rebloged;
+                li.innerHTML = "This post was not rebloged anywhere. Perhaps you should start spreading it?";
                 break;
             case "shared":
                 socialData = this.blormPost.Shared;
+                li.innerHTML = "Nobody shared it. Its up to you now.";
                 break;
             case "comments":
                 socialData = this.blormPost.Comments;
+                li.innerHTML = "No comments on this post.";
+                break;
+            case "info":
+                li.classList.add("PowerbarContentText");
+                li.innerHTML = "Blorm helps connecting publishers to promote each other and the content they love. Learn more about blorm at <a href=\"http://blorm.io\">blorm.io</a>\n";
                 break;
         }
 
-
-        let ul = document.createElement("ul");
-
+        ul.appendChild(li);
         // if there is interacton data build the list of links
-        if (typeof(socialData) != "undefined") {
+        if (typeof(socialData) != "undefined" && socialData.length > 0) {
 
             this.listcontent = new Array();
             socialData.forEach(function (item, index, arr) {
@@ -139,137 +146,224 @@ class blorm_menue_bar {
                 li.appendChild(a);
                 ul.appendChild(li);
             }
-
-            // if there is no interaction data just leave a short message
-        } else {
-            let li = document.createElement("li");
-            li.innerHTML = "No interactions here";
-            ul.appendChild(li);
         }
 
         let c = this.PowerbarContent.firstChild;
         if ( c != null) {
             this.PowerbarContent.removeChild(c);
         }
+
         this.PowerbarContent.appendChild(ul);
+    }
+
+    setPowerBarPosition() {
+
+        this.Powerbar.style.display = "inline";
+        let h = this.PowerbarContent.scrollHeight;
+
+        this.Powerbar.style.height = h + 1 + "px";
+        this.Powerbar.style.top =  "-" + h + "px";
+        this.PowerbarContent.style.backgroundColor = "#000";
+        this.PowerbarContent.style.color = "#fff";
+
     }
 
     InitHandler() {
         console.log("init handler");
         // mouse event for the powerbar when mouse on icons
         this.handlePlusSocialBars = this.blormWidget.getElementsByClassName("blormWidgetPlusSocialBarEventHandler");
-        this.PowerbarMobileTouchLayer = this.blormWidget.getElementsByClassName("blormWidgetPowerbarMobileTouchLayer")[0];
         let SocialBar;
         let _this = this;
-        //let powerBar = this.Powerbar;
 
-        for (SocialBar of this.handlePlusSocialBars) {
-            SocialBar.addEventListener(
+        this.handleLayerRebloged = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarRebloged")[0];
+        this.handleLayerShared = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarShared")[0];
+        this.handleLayerComments = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarComments")[0];
+        this.handleLayerLogo = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusLogoIcon")[0];
+
+        if (md.mobile() == null) {
+
+            for (SocialBar of this.handlePlusSocialBars) {
+                SocialBar.addEventListener(
+                    "mouseout",
+                    function () {
+                        _this.Powerbar.style.display = "none";
+                    },
+                    false
+                );
+            }
+
+            // keep the powerbar visible as long we use it
+            this.Powerbar.addEventListener(
                 "mouseover",
-                function(){
+                function () {
                     _this.Powerbar.style.display = "inline";
-
-                    let h = _this.PowerbarContent.scrollHeight;
-                    console.log(h);
-
-                    _this.Powerbar.style.height = h + 1 + "px";
-                    _this.Powerbar.style.top =  "-" + h + "px";
-                    _this.PowerbarContent.style.backgroundColor = "#000";
-                    _this.PowerbarContent.style.color = "#fff";
+                    _this.setPowerBarPosition();
                 },
                 false
             );
 
-            SocialBar.addEventListener(
-                "touchstart",
-                function(){
-                    console.log("touchstart");
-                    _this.Powerbar.style.display = "inline";
-
-                    let h = _this.PowerbarContent.scrollHeight;
-                    _this.Powerbar.style.height = h + 45 + "px";
-                    _this.Powerbar.style.top =  "-" + h - 5 + "px";
-                    _this.PowerbarContent.style.backgroundColor = "#000";
-                    _this.PowerbarContent.style.color = "#fff";
-                    _this.PowerbarMobileTouchLayer.style.display = "inline-block";
-                },
-                false
-            );
-
-            SocialBar.addEventListener(
+            this.Powerbar.addEventListener(
                 "mouseout",
-                function(){
+                function () {
                     _this.Powerbar.style.display = "none";
                 },
                 false
             );
+
+            this.handleLayerRebloged.addEventListener(
+                "mouseover",
+                function () {
+                    _this.setPowerBarContent("rebloged");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
+
+            this.handleLayerShared.addEventListener(
+                "mouseover",
+                function () {
+                    _this.setPowerBarContent("shared");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
+
+            this.handleLayerComments.addEventListener(
+                "mouseover",
+                function () {
+                    _this.setPowerBarContent("comments");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
+
+            this.handleLayerLogo.addEventListener(
+                "mouseover",
+                function () {
+                    _this.setPowerBarContent("info");
+                    _this.setPowerBarPosition();
+                    _this.BlormWidgetPlusLogoIconImg.src = _this.blormAssets+"/images/blorm_icon_black_3.png";
+                },
+                true
+            );
+
+            this.handleLayerLogo.addEventListener(
+                "mouseout",
+                function () {
+                    _this.BlormWidgetPlusLogoIconImg.src = _this.blormAssets+"/images/blorm_icon_black_1.png";
+                },
+                true
+            );
+
+            console.log("init handler finished");
         }
 
-        // keep the powerbar visible as long we use it
-        this.Powerbar.addEventListener(
-            "mouseover",
-            function(){
-                _this.Powerbar.style.display = "inline";
-            },
-            false
-        );
+        if (md.mobile() !== null) {
 
-        this.Powerbar.addEventListener(
-            "mouseout",
-            function(){
-                _this.Powerbar.style.display = "none";
-            },
-            false
-        );
+            this.handleLayerLogo.addEventListener(
+                "click",
+                function () {
+                    if ( _this.BlormWidgetPlusSocial.getAttribute("style") === "display:none" ) {
+                        _this.BlormWidgetPlusSocial.setAttribute("style","display:inline");
+                        _this.BlormWidgetPowerText.setAttribute("style","display:inline");
+                        _this.BlormWidgetPlusBlormInfo.setAttribute("style","display:inline");
+                        _this.BlormWidgetPlus.classList.add("BorderBottom");
+                        _this.BlormWidgetPlusLogoIconImg.src = _this.blormAssets+"/images/blorm_icon_black_3.png";
+                    } else {
+                        _this.BlormWidgetPlusSocial.setAttribute("style","display:none");
+                        _this.BlormWidgetPowerText.setAttribute("style","display:none");
+                        _this.BlormWidgetPlusBlormInfo.setAttribute("style","display:none");
+                        _this.BlormWidgetPlus.classList.remove("BorderBottom");
+                        _this.BlormWidgetPlusLogoIconImg.src = _this.blormAssets+"/images/blorm_icon_black_1.png";
 
-        this.handleLayerRebloged = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarRebloged")[0];
-        this.handleLayerRebloged.addEventListener("mouseover", function(){_this.setSocialDataContent("rebloged");}, true);
-        this.handleLayerRebloged.addEventListener("touchstart", function(){_this.setSocialDataContent("rebloged");}, true);
+                        if ( _this.SocialStatus !== "invisible") {
+                            _this.Powerbar.style.display = "none";
+                        }
+                    }
+                },
+                true
+            );
 
+            this.handleLayerRebloged.addEventListener(
+                "click",
+                function () {
+                    if ( _this.SocialStatus === "rebloged") {
+                        _this.Powerbar.style.display = "none";
+                        _this.SocialStatus = "invisible";
+                        return;
+                    }
+                    _this.setPowerBarContent("rebloged");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
 
-        this.handleLayerShared = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarShared")[0];
-        this.handleLayerShared.addEventListener(
-            "mouseover",
-            function(){
-                _this.setSocialDataContent("shared");
-            },
-            true
-        );
+            this.handleLayerShared.addEventListener(
+                "click",
+                function () {
+                    if ( _this.SocialStatus === "shared") {
+                        _this.Powerbar.style.display = "none";
+                        _this.SocialStatus = "invisible";
+                        return;
+                    }
+                    _this.setPowerBarContent("shared");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
 
-        this.handleLayerComments = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusSocialBarComments")[0];
-        this.handleLayerComments.addEventListener(
-            "mouseover",
-            function(){
-                _this.setSocialDataContent("comments");
-            },
-            true
-        );
+            this.handleLayerComments.addEventListener(
+                "click",
+                function () {
+                    if ( _this.SocialStatus === "comments") {
+                        _this.Powerbar.style.display = "none";
+                        _this.SocialStatus = "invisible";
+                        return;
+                    }
+                    _this.setPowerBarContent("comments");
+                    _this.setPowerBarPosition();
+                },
+                true
+            );
 
-        this.handleLayerLogo = this.ContainerDisplay.getElementsByClassName("blormWidgetPlusLogoIcon")[0];
-        this.handleLayerLogo.addEventListener(
-            "mouseover",
-            function(){
+            this.BlormWidgetPlusBlormInfo.addEventListener(
+                "click",
+                function () {
+                    if ( _this.SocialStatus === "info") {
+                        _this.Powerbar.style.display = "none";
+                        _this.SocialStatus = "invisible";
+                        return;
+                    }
+                    _this.setPowerBarContent("info");
+                    _this.setPowerBarPosition();
 
+                },
+                true
+            );
 
-                let c = _this.PowerbarContent.firstChild;
-                if ( c != null) {
-                    _this.PowerbarContent.removeChild(c);
-                }
-
-                let span = document.createElement("span");
-                span.classList.add("PowerbarContentText");
-                let content = document.createTextNode("Blorm helps connecting publishers to promote each other and the content they love. Learn more about blorm at <a href=\"http://blorm.io\">blorm.io</a>\n");
-                span.innerHTML = content.textContent;
-
-                _this.PowerbarContent.appendChild(span);
-
-            },
-            true
-        );
-        console.log("init handler finished");
+        }
     }
 
     RenderContainerMenu() {
+
+        // create the html widget
+        this.blormWidget = document.createElement("div");
+        this.blormWidget.className = "blormWidget";
+
+        // the menue is very all the magic comes together
+        this.ContainerMenu = document.createElement("div");
+        this.ContainerMenu.className = "blormWidgetContainerMenu";
+
+        /*
+        the ContainerMenu depends on two elements:
+        1. the powerbar is capable for showing the social interactions:
+        blogs reblogged the posts, userhandle commenting it, or users who shared the post on blorm
+        the powerbar only appears on mouseover
+
+        2. the display part:
+        this is the user-menue showing the origin source of the post, presenting the numbers and the icons
+        the powerbar ist visible for users
+         */
 
         /* powerbar plus content */
         // we need a container for the content(list of sharing publishers and comments)
@@ -281,11 +375,36 @@ class blorm_menue_bar {
         this.Powerbar.classList.add("blormWidgetPowerbar");
         this.Powerbar.appendChild(this.PowerbarContent);
 
-        const markupContainerDisplay = `
-                            <div class="blormWidgetPlusLogoIcon blormWidgetPlusSocialBarEventHandler">
-                                <img src="${this.blormAssets}/images/blorm_icon.png" class="blormWidgetPlusLogoIconImg">
-                            </div>
-                            <div class="blormWidgetPlusSocial">
+        // add the powerbar to the menue
+        this.ContainerMenu.appendChild(this.Powerbar);
+
+
+        this.ContainerDisplay = document.createElement("div");
+        this.ContainerDisplay.classList.add("blormWidgetContainerDisplay");
+
+        // display has two parts the LogoIcon and the SocialIcons list
+        this.BlormWidgetPlusLogoIcon = document.createElement("div");
+        this.BlormWidgetPlusLogoIcon.classList.add("blormWidgetPlusLogoIcon");
+        this.BlormWidgetPlusLogoIcon.classList.add("blormWidgetPlusSocialBarEventHandler");
+
+        this.BlormWidgetPlusLogoIconImg = document.createElement("img");
+        this.BlormWidgetPlusLogoIconImg.classList.add("blormWidgetPlusLogoIconImg");
+        this.BlormWidgetPlusLogoIconImg.src = this.blormAssets + "/images/blorm_icon_black_1.png";
+        //const markupContainerDisplayPlusLogoIcon = ;
+        //this.BlormWidgetPlusLogoIcon.innerHTML = `<img src="${this.blormAssets}/images/blorm_icon_black_1.png" class="blormWidgetPlusLogoIconImg">`;
+        this.BlormWidgetPlusLogoIcon.append(this.BlormWidgetPlusLogoIconImg);
+
+        // display has two parts the LogoIcon and the SocialIcons list
+        this.BlormWidgetPlusBlormInfo = document.createElement("div");
+        this.BlormWidgetPlusBlormInfo.classList.add("blormWidgetPlusBlormInfo");
+        this.BlormWidgetPlusBlormInfo.classList.add("blormWidgetPlusSocialBarEventHandler");
+        let infoUl = document.createElement("ul");
+        let infoUlLi = document.createElement("li");
+        infoUlLi.innerHTML = `<img src="${this.blormAssets}/icons/circle-info-more-information-detail-glyph.png" class="blormWidgetPlusLogoIconImg">`;
+        infoUl.append(infoUlLi);
+        this.BlormWidgetPlusBlormInfo.append(infoUl);
+
+        const markupContainerDisplayPlusSocial = `
                                 <ul class="blormWidgetPlusSocialBar">
                                     <li class="blormWidgetPlusSocialBarIcon blormWidgetPlusSocialBarEventHandler blormWidgetPlusSocialBarRebloged">
                                         <img src="${this.blormAssets}/icons/editor-copy-2-duplicate-glyph.png" alt="reblogged" >
@@ -306,15 +425,27 @@ class blorm_menue_bar {
                                         <span class="blormWidgetPlusSocialBarCommentsCount">${this.CommentsCount}</span>
                                     </li>
                                 </ul>
-                            </div>
-                            <div style="clear: both;"></div>`;
+                            `;
 
-        this.ContainerDisplay = document.createElement("div");
-        this.ContainerDisplay.classList.add("blormWidgetContainerDisplay");
+        this.BlormWidgetPlusSocial = document.createElement("div");
+        this.BlormWidgetPlusSocial.classList.add("blormWidgetPlusSocial");
+        this.BlormWidgetPlusSocial.innerHTML = markupContainerDisplayPlusSocial;
+
 
         this.BlormWidgetPlus = document.createElement("div");
         this.BlormWidgetPlus.classList.add("blormWidgetPlus");
-        this.BlormWidgetPlus.innerHTML = markupContainerDisplay;
+
+        this.BlormWidgetPlus.appendChild(this.BlormWidgetPlusLogoIcon);
+
+        if (md.mobile() !== null) {
+            this.BlormWidgetPlus.appendChild(this.BlormWidgetPlusBlormInfo);
+        }
+        this.BlormWidgetPlus.appendChild(this.BlormWidgetPlusSocial);
+
+        let clearDiv = document.createElement("div");
+        clearDiv.setAttribute("style", "clear:both");
+
+        this.BlormWidgetPlus.appendChild(clearDiv);
 
         this.ContainerDisplay.append(this.BlormWidgetPlus)
 
@@ -322,21 +453,25 @@ class blorm_menue_bar {
         this.BlormWidgetPowerText = document.createElement("div");
         this.BlormWidgetPowerText.classList.add("blormWidgetPowerText");
         let originWebsiteLink = document.createElement("a");
+        if (typeof(this.OriginWebsiteName) !== "undefined") {
+
+        console.log(this.OriginWebsiteName);
         originWebsiteLink.href = this.OriginWebsiteUrl;
         originWebsiteLink.innerText = this.OriginWebsiteName;
         this.BlormWidgetPowerText.append(originWebsiteLink);
+        }
         this.ContainerDisplay.appendChild(this.BlormWidgetPowerText);
 
 
         /* put it all together */
-        this.ContainerMenu.appendChild(this.Powerbar);
         this.ContainerMenu.appendChild(this.ContainerDisplay);
 
-        /* a box to float the menue left or right */
+        /* a wraper box to float the menue left or right */
         this.ContainerMenuBox = document.createElement("div");
         if (this.widgetFloat === "float_left") {
             this.ContainerMenuBox.classList.add("FloatLeft");
             this.BlormWidgetPlus.classList.add("FloatLeft");
+            this.BlormWidgetPlusLogoIcon.classList.add("FloatLeft");
             this.BlormWidgetPowerText.classList.add("FloatLeft");
             this.BlormWidgetPowerText.classList.add("AlignLeft");
             this.Powerbar.classList.add("PositionLeft");
@@ -345,10 +480,23 @@ class blorm_menue_bar {
         if (this.widgetFloat === "float_right") {
             this.ContainerMenuBox.classList.add("FloatRight");
             this.BlormWidgetPlus.classList.add("FloatRight");
+            this.BlormWidgetPlusLogoIcon.classList.add("FloatRight");
             this.BlormWidgetPowerText.classList.add("FloatRight");
             this.BlormWidgetPowerText.classList.add("AlignRight");
             this.Powerbar.classList.add("PositionRight");
         }
+
+        console.log( "md.mobile():" );
+        if ( md.mobile() !== null) {
+            console.log( md.mobile() );
+            this.BlormWidgetPlusSocial.setAttribute("style","display:none");
+            this.BlormWidgetPowerText.setAttribute("style","display:none");
+            this.BlormWidgetPlusBlormInfo.setAttribute("style","display:none");
+        } else {
+            this.BlormWidgetPlus.classList.add("BorderBottom");
+        }
+
+        // append the menu to the wrapper
         this.ContainerMenuBox.appendChild(this.ContainerMenu);
 
         // prepare the widget
@@ -452,25 +600,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         /* standard content elements "entry-content" */
-        /*contentWraper = ReblogedPost.getElementsByClassName("blorm-reblog-post-data");
-        contentWraper[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentWraper[0].nextSibling);
+    /*contentWraper = ReblogedPost.getElementsByClassName("blorm-reblog-post-data");
+    contentWraper[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentWraper[0].nextSibling);
 
-        headerBlock = ReblogedPost.getElementsByClassName("entry-header");
-        headerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidgetClassBoxed("entry-content"), headerBlock[0].nextSibling);
+    headerBlock = ReblogedPost.getElementsByClassName("entry-header");
+    headerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidgetClassBoxed("entry-content"), headerBlock[0].nextSibling);
 
-        /*contentBlock = ReblogedPost.getElementsByClassName("entry-content");
-        console.log(contentBlock[0].innerHTML);
-        temp = contentBlock[0].innerHTML;
-        console.log(blormMenuBar.GetWidget().outerHTML);
+    /*contentBlock = ReblogedPost.getElementsByClassName("entry-content");
+    console.log(contentBlock[0].innerHTML);
+    temp = contentBlock[0].innerHTML;
+    console.log(blormMenuBar.GetWidget().outerHTML);
 
-        contentBlock[0].innerHTML = temp + blormMenuBar.GetWidget().outerHTML;
-        //contentBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentBlock[0].nextSibling);
+    contentBlock[0].innerHTML = temp + blormMenuBar.GetWidget().outerHTML;
+    //contentBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentBlock[0].nextSibling);
 
-        // footer block
-        footerBlock = ReblogedPost.getElementsByClassName("entry-footer");
-        footerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), footerBlock[0].nextSibling);
+    // footer block
+    footerBlock = ReblogedPost.getElementsByClassName("entry-footer");
+    footerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), footerBlock[0].nextSibling);
 
-    });*/
+});*/
 
     var allBlormWidgets = document.getElementsByClassName("blormWidget");
 
@@ -479,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let id = BlormWidget.dataset.postid;
         post = getPostById(id);
-console.log(post);
+        console.log(post);
         if (Object.keys(post).length !== 0) {
             blormMenuBar = new blorm_menue_bar(post)
             //console.log(blormMenuBar);
