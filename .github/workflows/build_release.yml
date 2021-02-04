@@ -1,8 +1,8 @@
 on:
   push:
     branches: [ master ]
-#    tags:
-#      - 'v*' ## Push events to matching v*, i.e. v1.0, v20.15.10
+    tags:
+      - 'v*' ## Push events to matching v*, i.e. v1.0, v20.15.10
 
 name: Create Release
 
@@ -19,23 +19,18 @@ jobs:
           ls -lsa
           rm -R .github .gitignore .DS_Store
           ls -lsa
-          git config --global user.email "gitaction@blorm.io"
-          git config --global user.name "github actions"
-          git commit -m "removed .github .gitignore .DS_Store" -a
         shell: bash
 
       - name: Create Release
-        uses: "marvinpinto/action-automatic-releases@latest"
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build - we are still Beta"
-          files: |
-            assets
-            classes
-            lib
-            templates
-            blorm.php
-            config.php
-            REAME.md
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            First Beta Release for the plugin
+            - still in development, please do not use without contacting us via blorm.io
+          draft: false
+          prerelease: false
