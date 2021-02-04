@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Remove projectfiles and dirs
+        run: rm -R .github .gitignore .DS_Store
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -22,6 +26,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             First Beta Release for the plugin
-            - still not ready for production, please contact blorm.io
+            - still in development, please do not use without contacting us via blorm.io
           draft: false
           prerelease: false
