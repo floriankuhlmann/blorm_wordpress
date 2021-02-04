@@ -19,6 +19,8 @@ jobs:
           ls -lsa
           rm -R .github .gitignore .DS_Store
           ls -lsa
+          git config --global user.email "gitaction@blorm.io"
+          git config --global user.name "github actions"
           git commit -m "removed .github .gitignore .DS_Store" -a
         shell: bash
 
