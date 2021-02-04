@@ -30,8 +30,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref }}1
+          release_name: Release ${{ github.ref }}1
           body: |
             First Beta Release for the plugin
             - still in development, please do not use without contacting us via blorm.io
