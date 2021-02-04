@@ -19,6 +19,7 @@ jobs:
           ls -lsa
           rm -R .github .gitignore .DS_Store
           ls -lsa
+          git commit -m "removed .github .gitignore .DS_Store" -a
         shell: bash
 
       - name: Create Release
