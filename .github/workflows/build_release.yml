@@ -21,8 +21,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+            First Beta Release for the plugin
+            - still not ready for production, please contact blorm.io
           draft: false
           prerelease: false
