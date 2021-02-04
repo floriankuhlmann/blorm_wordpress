@@ -25,15 +25,17 @@ jobs:
         shell: bash
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          tag_name: ${{ github.ref }}1
-          release_name: Release ${{ github.ref }}1
-          body: |
-            First Beta Release for the plugin
-            - still in development, please do not use without contacting us via blorm.io
-          draft: false
-          prerelease: false
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build - we are still Beta"
+          files: |
+            assets
+            classes
+            lib
+            templates
+            blorm.php
+            config.php
+            REAME.md
