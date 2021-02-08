@@ -6,14 +6,6 @@
  * Time: 23:54
  */
 
-/*return [
-
-    'api' => 'http://localhost:8000',
-    'apikey' => 'CXYJGdrKTUzwSodnBLY5hdNe1CeJ3fH7WElvFORJBtZgYYhHEyeSgGPcs5qF',
-    'version' => '0.9'
-
-];*/
-
 function get_blorm_config() {
 
 
@@ -26,7 +18,7 @@ function get_blorm_config() {
     $returnArray = array_merge(
         $options,
         Array(
-        'api' => 'http://blorm-api.blormdev:8000',
+        'api' => 'https://api.blormdev',
         'version' => '0.9'
         )
     );
