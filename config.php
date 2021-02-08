@@ -18,7 +18,7 @@ function get_blorm_config() {
     $returnArray = array_merge(
         $options,
         Array(
-        'api' => 'https://api.blormdev',
+        'api' => 'https://api.blorm.io',
         'version' => '0.9'
         )
     );
