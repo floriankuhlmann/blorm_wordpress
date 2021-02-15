@@ -117,11 +117,9 @@ jQuery(document).ready(function() {
             },
             renderUser: function(post) {
                 if (post.isOwner) {
-                    userlink = "You";
-                } else {
-                    userlink = post.actor.name;
+                    return "You";
                 }
-                return userlink;
+                return post.actor.name;
             },
             feedUser: function(id) {
                 console.log(id);

@@ -15,12 +15,18 @@ function get_blorm_config() {
         $options = array();
     }
 
-    $returnArray = array_merge(
+    $api_options = Array(
+	    'api' => 'https://api.blorm.io',
+	    'version' => '0.9'
+    );
+
+    if ( file_exists ( plugin_dir_path( __FILE__ ) . '/config_dev.php' )) {
+    	$api_options = include plugin_dir_path( __FILE__ ) . '/config_dev.php';
+    }
+
+	$returnArray = array_merge(
         $options,
-        Array(
-        'api' => 'https://api.blorm.io',
-        'version' => '0.9'
-        )
+		$api_options
     );
 
     return $returnArray;

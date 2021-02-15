@@ -45,8 +45,6 @@ define( 'PLUGIN_BLORM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
 
-
-//require_once plugin_dir_path( __FILE__ ) . '/classes/SetupActions.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/settings.php';
 require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
 
@@ -64,9 +62,3 @@ if ($blormUserData->error == null) {
     require_once plugin_dir_path( __FILE__ ) . '/lib/admin_error.php';
 
 }
-
-
-
-
-
-//load_plugin_textdomain( 'plugin-blorm', false, dirname( plugin_basename( PLUGIN_BLORM_FILE ) ) . '/languages/' );

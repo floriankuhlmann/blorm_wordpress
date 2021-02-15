@@ -71,7 +71,7 @@ function prepare_dashboard_meta() {
     remove_action('welcome_panel', 'wp_welcome_panel');
 
     //https://codex.wordpress.org/Dashboard_Widgets_API
-	$newPostTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_bubble.png' )."\" class=\"blormImage\"> share here and now:";
+	$newPostTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_white_3.png' )."\" class=\"blormImage\"> share here and now:";
 	add_meta_box( 'BlormDashboardWidgetNewPost', $newPostTitle, 'dashboard_widget_blorm_newpost', 'dashboard', 'side', 'high' );
 
 	$searchUserTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> who do you want to follow? ";

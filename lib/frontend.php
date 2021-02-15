@@ -19,7 +19,7 @@ function enqueue_blorm_frontend_theme_style() {
 		$catId = $options['blorm_category_show_reblogged'];
 	}
 
-	if (is_home() || is_category($catId)) {
+	if (is_home() || is_single() || is_category($catId)) {
 		wp_enqueue_style ('blorm-theme-style', plugins_url('blorm/assets/css/blorm_frontend.css'));
 	}
 }
@@ -32,7 +32,7 @@ function enqueue_blorm_frontend_js() {
 		$catId = $options['blorm_category_show_reblogged'];
 	}
 
-	if (is_home() || is_category($catId)) {
+	if (is_home() || is_single() || is_category($catId)) {
 		wp_enqueue_script( 'blorm-mobile-detect', plugins_url( 'blorm/assets/js/mobile-detect.min.js' ) );
 		wp_enqueue_script( 'blorm-theme-js', plugins_url( 'blorm/assets/js/blorm/blorm_web_widget.js' ) );
 		wp_add_inline_script( 'blorm-theme-js', getBlormFrontendConfigJs(), 'before' );
@@ -45,6 +45,49 @@ add_action( 'wp_enqueue_scripts', 'enqueue_blorm_frontend_theme_style');
 add_action( 'wp_enqueue_scripts', 'enqueue_blorm_frontend_js');
 add_action( 'wp_head', 'add_getstream_data_to_head');
 
+
+
+/*
+ *
+ * adding cron schedule for loading the getstream data
+ * the getstream data is loaded every 180 seconds to cache the data
+ * and prevent the blorm-api from high traffic webpages
+ *
+*/
+add_filter( 'cron_schedules', 'blorm_add_cron_getstream_interval' );
+function blorm_add_cron_getstream_interval( $schedules ) {
+	$schedules['onehundredeighty_seconds'] = array(
+		'interval' => 180,
+		'display'  => esc_html__( 'Every sixty Seconds' ), );
+	return $schedules;
+}
+
+add_action( 'blorm_cron_getstream_hook', 'blorm_cron_getstream_exec' );
+
+if ( ! wp_next_scheduled( 'blorm_cron_getstream_hook' ) ) {
+	wp_schedule_event( time(), 'onehundredeighty_seconds', 'blorm_cron_getstream_hook' );
+}
+
+function blorm_cron_getstream_exec() {
+
+	$getstreamPostObjects = "{}";
+
+	$args = array(
+		'headers' => array('Authorization' => 'Bearer '.get_blorm_config_param('api_key'), 'Content-type' => 'application/json'),
+		'method' => 'GET',
+		'body' => '',
+		'data_format' => 'body',
+	);
+	$response = wp_remote_request(CONFIG_BLORM_APIURL ."/feed/timeline", $args);
+
+	if ($response['body'] != "") {
+		$getstreamPostObjects = $response['body'];
+
+	}
+
+	update_option( 'blorm_getstream_cached_post_data', $getstreamPostObjects, true );
+
+}
 
 
 function add_getstream_data_to_head() {
@@ -89,19 +132,11 @@ function add_getstream_data_to_head() {
 		}
 	}
 
-	// ALL POSTS FROM THE GETSTREM TIMELINE
+	// ALL POSTS FROM THE GETSTREAM TIMELINE
     // we need the blorm-data like comments, shares, retweets to enrich the posts on the local plattform
-    // prepare the request
-    $args = array(
-        'headers' => array('Authorization' => 'Bearer '.get_blorm_config_param('api_key'), 'Content-type' => 'application/json'),
-        'method' => 'GET',
-        'body' => '',
-        'data_format' => 'body',
-    );
-    $response = wp_remote_request(CONFIG_BLORM_APIURL ."/feed/timeline", $args);
+	// the data is loaded every 180 seconds via cron schedule 'blorm_cron_getstream_hook' and stored to wp_options
 
-	$bodyObjects = json_decode($response['body']);
-	//var_dump($bodyObjects);die();
+	$bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
 
     // blorm data for local usage
     $aGetStreamCreatedData = array();
@@ -326,17 +361,28 @@ function blorm_mod_the_posts($posts) {
 		    // modify content
 		    if ( isset( $options['position_widget_menue']) ) {
 			    if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
-				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>'.$post->post_content.'</div>';
+				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content.'</div>';
 				    $post->post_excerpt = $post->post_content;
 			    }
 		    }
 
 		    if ( isset( $options['position_widget_menue']) ) {
 			    if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
-				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div></div>';
+				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span></div>';
 				    $post->post_excerpt = $post->post_content;
 			    }
 		    }
+
+		    // modify content to place on image
+		    if ( isset( $options['position_widget_menue']) ) {
+			    if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
+				    $post->post_title = '<span class="blorm-icon" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><img src="'.plugins_url().'/blorm/assets/images/blorm_icon.png"></span>' . $post->post_title;
+
+				    $post->post_content = '<div class="blorm-post-content-container blormWidget-on-image '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+				    $post->post_excerpt = $post->post_content;
+			    }
+		    }
+
 	    }
     }
 

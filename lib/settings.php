@@ -210,6 +210,7 @@ function blorm_plugin_setting_add_blorm_widget() {
 	echo "<p>Select the position of the blorm info widget for your shared posts.<br><br></p>";
 	echo "<select id='blorm_plugin_options_frontend-position_widget_menue' name='blorm_plugin_options_frontend[position_widget_menue]'>\n
             <option value='-'>Do not render</option>\n
+            <option value='add_blorm_info_on_image' ".$isSelected('add_blorm_info_on_image').">on image</option>\n
             <option value='add_blorm_info_before_content' ".$isSelected('add_blorm_info_before_content').">before content</option>\n
             <option value='add_blorm_info_after_content' ".$isSelected('add_blorm_info_after_content').">after content</option>\n
             <option value='add_blorm_info_before_title' ".$isSelected('add_blorm_info_before_title').">before title</option>\n

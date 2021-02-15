@@ -587,39 +587,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     console.log("web-app init");
 
-    // get all rebloged posts on the page
-    /*var allReblogedPosts = document.getElementsByClassName("blorm-rebloged");
-
-    Array.from(allReblogedPosts).forEach(function(ReblogedPost){
-        console.log(ReblogedPost);
-        let id = ReblogedPost.id.split("-")[1];
-        blormMenuBar = new blorm_menue_bar(blormapp.reblogedPosts[id])
-
-
-        // ReblogedPost.appendChild(blormMenuBar.GetWidgetClassBoxed("entry-content"));
-
-
-        /* standard content elements "entry-content" */
-    /*contentWraper = ReblogedPost.getElementsByClassName("blorm-reblog-post-data");
-    contentWraper[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentWraper[0].nextSibling);
-
-    headerBlock = ReblogedPost.getElementsByClassName("entry-header");
-    headerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidgetClassBoxed("entry-content"), headerBlock[0].nextSibling);
-
-    /*contentBlock = ReblogedPost.getElementsByClassName("entry-content");
-    console.log(contentBlock[0].innerHTML);
-    temp = contentBlock[0].innerHTML;
-    console.log(blormMenuBar.GetWidget().outerHTML);
-
-    contentBlock[0].innerHTML = temp + blormMenuBar.GetWidget().outerHTML;
-    //contentBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), contentBlock[0].nextSibling);
-
-    // footer block
-    footerBlock = ReblogedPost.getElementsByClassName("entry-footer");
-    footerBlock[0].parentNode.insertBefore(blormMenuBar.GetWidget(), footerBlock[0].nextSibling);
-
-});*/
-
     var allBlormWidgets = document.getElementsByClassName("blormWidget");
 
     Array.from(allBlormWidgets).forEach(function(BlormWidget){
@@ -632,6 +599,56 @@ document.addEventListener("DOMContentLoaded", function() {
             blormMenuBar = new blorm_menue_bar(post)
             //console.log(blormMenuBar);
             BlormWidget.appendChild(blormMenuBar.GetMenue());
+        }
+    });
+
+    var allBlormWidgetsOnImages = document.getElementsByClassName("blormWidget-on-image");
+    Array.from(allBlormWidgetsOnImages).forEach(function(BlormWidget){
+        //console.log("blormWidget-on-image");
+        //console.log(BlormWidget.childNodes);
+
+
+        let id = BlormWidget.dataset.postid;
+        post = getPostById(id);
+        console.log(post);
+        if (Object.keys(post).length !== 0) {
+            blormMenuBar = new blorm_menue_bar(post)
+            //console.log(blormMenuBar);
+            //BlormWidget.appendChild(blormMenuBar.GetWidget());
+
+            if( BlormWidget.getElementsByTagName('img').length > 0) {
+                // there is an image
+                console.log("hurra");
+                console.log(BlormWidget.getElementsByTagName('img')[0]);
+
+                // img element that will be wrapped
+                var imgEl = BlormWidget.getElementsByTagName('img')[0];
+
+                // new image wrapper div
+                divWrapper = document.createElement('div');
+                divWrapper.classList.add("blormWidgetImageWrapper");
+
+                imgEl.parentNode.insertBefore(divWrapper, imgEl);
+
+                divWrapper.appendChild(imgEl);
+
+                divLayerWidget = document.createElement('div');
+                divLayerWidget.classList.add("blormWidgetImagelayerWidget");
+                divLayerWidget.append(blormMenuBar.GetWidget());
+
+                imgEl.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
+
+                divLayerBlormIcon = document.createElement('div');
+                divLayerBlormIcon.classList.add("blormWidgetImagelayerBlormIcon");
+                divLayerBlormIcon.classList.add("topleft");
+                divLayerBlormIconImg = document.createElement('img');
+                divLayerBlormIconImg.src = blormapp.postConfig.blormAssets + "/images/blorm_icon_network.png";
+                divLayerBlormIcon.append(divLayerBlormIconImg);
+                imgEl.parentNode.insertBefore(divLayerBlormIcon, imgEl.nextSibling);
+
+
+            }
+
         }
     });
 });
