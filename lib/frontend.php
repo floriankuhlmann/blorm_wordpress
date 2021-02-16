@@ -94,24 +94,24 @@ function add_getstream_data_to_head() {
 
 	// POSTS ARE CREATED ON THIS PLATFORM AND SHARED ON BLORM
 	// we need the information about created post on frontend rendering the posts and will collect them here
-    $aBlormCreatePosts = array();
+	$aBlormCreatePosts = array();
 
-    // get all posts from this plattformed that are shared on blorm
-    $aRecentPostsCreate = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1'));
+	// get all posts from this plattformed that are shared on blorm
+	$aRecentPostsCreate = wp_get_recent_posts(array('meta_key' => 'blorm_create', 'meta_value' => '1'));
 
-    // the activity_id is important to connect the posts with the blorm-data
-    foreach ( $aRecentPostsCreate as $aRecentPostCreate) {
-        $meta = get_post_meta($aRecentPostCreate["ID"]);
-        if (!empty($meta)) {
-            $aBlormCreatePosts[] = array(
-	            "post_id" => $aRecentPostCreate["ID"],
-                "activity_id" => $meta["blorm_create_activity_id"][0]
-            );
-        }
-    }
+	// the activity_id is important to connect the posts with the blorm-data
+	foreach ( $aRecentPostsCreate as $aRecentPostCreate) {
+		$meta = get_post_meta($aRecentPostCreate["ID"]);
+		if (!empty($meta)) {
+			$aBlormCreatePosts[] = array(
+				"post_id" => $aRecentPostCreate["ID"],
+				"activity_id" => $meta["blorm_create_activity_id"][0]
+			);
+		}
+	}
 
 
-    // POSTS ARE CREATED ON REMOTE PLATFORM AND REBLOGGED ON THIS PLATFORM
+	// POSTS ARE CREATED ON REMOTE PLATFORM AND REBLOGGED ON THIS PLATFORM
 	// we need the information about reblogged post on frontend rendering the posts and will collect them here
 	$aBlormReblogedPosts = array();
 
@@ -133,110 +133,110 @@ function add_getstream_data_to_head() {
 	}
 
 	// ALL POSTS FROM THE GETSTREAM TIMELINE
-    // we need the blorm-data like comments, shares, retweets to enrich the posts on the local plattform
+	// we need the blorm-data like comments, shares, retweets to enrich the posts on the local plattform
 	// the data is loaded every 180 seconds via cron schedule 'blorm_cron_getstream_hook' and stored to wp_options
 
 	$bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
 
-    // blorm data for local usage
-    $aGetStreamCreatedData = array();
+	// blorm data for local usage
+	$aGetStreamCreatedData = array();
 	$aGetStreamReblogedData = array();
 
-    foreach ($bodyObjects as $bodyObject) {
+	foreach ($bodyObjects as $bodyObject) {
 
-	    $getStreamData = new stdClass();
-	    if (isset($bodyObject->id)) {
+		$getStreamData = new stdClass();
+		if (isset($bodyObject->id)) {
 
-	        // CREATED POSTS
-	        // search for the data of the created posts
-	        if (array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id")) !== false) {
+			// CREATED POSTS
+			// search for the data of the created posts
+			if (array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id")) !== false) {
 
-	            $id = array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id"));
-	            $getStreamData->PostId = $aBlormCreatePosts[$id]["post_id"];
+				$id = array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id"));
+				$getStreamData->PostId = $aBlormCreatePosts[$id]["post_id"];
 
-	            $getStreamData->ActivityId = $bodyObject->id;
+				$getStreamData->ActivityId = $bodyObject->id;
 
-		        $getStreamData->ReblogedCount = 0;
-		        $getStreamData->CommentsCount = 0;
-		        $getStreamData->SharedCount = 0;
+				$getStreamData->ReblogedCount = 0;
+				$getStreamData->CommentsCount = 0;
+				$getStreamData->SharedCount = 0;
 
-		        if (isset($bodyObject->reaction_counts->reblog)) {
-			        $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
-		        }
+				if (isset($bodyObject->reaction_counts->reblog)) {
+					$getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+				}
 
-		        if (isset($bodyObject->latest_reactions->reblog)) {
-			        $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
-		        }
+				if (isset($bodyObject->latest_reactions->reblog)) {
+					$getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
+				}
 
-		        if (isset($bodyObject->reaction_counts->comment)) {
-			        $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
-		        }
+				if (isset($bodyObject->reaction_counts->comment)) {
+					$getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
+				}
 
-		        if (isset($bodyObject->latest_reactions->comment)) {
-			        $getStreamData->Comments = $bodyObject->latest_reactions->comment;
-		        }
+				if (isset($bodyObject->latest_reactions->comment)) {
+					$getStreamData->Comments = $bodyObject->latest_reactions->comment;
+				}
 
-		        if (isset($bodyObject->reaction_counts->shared)) {
-			        $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
-		        }
+				if (isset($bodyObject->reaction_counts->shared)) {
+					$getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+				}
 
-		        if (isset($bodyObject->latest_reactions->shared)) {
-			        $getStreamData->Shared = $bodyObject->latest_reactions->shared;
-		        }
+				if (isset($bodyObject->latest_reactions->shared)) {
+					$getStreamData->Shared = $bodyObject->latest_reactions->shared;
+				}
 
-		        $aGetStreamCreatedData[$getStreamData->PostId] = $getStreamData;
-	        }
+				$aGetStreamCreatedData[$getStreamData->PostId] = $getStreamData;
+			}
 
 
-	        // REBLOGED POSTS
-		    if (array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id")) !== false) {
+			// REBLOGED POSTS
+			if (array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id")) !== false) {
 
-		        //var_dump($bodyObject->actor->data);
+				//var_dump($bodyObject->actor->data);
 
-			    $id = array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id"));
-			    $getStreamData->PostId = $aBlormReblogedPosts[$id]["post_id"];
-			    $getStreamData->ActivityId = $bodyObject->id;
-			    $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
-			    $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
-			    $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
-			    if (isset($bodyObject->object->data->data->published_on_website_name)) {
-				    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
-			    }
-			    if (isset($bodyObject->object->data->data->published_on_website_url)) {
-				    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
-			    }
-			    $getStreamData->ReblogedCount = 0;
-			    $getStreamData->CommentsCount = 0;
-			    $getStreamData->SharedCount = 0;
+				$id = array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id"));
+				$getStreamData->PostId = $aBlormReblogedPosts[$id]["post_id"];
+				$getStreamData->ActivityId = $bodyObject->id;
+				$getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
+				$getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
+				$getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
+				if (isset($bodyObject->object->data->data->published_on_website_name)) {
+					$getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
+				}
+				if (isset($bodyObject->object->data->data->published_on_website_url)) {
+					$getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
+				}
+				$getStreamData->ReblogedCount = 0;
+				$getStreamData->CommentsCount = 0;
+				$getStreamData->SharedCount = 0;
 
-			    if (isset($bodyObject->reaction_counts->reblog)) {
-				    $getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
-			    }
+				if (isset($bodyObject->reaction_counts->reblog)) {
+					$getStreamData->ReblogedCount = $bodyObject->reaction_counts->reblog;
+				}
 
-			    if (isset($bodyObject->latest_reactions->reblog)) {
-				    $getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
-			    }
+				if (isset($bodyObject->latest_reactions->reblog)) {
+					$getStreamData->Rebloged = $bodyObject->latest_reactions->reblog;
+				}
 
-			    if (isset($bodyObject->reaction_counts->comment)) {
-				    $getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
-			    }
+				if (isset($bodyObject->reaction_counts->comment)) {
+					$getStreamData->CommentsCount = $bodyObject->reaction_counts->comment;
+				}
 
-			    if (isset($bodyObject->latest_reactions->comment)) {
-				    $getStreamData->Comments = $bodyObject->latest_reactions->comment;
-			    }
+				if (isset($bodyObject->latest_reactions->comment)) {
+					$getStreamData->Comments = $bodyObject->latest_reactions->comment;
+				}
 
-			    if (isset($bodyObject->reaction_counts->shared)) {
-				    $getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
-			    }
+				if (isset($bodyObject->reaction_counts->shared)) {
+					$getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+				}
 
-			    if (isset($bodyObject->latest_reactions->shared)) {
-				    $getStreamData->Shared = $bodyObject->latest_reactions->shared;
-			    }
+				if (isset($bodyObject->latest_reactions->shared)) {
+					$getStreamData->Shared = $bodyObject->latest_reactions->shared;
+				}
 
-			    $aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
-		    }
-	    }
-    }
+				$aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
+			}
+		}
+	}
 
 	$blormPostConfig = new stdClass();
 	$blormPostConfig->blormAssets = plugins_url()."/blorm/assets/";
@@ -279,27 +279,37 @@ function add_getstream_data_to_head() {
 	}
 
 
-    echo "<script type=\"text/javascript\">\n\n";
-    echo "var blormapp = {
+	echo "<script type=\"text/javascript\">\n\n";
+	echo "var blormapp = {
 			postConfig: ".json_encode($blormPostConfig, JSON_PRETTY_PRINT).",\n
             blormPosts: ".json_encode($aGetStreamCreatedData, JSON_PRETTY_PRINT).",\n
             reblogedPosts: ".json_encode($aGetStreamReblogedData, JSON_PRETTY_PRINT)."\n";
-    echo "}\n</script>";
+	echo "}\n</script>";
 }
 
 add_filter( 'post_class', 'blorm_created_class',10,3);
 function blorm_created_class (array $classes, $class, $post_id) {
 
-    $a = get_post_meta($post_id);
-    if (isset($a["blorm_create"])) {
-        $classes[] = 'blorm-shared';
-    }
+	$options = get_option("blorm_plugin_options_frontend");
 
-    if (isset($a["blorm_reblog_activity_id"])) {
-        $classes[] = 'blorm-rebloged';
-    }
+	$a = get_post_meta($post_id);
+	if (isset($a["blorm_create"])) {
+		array_push($classes, 'blorm-shared');
 
-    return $classes;
+		if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
+			array_push($classes, 'blormwidget-on-image-post');
+		}
+	}
+
+	if (isset($a["blorm_reblog_activity_id"])) {
+		array_push($classes, 'blorm-rebloged');
+
+		if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
+			array_push($classes, 'blormwidget-on-image-post');
+		}
+	}
+
+	return $classes;
 }
 
 
@@ -325,69 +335,72 @@ add_action( 'the_posts', 'blorm_mod_the_posts' );
 
 function blorm_mod_the_posts($posts) {
 
-    $options = get_option("blorm_plugin_options_frontend");
+	$options = get_option("blorm_plugin_options_frontend");
 
-    foreach ($posts as $post) {
+	foreach ($posts as $post) {
 
-    	$a = get_post_meta($post->ID);
+		$a = get_post_meta($post->ID);
 
-	    $acivityId = "";
-	    $post_class = "blorm-post-data";
-	    if (isset($a["blorm_reblog_activity_id"])) {
-		    $post_class= "blorm-reblog-post-data";
-		    $acivityId = $a['blorm_reblog_activity_id'][0];
-	    }
+		$acivityId = "";
+		$post_class = "blorm-post-data";
+		if (isset($a["blorm_reblog_activity_id"])) {
+			$post_class= "blorm-reblog-post-data";
+			$acivityId = $a['blorm_reblog_activity_id'][0];
+		}
 
-	    if (isset($a["blorm_create_activity_id"])) {
-		    $post_class= "blorm-create-post-data";
-		    $acivityId = $a['blorm_create_activity_id'][0];
-	    }
+		if (isset($a["blorm_create_activity_id"])) {
+			$post_class= "blorm-create-post-data";
+			$acivityId = $a['blorm_create_activity_id'][0];
+		}
 
-	    if (isset($a["blorm_reblog_activity_id"])  || isset($a["blorm_create_activity_id"])) {
+		if (isset($a["blorm_reblog_activity_id"])  || isset($a["blorm_create_activity_id"])) {
 
-	    	// modify title
-		    if ( isset( $options['position_widget_menue']) ) {
-			    if ( $options['position_widget_menue'] === 'add_blorm_info_before_title' ) {
-				    $post->post_title = '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>' . $post->post_title;
-			    }
-		    }
+			// modify title
+			if ( isset( $options['position_widget_menue']) ) {
+				if ( $options['position_widget_menue'] === 'add_blorm_info_before_title' ) {
 
-		    if ( isset( $options['position_widget_menue']) ) {
-			    if ( $options['position_widget_menue'] === 'add_blorm_info_after_title' ) {
-				    $post->post_title = $post->post_title . '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>';
-			    }
-		    }
+					$post->post_title = '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>Rebloged: ' . $post->post_title;
+				}
+			}
 
-		    // modify content
-		    if ( isset( $options['position_widget_menue']) ) {
-			    if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
-				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content.'</div>';
-				    $post->post_excerpt = $post->post_content;
-			    }
-		    }
+			if ( isset( $options['position_widget_menue']) ) {
+				if ( $options['position_widget_menue'] === 'add_blorm_info_after_title' ) {
 
-		    if ( isset( $options['position_widget_menue']) ) {
-			    if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
-				    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span></div>';
-				    $post->post_excerpt = $post->post_content;
-			    }
-		    }
+					$post->post_title = 'Rebloged: '. $post->post_title . '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>';
+				}
+			}
 
-		    // modify content to place on image
-		    if ( isset( $options['position_widget_menue']) ) {
-			    if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
-				    $post->post_title = '<span class="blorm-icon" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><img src="'.plugins_url().'/blorm/assets/images/blorm_icon.png"></span>' . $post->post_title;
+			// modify content
+			if ( isset( $options['position_widget_menue']) ) {
+				if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
+					$post->post_title = 'Rebloged: ' . $post->post_title;
 
-				    $post->post_content = '<div class="blorm-post-content-container blormWidget-on-image '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
-				    $post->post_excerpt = $post->post_content;
-			    }
-		    }
+					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content.'</div>';
+					$post->post_excerpt = $post->post_content;
+				}
+			}
 
-	    }
-    }
+			if ( isset( $options['position_widget_menue']) ) {
+				if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
+					$post->post_title = 'Rebloged: ' . $post->post_title;
 
+					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span></div>';
+					$post->post_excerpt = $post->post_content;
+				}
+			}
 
+			// modify content to place on image
+			if ( isset( $options['position_widget_menue']) ) {
+				if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
+					$post->post_title = 'Rebloged: ' . $post->post_title;
 
-    //var_dump($post);
-    return $posts;
+					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+					$post->post_excerpt = $post->post_content;
+				}
+			}
+
+		}
+	}
+
+	return $posts;
 }

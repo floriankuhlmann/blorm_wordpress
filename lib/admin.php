@@ -23,7 +23,7 @@ function enqueue_blorm_admin_theme_style() {
 
     /* JS */
     global $pagenow;
-    if ($pagenow == 'index.php') {
+    if (is_admin() && $pagenow == 'index.php') {
 
         wp_enqueue_script('blorm-admin-theme-timeago', plugins_url('../assets/js/moment.min.js', __FILE__));
         wp_enqueue_script('blorm-admin-theme-jquery', plugins_url('../assets/js/jquery-3.3.1.min.js', __FILE__));

@@ -19,11 +19,11 @@
     padding-right: 0.5rem;
 }
 
-.blorm-post-content-container  .blormWidgetImageWrapper {
+.post  .blormWidgetImageWrapper {
     position: relative;
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon {
     position: absolute;
     width: 50%;
     height: 50%;
@@ -32,39 +32,39 @@
     background-size: cover;
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
     top:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_top.png");
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
     top:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_top.png");
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
     bottom:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_bottom.png");
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
     bottom:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_bottom.png");
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg {
     position: absolute;
     width: 20%;
     height: auto;
-    top: 5%;
-    left: 5%;
+    top: 10px;
+    left: 10px;
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
     position: absolute;
     bottom:0;
     right:0;
@@ -77,14 +77,14 @@
     background-size: cover;
 }
 
-.blorm-post-content-container .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget {
+.post .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget {
     position: absolute;
     width:100%;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
     color: #000;
-    bottom: 5%;
-    right: 5%;
+    bottom: 10px;
+    right: 10px;
 }
 
 .blormWidget {
@@ -133,6 +133,11 @@
     margin: 5px 0 0 0;
     position: relative;
     width:200px;
+}
+
+.blormWidget .blormWidgetContainerMenu .blormWidgetContainerDisplay {
+    display: block;
+    height: 52px;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus {
@@ -274,8 +279,14 @@
     width: 100%;
     position: absolute;
     top: 25px;
+    display: block;
+    height: 25px;
 }
 
+.blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a {
+    font-size: 14px;
+    color:#000;
+}
 
 @media only screen
 and (max-device-width: 860px) {

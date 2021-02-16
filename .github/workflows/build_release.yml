@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ master ]
-    tags:
-      - 'v*' ## Push events to matching v*, i.e. v1.0
+    branches: [ release ]
+    #tags:
+    #  - 'v*' ## Push events to matching v*, i.e. v1.0
 
 name: Create Release
 
@@ -11,16 +11,6 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Remove projectfiles and dirs
-        run: |
-          ls -lsa
-          rm -R .github .gitignore .DS_Store
-          ls -lsa
-        shell: bash
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -32,5 +22,3 @@ jobs:
           body: |
             First Beta Release for the plugin
             - still in development, please do not use without contacting us via blorm.io
-          draft: false
-          prerelease: false

@@ -46,19 +46,18 @@ define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
 
 require_once plugin_dir_path( __FILE__ ) . '/lib/settings.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
+require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';
+require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
 
-$blormUserData = getUserDataFromBlorm();
+if (is_admin()) {
 
-if ($blormUserData->error == null) {
+	require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
+	$blormUserData = getUserDataFromBlorm();
+	if ($blormUserData->error == null) {
+		require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
+		require_once plugin_dir_path( __FILE__ ) . '/lib/admin.php';
 
-    require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
-    require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
-    require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';
-    require_once plugin_dir_path( __FILE__ ) . '/lib/admin.php';
-
-} else {
-
-    require_once plugin_dir_path( __FILE__ ) . '/lib/admin_error.php';
-
+	} else {
+		require_once plugin_dir_path( __FILE__ ) . '/lib/admin_error.php';
+	}
 }

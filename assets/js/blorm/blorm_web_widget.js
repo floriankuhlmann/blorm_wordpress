@@ -455,10 +455,10 @@ class blorm_menue_bar {
         let originWebsiteLink = document.createElement("a");
         if (typeof(this.OriginWebsiteName) !== "undefined") {
 
-        console.log(this.OriginWebsiteName);
-        originWebsiteLink.href = this.OriginWebsiteUrl;
-        originWebsiteLink.innerText = this.OriginWebsiteName;
-        this.BlormWidgetPowerText.append(originWebsiteLink);
+            console.log(this.OriginWebsiteName);
+            originWebsiteLink.href = "//"+this.OriginWebsiteUrl;
+            originWebsiteLink.innerText = this.OriginWebsiteName;
+            this.BlormWidgetPowerText.append(originWebsiteLink);
         }
         this.ContainerDisplay.appendChild(this.BlormWidgetPowerText);
 
@@ -590,46 +590,51 @@ document.addEventListener("DOMContentLoaded", function() {
     var allBlormWidgets = document.getElementsByClassName("blormWidget");
 
     Array.from(allBlormWidgets).forEach(function(BlormWidget){
-        console.log(BlormWidget);
 
         let id = BlormWidget.dataset.postid;
         post = getPostById(id);
-        console.log(post);
         if (Object.keys(post).length !== 0) {
             blormMenuBar = new blorm_menue_bar(post)
-            //console.log(blormMenuBar);
             BlormWidget.appendChild(blormMenuBar.GetMenue());
         }
     });
 
-    var allBlormWidgetsOnImages = document.getElementsByClassName("blormWidget-on-image");
-    Array.from(allBlormWidgetsOnImages).forEach(function(BlormWidget){
-        //console.log("blormWidget-on-image");
-        //console.log(BlormWidget.childNodes);
+    var allBlormWidgetsOnImages = document.getElementsByClassName("blormwidget-on-image-post");
+    Array.from(allBlormWidgetsOnImages).forEach(function(BlormPost){
 
-
-        let id = BlormWidget.dataset.postid;
+        // the container holds the data
+        let BlormPostContainer = BlormPost.getElementsByClassName("blorm-post-content-container")[0];
+        let id = BlormPostContainer.dataset.postid;
         post = getPostById(id);
-        console.log(post);
-        if (Object.keys(post).length !== 0) {
-            blormMenuBar = new blorm_menue_bar(post)
-            //console.log(blormMenuBar);
-            //BlormWidget.appendChild(blormMenuBar.GetWidget());
 
-            if( BlormWidget.getElementsByTagName('img').length > 0) {
+        if (Object.keys(post).length !== 0) {
+
+            // if the post is a reblog and not a shared post we want to change the urls to the origin post
+            if (BlormPostContainer.classList.contains("blorm-reblog-post-data")) {
+                let BlormPostLinks = BlormPost.getElementsByTagName('a');
+                if (BlormPostLinks.length > 0) {
+                    Array.from(BlormPostLinks).forEach(function (BlormPostLink) {
+                        BlormPostLink.href = post.TeaserUrl;
+                        //console.log(BlormPostLink);
+                    });
+                }
+            }
+
+            // this is the menua bar inside the image container
+            blormMenuBar = new blorm_menue_bar(post)
+
+            if( BlormPost.getElementsByTagName('img').length > 0) {
                 // there is an image
-                console.log("hurra");
-                console.log(BlormWidget.getElementsByTagName('img')[0]);
+                console.log(BlormPost.getElementsByTagName('img')[0]);
 
                 // img element that will be wrapped
-                var imgEl = BlormWidget.getElementsByTagName('img')[0];
+                var imgEl = BlormPost.getElementsByTagName('img')[0];
 
                 // new image wrapper div
                 divWrapper = document.createElement('div');
                 divWrapper.classList.add("blormWidgetImageWrapper");
 
                 imgEl.parentNode.insertBefore(divWrapper, imgEl);
-
                 divWrapper.appendChild(imgEl);
 
                 divLayerWidget = document.createElement('div');
@@ -643,6 +648,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 divLayerBlormIcon.classList.add("topleft");
                 divLayerBlormIconImg = document.createElement('img');
                 divLayerBlormIconImg.src = blormapp.postConfig.blormAssets + "/images/blorm_icon_network.png";
+                divLayerBlormIconImg.classList.add("blormWidgetImagelayerBlormIconImg");
                 divLayerBlormIcon.append(divLayerBlormIconImg);
                 imgEl.parentNode.insertBefore(divLayerBlormIcon, imgEl.nextSibling);
 
