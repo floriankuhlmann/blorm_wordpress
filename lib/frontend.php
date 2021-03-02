@@ -353,7 +353,7 @@ function blorm_mod_the_posts($posts) {
 			$acivityId = $a['blorm_create_activity_id'][0];
 		}
 
-		if (isset($a["blorm_reblog_activity_id"])  || isset($a["blorm_create_activity_id"])) {
+		if (isset($a["blorm_reblog_activity_id"]) || isset($a["blorm_create_activity_id"])) {
 
 			// modify title
 			if ( isset( $options['position_widget_menue']) ) {
@@ -366,14 +366,19 @@ function blorm_mod_the_posts($posts) {
 			if ( isset( $options['position_widget_menue']) ) {
 				if ( $options['position_widget_menue'] === 'add_blorm_info_after_title' ) {
 
-					$post->post_title = 'Rebloged: '. $post->post_title . '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>';
+					$post->post_title = $post->post_title . '<div class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></div>';
+					if (isset($a["blorm_reblog_activity_id"])) {
+						$post->post_title = 'Rebloged: '. $post->post_title;
+					}
 				}
 			}
 
 			// modify content
 			if ( isset( $options['position_widget_menue']) ) {
 				if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
-					$post->post_title = 'Rebloged: ' . $post->post_title;
+					if (isset($a["blorm_reblog_activity_id"])) {
+						$post->post_title = 'Rebloged: '. $post->post_title;
+					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content.'</div>';
 					$post->post_excerpt = $post->post_content;
@@ -382,7 +387,9 @@ function blorm_mod_the_posts($posts) {
 
 			if ( isset( $options['position_widget_menue']) ) {
 				if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
-					$post->post_title = 'Rebloged: ' . $post->post_title;
+					if (isset($a["blorm_reblog_activity_id"])) {
+						$post->post_title = 'Rebloged: '. $post->post_title;
+					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span></div>';
 					$post->post_excerpt = $post->post_content;
@@ -392,7 +399,9 @@ function blorm_mod_the_posts($posts) {
 			// modify content to place on image
 			if ( isset( $options['position_widget_menue']) ) {
 				if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
-					$post->post_title = 'Rebloged: ' . $post->post_title;
+					if (isset($a["blorm_reblog_activity_id"])) {
+						$post->post_title = 'Rebloged: '. $post->post_title;
+					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
 					$post->post_excerpt = $post->post_content;
