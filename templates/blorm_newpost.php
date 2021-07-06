@@ -217,7 +217,7 @@
                 $SanitizedPost["teasertext"] = "";
                 $blocks = parse_blocks( $recent_post["post_content"] );
                 if (isset($blocks[0])){
-                    $SanitizedPost["teasertext"] = filter_var($blocks[0]['innerHTML'], FILTER_SANITIZE_STRING);
+                    $SanitizedPost["teasertext"] = str_replace("\n","",filter_var($blocks[0]['innerHTML'], FILTER_SANITIZE_STRING));
                 }
 
                 $SanitizedPost["image"] = "nothumb";

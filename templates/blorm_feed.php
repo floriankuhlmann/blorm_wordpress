@@ -1,8 +1,8 @@
 <?php
 
-global $blormUserData;
-if ($blormUserData->error != null) {
-	$blormUserName = $blormUserData->user->name;
+global $blormUserAccountData;
+if ($blormUserAccountData->error != null) {
+	$blormUserName = $blormUserAccountData->user->name;
 }
 
 
@@ -17,6 +17,7 @@ if ($blormUserData->error != null) {
     jQuery(document).ready(function() {
         blormapp.feedmodule = new Vue({
             el: '#BlormFeed',
+
             created() {},
             data: {
                 posts: blormapp.core.feedTimeline(),

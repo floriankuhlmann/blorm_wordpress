@@ -95,11 +95,6 @@ function preRequestLocalPostsUpdate(&$request) {
     switch($parameter["restparameter"]) {
 	    case (preg_match('/^(feed\/timeline)\/?$/', $parameter["restparameter"]) ? true : false) :
 
-	    	/*error_log("feed\/timeline - pre request at: ".date("Y-m-d.h:i:sa"));
-		    error_log($parameter["restparameter"]);
-		    error_log(json_encode($body));
-		    error_log(json_encode($request->get_headers()));
-			*/
 		    break;
 
         //READ
@@ -127,7 +122,7 @@ function preRequestLocalPostsUpdate(&$request) {
 
             $delparameter = end($parameter);
 
-            $args = array('post_type' => 'post', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
+            $args = array('post_type' => 'blormpost', 'meta_key' => 'blorm_reblog_activity_id', 'meta_value' => $delparameter);
             $the_query = get_posts( $args );
 
             if (isset($the_query[0])) {
@@ -171,11 +166,6 @@ function postRequestLocalPostsUpdate($request, $response) {
     switch($parameter["restparameter"]) {
 	    case (preg_match('/^(feed\/timeline)\/?$/', $parameter["restparameter"]) ? true : false) :
 
-		    /*error_log("feed\/timeline - prposte request at: ".date("Y-m-d.h:i:sa"));
-		    error_log($parameter["restparameter"]);
-		    error_log(json_encode($body));
-		    error_log(json_encode($request->get_headers()));
-			*/
 		    break;
 
 	    // CREATE
@@ -203,11 +193,8 @@ function postRequestLocalPostsUpdate($request, $response) {
                 $requestBodyObj = json_decode($body);
                 $responseBodyObj = json_decode($response["body"]);
 
-                error_log($response["body"]);
-
                 /*$content = "<span data-blorm-id=\"".$responseBodyObj->{'data'}->{'activity_id'}."\"><a href=\"".$requestBodyObj->{'origin_post_data'}->{'url'}."\">
                             ".$requestBodyObj->{'origin_post_data'}->{'text'}."</a></span>";*/
-
 
                 // save custom post
                 $post_id = wp_insert_post(array(
@@ -215,13 +202,13 @@ function postRequestLocalPostsUpdate($request, $response) {
                     "post_content" => $requestBodyObj->{'origin_post_data'}->{'text'},
                     "post_status" => "publish",
                     "post_category" => array("Blorm"),
-                    "post_type" => "post"
+                    "post_type" => "blormpost"
                 ));
 
                 add_post_meta($post_id, "blorm_reblog_teaser_image", $requestBodyObj->{'origin_post_data'}->{'image'});
                 add_post_meta($post_id, "blorm_reblog_teaser_url", $requestBodyObj->{'origin_post_data'}->{'url'});
                 add_post_meta($post_id, "blorm_reblog_object_iri", $requestBodyObj->{'origin_post'}->{'object_iri'});
-                add_post_meta($post_id, "blorm_reblog_activity_id", $responseBodyObj->{'data'}->{'activity_id'});
+                add_post_meta($post_id, "blorm_reblog_activity_id", $responseBodyObj->{'data'}->{'user_activity_id'});
 
                 // prepare the title for the file
                 $filetitle = sanitize_title(
@@ -286,13 +273,13 @@ function postRequestLocalPostsUpdate($request, $response) {
 
         	$delparameter = explode('/', $parameter["restparameter"]);
 
-            if ($response) {
+            /*if ($response) {
                 $recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create_activity_id', 'meta_value' => end($delparameter)));
 	            if (isset($recent_posts_with_meta[0])) {
 		            delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create_activity_id");
 		            delete_post_meta($recent_posts_with_meta[0]["ID"],"blorm_create");
 	            }
-            }
+            }*/
 
             break;
 

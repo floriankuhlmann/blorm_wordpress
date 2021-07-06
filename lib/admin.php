@@ -25,37 +25,22 @@ function enqueue_blorm_admin_theme_style() {
     global $pagenow;
     if (is_admin() && $pagenow == 'index.php') {
 
-        wp_enqueue_script('blorm-admin-theme-timeago', plugins_url('../assets/js/moment.min.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-jquery', plugins_url('../assets/js/jquery-3.3.1.min.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-axios', plugins_url('../assets/js/axios.min.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-vue', plugins_url('../assets/js/vue.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-materialize', plugins_url('../assets/js/jquery-ui-1.12.1/jquery-ui.min.js', __FILE__));
-
-        wp_enqueue_script('blorm-admin-theme-index', plugins_url('../assets/js/blorm/blorm_app.js', __FILE__));
-        wp_enqueue_script('blorm-admin-theme-index-feed', plugins_url('../assets/js/blorm/feed.js', __FILE__));
+       // wp_enqueue_script('blorm-admin-theme-timeago', plugins_url('../assets/js/moment.min.js', __FILE__));
+        wp_enqueue_script('blorm-admin-theme-app', plugins_url('../assets/js/blorm_app.js', __FILE__), '','',true);
 
         /* Wordpress API backbone.js */
         wp_enqueue_script('wp-api');
 
         // Register custom variables for the AJAX script.
-        wp_localize_script( 'blorm-admin-theme-index', 'restapiVars', [
+        wp_localize_script( 'blorm-admin-theme-app', 'restapiVars', [
             'root'  => esc_url_raw( rest_url() ),
             'nonce' => wp_create_nonce( 'wp_rest' ),
-        ] );
+        ]);
 
-        wp_add_inline_script('blorm-admin-theme-index', getConfigJs() ,'before');
+        wp_add_inline_script('blorm-admin-theme-app', getConfigJs() ,'before');
 
     }
-
 }
-
-//add_action( 'vue_templates', 'add_vue_templates');
-/*function add_vue_templates() {
-    // echo the vue js stuff
-    require_once PLUGIN_BLORM_PLUGIN_DIR  .'/templates/blorm_vue_templates.php';
-} */
-
-
 
 function prepare_dashboard_meta() {
     remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );
@@ -71,93 +56,147 @@ function prepare_dashboard_meta() {
     remove_action('welcome_panel', 'wp_welcome_panel');
 
     //https://codex.wordpress.org/Dashboard_Widgets_API
-	$newPostTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_white_3.png' )."\" class=\"blormImage\"> share here and now:";
-	add_meta_box( 'BlormDashboardWidgetNewPost', $newPostTitle, 'dashboard_widget_blorm_newpost', 'dashboard', 'side', 'high' );
+    add_meta_box(
+        'BlormDashboardWidgetUserProfile',
+        '<img src='.plugins_url("blorm/assets/images/blorm_icon_white_3.png").' class="blormImage"> <blorm-username fill-word-second-person="r" ></blorm-username> user profile:',
+        'dashboard_widget_blorm_userprofile',
+        'dashboard',
+        'side',
+        'high');
 
-	$searchUserTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> who do you want to follow? ";
-    add_meta_box( 'BlormDashboardWidgetSearchUser', $searchUserTitle, 'dashboard_widget_blorm_usermodule' , 'dashboard', 'side', 'high' );
+	add_meta_box(
+	    'BlormDashboardWidgetNewPost',
+        '<img src='.plugins_url("blorm/assets/images/blorm_icon_white_3.png").' class="blormImage"> share here and now:',
+        'dashboard_widget_blorm_newpost',
+        'dashboard',
+        'side',
+        'high');
 
-	$followingTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> you are following:";
-	add_meta_box( 'BlormDashboardWidgetFollowing', $followingTitle, 'dashboard_widget_blorm_followinglist' , 'dashboard', 'side', 'high' );
+    add_meta_box(
+        'BlormDashboardWidgetSearchUser',
+        '<img src='.plugins_url( "blorm/assets/images/blorm_icon_world.png" ).' class="blormImage"> who do you want to follow? ',
+        'dashboard_widget_blorm_usermodule',
+        'dashboard',
+        'side',
+        'high');
 
-	$followerTitle = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_icon_world.png' )."\" class=\"blormImage\"> your followers:";
-	add_meta_box( 'BlormDashboardWidgetFollowers', $followerTitle, 'dashboard_widget_blorm_followerlist' , 'dashboard', 'side', 'high' );
+	add_meta_box(
+	    'BlormDashboardWidgetFollowing',
+        '<img src='.plugins_url( "blorm/assets/images/blorm_icon_world.png" ).' class="blormImage"> <blorm-username fill-word-second-person=" are" fill-word-third-person=" is"></blorm-username> following:',
+        'dashboard_widget_blorm_followinglist',
+        'dashboard',
+        'side',
+        'high');
 
+	add_meta_box(
+	    'BlormDashboardWidgetFollowers',
+        '<img src='.plugins_url( "blorm/assets/images/blorm_icon_world.png" ).' class="blormImage"> <blorm-username fill-word-second-person="r" fill-word-third-person="s"></blorm-username> followers:',
+        'dashboard_widget_blorm_followerlist',
+        'dashboard',
+        'side',
+        'high');
 }
 
+function dashboard_widget_blorm_userprofile() {
+    // echo get list of blogusers
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-userprofile_component.php';
+}
 
 function dashboard_widget_blorm_usermodule() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_user_search.php';
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-usersearch_component.php';
 }
 
 function dashboard_widget_blorm_followinglist() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_followinglist.php';
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-followinglist_component.php';
 }
 
 function dashboard_widget_blorm_followerlist() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_followerlist.php';
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-followerlist_component.php';
 }
 
 function dashboard_widget_blorm_newpost() {
     // echo form for new post
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_newpost.php';
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-newpost_component.php';
 }
 
 function blorm_dashboard_widget_feed_function() {
     // echo the blorm feed
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . '/templates/blorm_feed.php';
+    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-feed_component.php';
 }
-
 
 function add_dashboard_blorm_feed_widget() {
 
     $blormUserName = "*";
-
-    global $blormUserData;
-    if ($blormUserData->error == null) {
-        $blormUserName = $blormUserData->user->name;
+    global $blormUserAccountData;
+    if ($blormUserAccountData->error == null) {
+        $blormUserName = $blormUserAccountData->user->name;
     }
-	$title = "<img src=\"".plugins_url( 'blorm/assets/images/blorm_logo_world.png' )."\" class=\"blormImage\"> - ". $blormUserName;
     wp_add_dashboard_widget(
         'BlormDashboardWidgetFeed', // Widget slug.
-        $title, // Title.
+        '<a href="/wp-admin/index.php"><img src="'.plugins_url( 'blorm/assets/images/blorm_logo_world.png' ).'" class="blormImage"></a> <blorm-username fill-word-second-person="r" fill-word-third-person="s"></blorm-username> Feed',
         'blorm_dashboard_widget_feed_function' // Display function.
     );
 }
 
 function getConfigJs() {
 
+    global $blormUserAccountData;
+
     $jsdata =   "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
     $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';\n";
     $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;\n";
     $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
-
-    // user data
-
+    $jsdata .=  "var blormPluginUrl = '".plugins_url()."/blorm';\n";
+    // user data fallback definiton
     $userdata =  "var blormapp = {
-                user : {
-                    \"name\": \"*\",
-                    \"blormhandle\": \"*\",
-                    \"id\": \"*\",
-                    \"website\": \"*\",
-                    \"photo_url\": \"*\",
-                },
-        };\n";
+                    account : {
+                        \"name\": \"*\",
+                        \"blormhandle\": \"*\",
+                        \"id\": \"*\",
+                        \"photo_url\": \"*\",
+                        \"website_name\": \"*\",
+                        \"website_href\": \"*\",
+                        \"website_category\": \"*\",
+                        \"website_type\": \"*\",
+                        \"website_id\": \"*\",
+                    }
+                };\n
+                blormapp.user = blormapp.account;
+                ";
 
-    global $blormUserData;
-    if ($blormUserData->error == null) {
-        $userdata =  "var blormapp = {
-                user : {
-                    \"name\": \"".$blormUserData->user->name."\",
-                    \"blormhandle\": \"".$blormUserData->user->blormhandle."\",
-                    \"id\": \"".$blormUserData->user->id."\",
-                    \"photo_url\": \"".$blormUserData->user->photo_url."\",
-                },
-        };\n";
+    if ($blormUserAccountData->error != null) {
+        $jsdata .= $userdata;
+        return $jsdata;
     }
+
+    // user data setup
+    $userdata =  "var blormapp = {
+                    account : {
+                        \"name\": \"".$blormUserAccountData->user->name."\",
+                        \"blormhandle\": \"".$blormUserAccountData->user->blormhandle."\",
+                        \"id\": \"".$blormUserAccountData->user->id."\",
+                        \"photo_url\": \"".$blormUserAccountData->user->photo_url."\",
+                        \"website_name\": \"".$blormUserAccountData->user->website_name."\",
+                        \"website_href\": \"".$blormUserAccountData->user->website_href."\",
+                        \"website_category\": \"".$blormUserAccountData->user->website_category."\",
+                        \"website_type\": \"".$blormUserAccountData->user->website_type."\",
+                        \"website_id\": \"".$blormUserAccountData->user->website_id."\",
+                    },
+                    recentPosts: [\n";
+                    $recent_posts = wp_get_recent_posts();
+                    foreach ($recent_posts as $recent_post) {
+                        $blocks = parse_blocks( $recent_post["post_content"] );
+                        if (isset($blocks[0])){
+                            $teasertext = str_replace("\n","",filter_var($blocks[0]['innerHTML'], FILTER_SANITIZE_STRING));
+                        }
+                        $userdata .= '{id:"'.$recent_post["ID"].'", headline:"'.$recent_post["post_title"].'", teasertext:"'.$teasertext.'"},';
+                    }
+                    $userdata .=  "]\n
+                };\n
+                blormapp.user = blormapp.account;\n";
 
     $jsdata .= $userdata;
 

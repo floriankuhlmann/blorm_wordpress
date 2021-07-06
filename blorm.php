@@ -44,20 +44,19 @@ define( 'PLUGIN_BLORM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Plugin Root File.
 define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
-
-require_once plugin_dir_path( __FILE__ ) . '/lib/settings.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/frontend.php';
-require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_api.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_post.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/settings.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/frontend.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_api.php';
 
 if (is_admin()) {
 
-	require_once plugin_dir_path( __FILE__ ) . '/lib/user.php';
-	$blormUserData = getUserDataFromBlorm();
-	if ($blormUserData->error == null) {
-		require_once plugin_dir_path( __FILE__ ) . '/lib/blorm_post.php';
-		require_once plugin_dir_path( __FILE__ ) . '/lib/admin.php';
+	require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
+	$blormUserAccountData = getUserAccountDataFromBlorm();
+	if ($blormUserAccountData->error == null) {
+		require_once plugin_dir_path( __FILE__ ) . 'lib/admin.php';
 
 	} else {
-		require_once plugin_dir_path( __FILE__ ) . '/lib/admin_error.php';
+		require_once plugin_dir_path( __FILE__ ) . 'lib/admin_error.php';
 	}
 }

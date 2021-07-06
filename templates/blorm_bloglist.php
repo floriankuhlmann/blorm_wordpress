@@ -64,8 +64,6 @@
 <div class="BlormWidgetContainer">
     <div id="BlormBlogList" class="BlormBlogList margin-bottom-10">
         <form @submit.prevent="submit_follow_blog">
-
-
             <select class="blorm-userlist-select" v-model="selected">
                 <option value="firstentry" disabled selected>Available Blogs to follow</option>
                 <option v-for="user in users" v-bind:value="user.id">

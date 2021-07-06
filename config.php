@@ -17,7 +17,8 @@ function get_blorm_config() {
 
     $api_options = Array(
 	    'api' => 'https://api.blorm.io',
-	    'version' => '0.9'
+	    'version' => '0.9',
+        'update_intervall' => '180',
     );
 
     if ( file_exists ( plugin_dir_path( __FILE__ ) . '/config_dev.php' )) {

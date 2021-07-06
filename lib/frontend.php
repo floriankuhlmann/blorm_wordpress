@@ -56,14 +56,21 @@ add_action( 'wp_head', 'add_getstream_data_to_head');
 */
 add_filter( 'cron_schedules', 'blorm_add_cron_getstream_interval' );
 function blorm_add_cron_getstream_interval( $schedules ) {
+
+    $update_intervall = 1;
+    $config = get_blorm_config();
+
+    if (isset($config['update_intervall']) ) {
+        $update_intervall = $config['update_intervall'];
+    }
+
 	$schedules['onehundredeighty_seconds'] = array(
-		'interval' => 180,
+		'interval' => $update_intervall,
 		'display'  => esc_html__( 'Every sixty Seconds' ), );
 	return $schedules;
 }
 
 add_action( 'blorm_cron_getstream_hook', 'blorm_cron_getstream_exec' );
-
 if ( ! wp_next_scheduled( 'blorm_cron_getstream_hook' ) ) {
 	wp_schedule_event( time(), 'onehundredeighty_seconds', 'blorm_cron_getstream_hook' );
 }
@@ -77,12 +84,23 @@ function blorm_cron_getstream_exec() {
 		'method' => 'GET',
 		'body' => '',
 		'data_format' => 'body',
+        'timeout' => 5,
+        'sslverify' => true,
 	);
-	$response = wp_remote_request(CONFIG_BLORM_APIURL ."/feed/timeline", $args);
+	$response = wp_remote_request(CONFIG_BLORM_APIURL ."/feed/userpublic", $args);
+
+	if( is_wp_error( $response ) ) {
+        error_log($response->get_error_message());
+        return;
+    }
+
+    if( $response['response']['code'] !== 200 ) {
+        error_log("error api request ".CONFIG_BLORM_APIURL ."/feed/userpublic : ".$response['response']['code']);
+        return;
+    }
 
 	if ($response['body'] != "") {
 		$getstreamPostObjects = $response['body'];
-
 	}
 
 	update_option( 'blorm_getstream_cached_post_data', $getstreamPostObjects, true );
@@ -116,7 +134,8 @@ function add_getstream_data_to_head() {
 	$aBlormReblogedPosts = array();
 
 	// get all posts from this plattformed that are shared on blorm
-	$aRecentPostsRebloged = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+	$aRecentPostsRebloged = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id','post_type' => 'blormpost'));
+
 	//var_dump($aRecentPostsReblogged);
 	// the activity_id is important to connect the posts with the blorm-data
 	foreach ( $aRecentPostsRebloged as $aRecentPostRebloged) {
@@ -131,7 +150,6 @@ function add_getstream_data_to_head() {
 			);
 		}
 	}
-
 	// ALL POSTS FROM THE GETSTREAM TIMELINE
 	// we need the blorm-data like comments, shares, retweets to enrich the posts on the local plattform
 	// the data is loaded every 180 seconds via cron schedule 'blorm_cron_getstream_hook' and stored to wp_options
@@ -177,21 +195,18 @@ function add_getstream_data_to_head() {
 				}
 
 				if (isset($bodyObject->reaction_counts->shared)) {
-					$getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+					$getStreamData->SharedCount = $bodyObject->reaction_counts->share;
 				}
 
 				if (isset($bodyObject->latest_reactions->shared)) {
-					$getStreamData->Shared = $bodyObject->latest_reactions->shared;
+					$getStreamData->Shared = $bodyObject->latest_reactions->share;
 				}
 
 				$aGetStreamCreatedData[$getStreamData->PostId] = $getStreamData;
 			}
 
-
 			// REBLOGED POSTS
 			if (array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id")) !== false) {
-
-				//var_dump($bodyObject->actor->data);
 
 				$id = array_search($bodyObject->id, array_column($aBlormReblogedPosts, "activity_id"));
 				$getStreamData->PostId = $aBlormReblogedPosts[$id]["post_id"];
@@ -225,12 +240,12 @@ function add_getstream_data_to_head() {
 					$getStreamData->Comments = $bodyObject->latest_reactions->comment;
 				}
 
-				if (isset($bodyObject->reaction_counts->shared)) {
-					$getStreamData->SharedCount = $bodyObject->reaction_counts->shared;
+				if (isset($bodyObject->reaction_counts->share)) {
+					$getStreamData->SharedCount = $bodyObject->reaction_counts->share;
 				}
 
-				if (isset($bodyObject->latest_reactions->shared)) {
-					$getStreamData->Shared = $bodyObject->latest_reactions->shared;
+				if (isset($bodyObject->latest_reactions->share)) {
+					$getStreamData->Shared = $bodyObject->latest_reactions->share;
 				}
 
 				$aGetStreamReblogedData[$getStreamData->PostId] = $getStreamData;
@@ -312,14 +327,21 @@ function blorm_created_class (array $classes, $class, $post_id) {
 	return $classes;
 }
 
+//https://developer.wordpress.org/plugins/post-types/working-with-custom-post-types/
+add_action( 'pre_get_posts', 'blorm_add_posttype_blorm_to_loop' );
+function blorm_add_posttype_blorm_to_loop( $query ) {
+
+    if ($query->is_main_query())
+        $query->set( 'post_type', array( 'post', 'blormpost' ) );
+    return $query;
+}
 
 /*
  *
  * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
  */
-
-add_action( 'pre_get_posts', 'wpsites_remove_posts_from_home_page' );
-function wpsites_remove_posts_from_home_page( $query ) {
+add_action( 'pre_get_posts', 'blorm_remove_posts_from_home_page' );
+function blorm_remove_posts_from_home_page( $query ) {
 
 	$options = get_option( 'blorm_plugin_options_category' );
 
@@ -328,11 +350,11 @@ function wpsites_remove_posts_from_home_page( $query ) {
 			$query->set( 'cat', '-'.$options['blorm_category_show_reblogged'] );
 		}
 	}
+
+    return $query;
 }
+
 add_action( 'the_posts', 'blorm_mod_the_posts' );
-
-
-
 function blorm_mod_the_posts($posts) {
 
 	$options = get_option("blorm_plugin_options_frontend");
@@ -381,7 +403,7 @@ function blorm_mod_the_posts($posts) {
 					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content.'</div>';
-					$post->post_excerpt = $post->post_content;
+					//$post->post_excerpt = $post->post_content;
 				}
 			}
 
@@ -392,7 +414,7 @@ function blorm_mod_the_posts($posts) {
 					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span></div>';
-					$post->post_excerpt = $post->post_content;
+					//$post->post_excerpt = $post->post_content;
 				}
 			}
 
@@ -404,7 +426,7 @@ function blorm_mod_the_posts($posts) {
 					}
 
 					$post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
-					$post->post_excerpt = $post->post_content;
+					//$post->post_excerpt = $post->post_content;
 				}
 			}
 

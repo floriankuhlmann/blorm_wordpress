@@ -55,32 +55,6 @@ blormapp.core = {
                 data.latestReactions = value.latest_reactions;
                 return data;
             }
-            /*if (value.teaser) {
-                data.error = false;
-                data.teaser = true;
-                data.activityId = value.id;
-                data.object = {
-                    iri: value.object.id,
-                    type: "teaser",
-                    verb: value.verb,
-                    time: value.time,
-                    headline: value.teaser.headline,
-                    text: value.teaser.text,
-                    image: value.teaser.image,
-                    url: value.teaser.url,
-                };
-                data.actor = {
-                    id: value.actor.id,
-                    userName: ":-)",
-                    photoUrl: "",
-                    website: "",
-                };
-                data.ownReactions = value.own_reactions;
-                data.reactionCounts = value.reaction_counts;
-                data.latestReactions = value.latest_reactions;
-
-                return data;
-            }*/
         });
         return postData;
     },
@@ -453,24 +427,7 @@ blormapp.core = {
                 reject(error);
             });
         });
-        //console.log(promiseObj);
-        //Returns Promise object
         return promiseObj;
-        /*axios.get(
-            restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': restapiVars.nonce,}
-            }).then(response => {
-                console.log(response.data);
-                blormapp.user.followers = response.data;
-                //blormapp.blormFollowerListing.followingblogs = response.data;
-                return response.data;
-            }).catch(error => {
-             console.log("error:");
-             console.log(error)
-            });*/
         },
     /**
      * getFollowersOfUser
@@ -492,24 +449,7 @@ blormapp.core = {
                 reject(error);
             });
         });
-        //console.log(promiseObj);
-        //Returns Promise object
         return promiseObj;
-        /*axios.get(
-            restapiVars.root+'blormapi/v1/feed/followers/timeline/'+blormapp.user.id,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': restapiVars.nonce,}
-            }).then(response => {
-                console.log(response.data);
-                blormapp.user.followers = response.data;
-                //blormapp.blormFollowerListing.followingblogs = response.data;
-                return response.data;
-            }).catch(error => {
-             console.log("error:");
-             console.log(error)
-            });*/
     },
     /**
      * getUserData

@@ -1,6 +1,6 @@
 
 .type-blormpost {
-    border: 1px solid black;
+
 }
 
 .blorm-post-content-container {
@@ -8,22 +8,22 @@
     padding: 0 !important;
 }
 
-.post .blorm-icon{
+.blormpost .blorm-icon {
     height: 1em;
     line-height: 1em;
 }
 
-.post .blorm-icon img{
+.blormpost .blorm-icon img {
     height: 0.75em;
     width: auto;
     padding-right: 0.5rem;
 }
 
-.post  .blormWidgetImageWrapper {
+.blormpost  .blormWidgetImageWrapper {
     position: relative;
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon {
     position: absolute;
     width: 50%;
     height: 50%;
@@ -32,31 +32,31 @@
     background-size: cover;
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
     top:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_top.png");
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
     top:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_top.png");
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
     bottom:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_bottom.png");
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
     bottom:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_bottom.png");
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg {
     position: absolute;
     width: 20%;
     height: auto;
@@ -64,7 +64,7 @@
     left: 10px;
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
     position: absolute;
     bottom:0;
     right:0;
@@ -77,7 +77,7 @@
     background-size: cover;
 }
 
-.post .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget {
+.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget {
     position: absolute;
     width:100%;
     font-family: Arial, Helvetica, sans-serif;
@@ -191,7 +191,7 @@
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocial ul li.blormWidgetPlusSocialBarText{
-    vertical-align: super;
+    /*vertical-align: super;*/
     padding-right: 5px;
 }
 
@@ -209,7 +209,7 @@
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusLogoIcon img {
     height: 18px;
-    margin-top: 2px;
+    /*margin-top: 2px;*/
     width: auto;
     line-height: 25px;
     cursor: pointer;
@@ -261,16 +261,16 @@
     padding: 2px 4px 2px 2px;
     margin: 0;
     float: left;
-    font-size: 0.6rem;
-    line-height: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 0.9rem;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent .PowerbarContentText {
     padding: 2px;
     margin: 0px;
     float: left;
-    font-size: 0.6rem;
-    line-height: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 0.9rem;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText {

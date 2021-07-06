@@ -7,8 +7,7 @@
  */?>
 
 <script type="application/javascript">
-    jQuery(document).ready(function(){
-
+        document.addEventListener("DOMContentLoaded", function() {
         var ajaxapi = blogdomain+ajaxurl;
 
         // Define a new component called button-counter

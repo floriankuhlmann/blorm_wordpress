@@ -126,7 +126,7 @@ class blorm_menue_bar {
                 break;
         }
 
-        ul.appendChild(li);
+
         // if there is interacton data build the list of links
         if (typeof(socialData) != "undefined" && socialData.length > 0) {
 
@@ -135,7 +135,7 @@ class blorm_menue_bar {
                 this.listcontent[index] = {name:item.user.data.data.website_name,link:item.user.data.data.website_url };
             }, this);
             let li = document.createElement("li");
-            li.innerHTML = "Post is " + data +" on:";
+            li.innerHTML = "Post is " + ContentType +" on:";
             ul.appendChild(li);
 
             for (content of this.listcontent) {
@@ -146,6 +146,8 @@ class blorm_menue_bar {
                 li.appendChild(a);
                 ul.appendChild(li);
             }
+        } else {
+            ul.appendChild(li);
         }
 
         let c = this.PowerbarContent.firstChild;

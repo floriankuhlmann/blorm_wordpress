@@ -1,12 +1,66 @@
+.wp-list-table .type-blormpost {
+    display: none;
+}
+
+
 /* the widgets */
 
 #BlormDashboardWidgetNewPost,
 #BlormDashboardWidgetSearchUser,
 #BlormDashboardWidgetFollowing,
 #BlormDashboardWidgetFollowers,
-#BlormDashboardWidgetFeed {
+#BlormDashboardWidgetFeed,
+#BlormDashboardWidgetUserProfile {
     background-color: #ffff94;
 }
+
+
+/* user profile */
+.BlormUserProfile .BlormUserProfileBox {
+    padding:0.5rem 0.5rem 0.5rem 0.5rem;
+    border:1px solid #eee;
+    background-color: rgb(252, 252, 252);
+}
+
+.BlormUserProfile .BlormUserProfileNameBox,
+.BlormUserProfile .BlormUserProfileImageBox {
+    width:25%;
+    float:left;
+}
+
+.BlormUserProfile .BlormUserProfileInfoBox {
+    width:25%;
+    float:left;
+    text-align: left;
+}
+
+.BlormUserProfile .BlormUserProfileEdit {
+    width:25%;
+    float:left;
+    text-align: left;
+}
+
+.BlormUserProfileUserImage {
+    width: 5rem;
+    margin: 1px 5px 1px 1px;
+    padding: 5px 5px 0px 5px;
+    float: left;
+    word-wrap: break-word;
+    word-break: break-all;
+    background-color: #f6f6f6;
+    color:#555;
+    overflow:hidden;
+    border-bottom: #f6f6f6 5px solid;
+}
+
+.BlormUserProfileUserImage img {
+    width: 100%;
+    height: auto;
+    background-color: #f6f6f6;
+    color:#555;
+    overflow:hidden;
+}
+
 
 /* new post */
 
@@ -39,41 +93,7 @@
 /* follower widgets */
 
 
-.BlormFollowListUser {
-    width: 5rem;
-    margin: 1px 5px 5px 1px;
-    padding: 5px 5px 0px 5px;
-    float: left;
-    word-wrap: break-word;
-    word-break: break-all;
-    background-color: #f6f6f6;
-    color:#555;
-    overflow:hidden;
-    border-bottom: #f6f6f6 5px solid;
-}
 
-.BlormFollowingList .BlormFollowListUser {
-    cursor: pointer;
-}
-
-.BlormFollowListUserImg {
-    width: 5rem;
-    height: 5rem;
-    background-color: #f6f6f6;
-    color:#555;
-    overflow:hidden;
-    border-bottom: #f6f6f6 5px solid;
-
-}
-
-.BlormFollowListUserImg img {
-    width:100%;
-    height: auto;
-}
-
-.BlormFollowListUserImg .url {
-    font-size: xx-small;
-}
 
 
 /* blorm feed */

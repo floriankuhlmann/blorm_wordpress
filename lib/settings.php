@@ -1,7 +1,17 @@
 <?php
 
-$menuSlug= 'blorm-plugin';
 
+
+
+
+
+/*
+ *
+ * define options and settings
+ *
+ */
+
+$menuSlug= 'blorm-plugin';
 
 function blorm_options_page() {
 	$hookname = add_menu_page(

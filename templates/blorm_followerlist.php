@@ -7,7 +7,7 @@
  */?>
 
 <script type="application/javascript">
-    jQuery(document).ready(function(){
+    document.addEventListener("DOMContentLoaded", function() {
 
         var ajaxapi = blogdomain+ajaxurl;
 
@@ -33,9 +33,9 @@
                 },
                 handleUnfollowSuccess: function (response) {
 
-                        jQuery( "#usernamefollow" ).val("");
+                        jQuery("#usernamefollow").val("");
                         jQuery(".BlormFeedbackBox").css('display','inline');
-                        jQuery( ".BlormFeedbackBoxText" ).html( "You unfollowed <br>'"+this.usernameunfollow+"'." );
+                        jQuery(".BlormFeedbackBoxText").html( "You unfollowed <br>'"+this.usernameunfollow+"'." );
 
                         blormapp.core.getFollowersOfUser();
 
