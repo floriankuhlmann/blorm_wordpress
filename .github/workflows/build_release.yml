@@ -11,20 +11,31 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - uses: "marvinpinto/action-automatic-releases@latest"
-          with:
-            repo_token: "${{ secrets.GITHUB_TOKEN }}"
-            automatic_release_tag: "latest"
-            prerelease: true
-            title: "Development Build"
-            files: |
-              /assets/css
-              /assets/icons
-              /assets/images
-              /assets/js
-              /config
-              /lib
-              /templates
-              /blorm.php
-              /uninstall.php
+      - name: Create Release
+        id: create_release
+        #uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        #with:
+        #  tag_name: ${{ github.ref }}
+        #  release_name: Release ${{ github.ref }}
+        #  body: |
+        #    First Beta Release for the plugin
+         #   - still in development, please do not use without contacting us via blorm.io
 
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            /assets/css
+            /assets/icons
+            /assets/images
+            /assets/js
+            /config
+            /lib
+            /templates
+            /blorm.php
+            /uninstall.php
