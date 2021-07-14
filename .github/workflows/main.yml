@@ -38,7 +38,7 @@ jobs:
           cp -R assets/js blorm
           cp -R config blorm
           cp -R lib blorm
-          cp -R template blorm
+          cp -R templates blorm
           cp blorm.php blorm
           cp uninstall.php blorm
           
