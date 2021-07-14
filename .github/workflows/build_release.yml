@@ -11,14 +11,11 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            First Beta Release for the plugin
-            - still in development, please do not use without contacting us via blorm.io
+      steps:
+        - uses: actions/checkout@master
+        - name: Archive Release
+          uses: thedoctor0/zip-release@master
+          with:
+            filename: 'blorm.zip'
+            exclusions: '*.git* /*node_modules/* .editorconfig'
+            directory: 'blorm'
