@@ -11,11 +11,10 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      steps:
-        - uses: actions/checkout@master
-        - name: Archive Release
-          uses: thedoctor0/zip-release@master
-          with:
-            filename: 'blorm.zip'
-            exclusions: '*.git* /*node_modules/* .editorconfig'
-            directory: 'blorm'
+      - uses: actions/checkout@master
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: 'blorm.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+          directory: 'blorm'
