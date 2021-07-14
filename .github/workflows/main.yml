@@ -30,7 +30,28 @@ jobs:
         run: mkdir blorm
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: copy assets to blorm
         run: |
-          cp -R assets blorm
+          cp -R assets/css blorm
+          cp -R assets/icons blorm
+          cp -R assets/images blorm
+          cp -R assets/js blorm
           cp -R config blorm
+          cp -R lib blorm
+          cp -R template blorm
+          cp blorm.php blorm
+          cp uninstall.php blorm
+          
+      - name: zip the assets
+        run: zip -r blorm.zip blorm
+    
+      - name: Create Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            blorm.zip
+      
