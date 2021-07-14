@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ release ]
-    #tags:
-    #  - 'v*' ## Push events to matching v*, i.e. v1.0
+    branches: [ master ]
+    tags:
+      - 'v*' ## Push events to matching v*, i.e. v1.0
 
 name: Create Release
 
