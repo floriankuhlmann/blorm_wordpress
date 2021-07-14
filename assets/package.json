@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "jquery": "^3.6.0",
+    "moment": "^2.29.1",
+    "vue": "^3.0.0-beta.3",
+    "vue-template-compiler": "^2.6.14",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.0.0-beta.3",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^3.5.2",
+    "file-loader": "^6.0.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "url-loader": "^4.1.0",
+    "vue-loader": "^16.0.0-alpha.3",
+    "vue-style-loader": "^4.1.2",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "keywords": [
+    "todo",
+    "vue"
+  ],
+  "name": "blorm",
+  "description": "A simple todo list application written in Vue with Single File Component (SFC) support."
+}

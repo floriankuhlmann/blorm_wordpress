@@ -44,10 +44,6 @@ function rest_blormapi_handler(WP_REST_Request $request) {
         return new WP_REST_Response(array("message" =>"user not logged in"),200 ,array('Content-Type' => 'application/json'));
     }
 
-    //error_log("request:");
-    //error_log($request->get_method());
-
-
     if(!empty($_FILES['uploadfile'])) {
 
         if ( ! function_exists( 'wp_handle_upload' ) ) require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -179,7 +175,6 @@ function postRequestLocalPostsUpdate($request, $response) {
 
                 $rBody = json_decode($response["body"]);
                 add_post_meta($bodyObj->{'teaser'}->{'postid'},"blorm_create_activity_id",$rBody->data->activity_id);
-
             }
 
             break;

@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 require_once plugin_dir_path( __FILE__ ) . '/lib/helper.php';
-require_once __DIR__.'/config.php';
+require_once __DIR__.'/config/config.php';
 
 // Definee Configs
 define( 'CONFIG_BLORM_BLOGDOMAIN', get_bloginfo('wpurl'));
@@ -44,17 +44,24 @@ define( 'PLUGIN_BLORM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Plugin Root File.
 define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
+// configuration and code for the frontend rendering
+require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_styles_and_scripts.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_cache_and_cron.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_loop_and_post.php';
+
+// blormpost, widget and ajax api
 require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_post.php';
-require_once plugin_dir_path( __FILE__ ) . 'lib/settings.php';
-require_once plugin_dir_path( __FILE__ ) . 'lib/frontend.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_api.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_widget.php';
 
+// the admin area
 if (is_admin()) {
-
 	require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
 	$blormUserAccountData = getUserAccountDataFromBlorm();
 	if ($blormUserAccountData->error == null) {
-		require_once plugin_dir_path( __FILE__ ) . 'lib/admin.php';
+        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_settings.php';
+        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_styles_and_scripts.php';
+		require_once plugin_dir_path( __FILE__ ) . 'lib/admin_init_dashboard.php';
 
 	} else {
 		require_once plugin_dir_path( __FILE__ ) . 'lib/admin_error.php';
