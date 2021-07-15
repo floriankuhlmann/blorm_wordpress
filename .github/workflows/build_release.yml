@@ -27,15 +27,17 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: make the blorm dir
-        run: mkdir blorm
-
+        run: | 
+          mkdir blorm
+          mkdir blorm/assets
+          
       # Runs a set of commands using the runners shell
       - name: copy assets to blorm
         run: |
-          cp -R assets/css blorm
-          cp -R assets/icons blorm
-          cp -R assets/images blorm
-          cp -R assets/js blorm
+          cp -R assets/css blorm/assets
+          cp -R assets/icons blorm/assets
+          cp -R assets/images blorm/assets
+          cp -R assets/js blorm/assets
           cp -R config blorm
           cp -R lib blorm
           cp -R templates blorm
