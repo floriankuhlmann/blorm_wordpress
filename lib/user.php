@@ -70,6 +70,16 @@ function getUserAccountDataFromBlorm() {
     // prepare the request
     $userObjects = json_decode(get_option( 'blorm_getstream_cached_user_data' ));
 
+    if ($userObjects == null) {
+        blorm_cron_getstream_user_exec();
+        $userObjects = json_decode(get_option( 'blorm_getstream_cached_user_data' ));
+    }
+
+    if ($userObjects == null) {
+        $returnObj->error = "no userdata available";
+        return $returnObj;
+    }
+
     $user = new stdClass();
     $user->name = $userObjects->name;
     $user->blormhandle = $userObjects->blormhandle;
@@ -80,7 +90,6 @@ function getUserAccountDataFromBlorm() {
     $user->website_href = $userObjects->website_href;
     $user->website_category = $userObjects->website_category;
     $user->website_type = $userObjects->website_type;
-
 
     $returnObj->user = $user;
 
