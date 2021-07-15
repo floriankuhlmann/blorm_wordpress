@@ -56,14 +56,15 @@ require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_widget.php';
 
 // the admin area
 if (is_admin()) {
-	require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
-	$blormUserAccountData = getUserAccountDataFromBlorm();
-	if ($blormUserAccountData->error == null) {
-        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_settings.php';
-        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_styles_and_scripts.php';
-		require_once plugin_dir_path( __FILE__ ) . 'lib/admin_init_dashboard.php';
+    require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
+    require_once plugin_dir_path( __FILE__ ) . 'lib/admin_settings.php';
 
-	} else {
-		require_once plugin_dir_path( __FILE__ ) . 'lib/admin_error.php';
-	}
+    $blormUserAccountData = getUserAccountDataFromBlorm();
+    if ($blormUserAccountData->error == null) {
+        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_styles_and_scripts.php';
+        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_init_dashboard.php';
+
+    } else {
+        require_once plugin_dir_path( __FILE__ ) . 'lib/admin_error.php';
+    }
 }
