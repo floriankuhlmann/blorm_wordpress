@@ -454,8 +454,7 @@ class blorm_menue_bar {
 
         this.BlormWidgetPlus.appendChild(clearDiv);
 
-        this.ContainerDisplay.append(this.BlormWidgetPlus)
-
+        this.ContainerDisplay.append(this.BlormWidgetPlus);
 
         this.BlormWidgetPowerText = document.createElement("div");
         this.BlormWidgetPowerText.classList.add("blormWidgetPowerText");

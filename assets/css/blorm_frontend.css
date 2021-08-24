@@ -38,28 +38,28 @@
 .blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
     top:0;
     left:0;
-    background-image: url("../images/blorm_icon_bubble_left_top.png");
+    background-image: url("../images/blorm_icon_bubble_left_top_sw.png");
 }
 
 .blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright,
 .blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
     top:0;
     right:0;
-    background-image: url("../images/blorm_icon_bubble_right_top.png");
+    background-image: url("../images/blorm_icon_bubble_right_top_sw.png");
 }
 
 .blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft,
 .blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
     bottom:0;
     left:0;
-    background-image: url("../images/blorm_icon_bubble_left_bottom.png");
+    background-image: url("../images/blorm_icon_bubble_left_bottom_sw.png");
 }
 
 .blorm-display-posts-widget-element  .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright,
 .blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
     bottom:0;
     right:0;
-    background-image: url("../images/blorm_icon_bubble_right_bottom.png");
+    background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
 }
 
 .blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg,
@@ -79,7 +79,7 @@
     padding: 0;
     width: 50%;
     height: 50%;
-    background-image: url("../images/blorm_icon_bubble_right_bottom.png");
+    background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
     background-position: right bottom;
     background-repeat: no-repeat;
     background-size: cover;
@@ -266,6 +266,11 @@
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent a {
     color:#fff;
+    text-decoration: underline grey;
+}
+
+.blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent a:hover {
+    text-decoration: underline white;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent.DisplayTransition {
@@ -289,16 +294,16 @@
     padding: 2px 4px 2px 2px;
     margin: 0;
     float: left;
-    font-size: 0.9rem;
-    line-height: 0.9rem;
+    font-size: 14px;
+    line-height: 14px;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent .PowerbarContentText {
     padding: 2px;
     margin: 0px;
     float: left;
-    font-size: 0.9rem;
-    line-height: 0.9rem;
+    font-size: 14px;
+    line-height: 14px;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText {
@@ -314,6 +319,13 @@
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a {
     font-size: 14px;
     color:#000;
+    text-decoration: underline grey;
+}
+
+.blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a:hover {
+    font-size: 14px;
+    color:#000;
+    text-decoration: underline black;
 }
 
 @media only screen

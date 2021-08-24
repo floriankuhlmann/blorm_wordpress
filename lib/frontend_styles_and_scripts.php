@@ -91,6 +91,8 @@ function add_getstream_data_to_head() {
 
     $bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
 
+
+
     // blorm data for local usage
     $aGetStreamCreatedData = array();
     $aGetStreamReblogedData = array();
@@ -99,7 +101,6 @@ function add_getstream_data_to_head() {
 
         $getStreamData = new stdClass();
         if (isset($bodyObject->id)) {
-
             // CREATED POSTS
             // search for the data of the created posts
             if (array_search($bodyObject->id, array_column($aBlormCreatePosts, "activity_id")) !== false) {
@@ -149,11 +150,12 @@ function add_getstream_data_to_head() {
                 $getStreamData->TeaserImage = $aBlormReblogedPosts[$id]["teaser_image"];
                 $getStreamData->TeaserUrl = $aBlormReblogedPosts[$id]["teaser_url"];
                 $getStreamData->TeaserIri = $aBlormReblogedPosts[$id]["teaser_iri"];
-                if (isset($bodyObject->object->data->data->published_on_website_name)) {
-                    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->published_on_website_name;
+
+                if (isset($bodyObject->object->data->data->publishedOnWebsiteName)) {
+                    $getStreamData->OriginWebsiteName = $bodyObject->object->data->data->publishedOnWebsiteName;
                 }
-                if (isset($bodyObject->object->data->data->published_on_website_url)) {
-                    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->published_on_website_url;
+                if (isset($bodyObject->object->data->data->publishedOnWebsiteUrl)) {
+                    $getStreamData->OriginWebsiteUrl = $bodyObject->object->data->data->publishedOnWebsiteUrl;
                 }
                 $getStreamData->ReblogedCount = 0;
                 $getStreamData->CommentsCount = 0;
