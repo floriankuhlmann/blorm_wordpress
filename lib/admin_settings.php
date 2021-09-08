@@ -75,7 +75,8 @@ function blorm_plugin_options_page_submit() {
 	                    wp_set_post_categories( $post['ID'], array( $_POST['blorm_plugin_options_category']['blorm_category_show_reblogged']), true );
                     }
 				}
-
+				// update the user cache
+                blorm_cron_getstream_user_exec();
 				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
 			}
 		}

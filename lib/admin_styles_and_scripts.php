@@ -92,11 +92,16 @@ function getConfigJs() {
     // a list of the available posts for sharing in the network (used by the newpost-component
     $recent_posts = wp_get_recent_posts();
     foreach ($recent_posts as $recent_post) {
-        $blocks = parse_blocks( $recent_post["post_content"] );
-        if (isset($blocks[0])){
-            $teasertext = str_replace("\n","",filter_var($blocks[0]['innerHTML'], FILTER_SANITIZE_STRING));
-        }
-        $userdata .= '{id:"'.$recent_post["ID"].'", headline:"'.$recent_post["post_title"].'", teasertext:"'.$teasertext.'"},';
+
+        $teasertext = str_replace("\n","",filter_var(get_the_excerpt($recent_post['ID']), FILTER_SANITIZE_STRING));
+        $teasertext = str_replace("\"","'",$teasertext);
+
+        $posttitle = str_replace("\n","",filter_var($recent_post["post_title"], FILTER_SANITIZE_STRING));
+        $posttitle = str_replace("\"","'",$posttitle);
+        $userdata .= "{ id:\"".$recent_post["ID"]."\",
+                        headline:\"".$posttitle."\",
+                        teasertext:\"".$teasertext."\"
+                        },\n";
     }
     $userdata .=  "]\n
                 };\n

@@ -81,6 +81,13 @@ function getUserAccountDataFromBlorm() {
         return $returnObj;
     }
 
+    if (is_string($userObjects)) {
+        if ($userObjects ==  "Token not valid" ) {
+            $returnObj->error = "API token is not valid";
+            return $returnObj;
+        }
+    }
+
     $user = new stdClass();
     $user->name = $userObjects->name;
     $user->blormhandle = $userObjects->blormhandle;

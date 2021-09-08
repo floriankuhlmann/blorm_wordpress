@@ -59,32 +59,32 @@ function prepare_dashboard_meta() {
 
 function dashboard_widget_blorm_userprofile() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-userprofile_component.php';
+    echo "<div id=\"blorm-userprofile-id\"><blorm-userprofile ></blorm-userprofile></div>";
 }
 
 function dashboard_widget_blorm_usermodule() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-usersearch_component.php';
+    echo "<blorm-usersearch></blorm-usersearch>";
 }
 
 function dashboard_widget_blorm_followinglist() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-followinglist_component.php';
+    echo "<blorm-following-users></blorm-following-users>";
 }
 
 function dashboard_widget_blorm_followerlist() {
     // echo get list of blogusers
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-followerlist_component.php';
+    echo "<blorm-followers-of-user></blorm-followers-of-user>";
 }
 
 function dashboard_widget_blorm_newpost() {
     // echo form for new post
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-newpost_component.php';
+    echo "<blorm-newpost></blorm-newpost>";
 }
 
 function blorm_dashboard_widget_feed_function() {
     // echo the blorm feed
-    require_once PLUGIN_BLORM_PLUGIN_DIR  . 'templates/blorm-feed_component.php';
+    echo "<blorm-feed></blorm-feed>";
 }
 
 
