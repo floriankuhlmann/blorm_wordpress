@@ -91,7 +91,7 @@ function add_getstream_data_to_head() {
 
     $bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
 
-
+    if ($bodyObjects == null) return;
 
     // blorm data for local usage
     $aGetStreamCreatedData = array();

@@ -51,6 +51,7 @@ function blorm_cron_getstream_user_exec() {
         if (isset($ApiResponse->errors['http_request_failed'])) {
             error_log($ApiResponse->errors['http_request_failed'][0]);
         }
+        return;
     }
 
     if ($ApiResponse["response"]["message"] == "Unauthorized" ) {

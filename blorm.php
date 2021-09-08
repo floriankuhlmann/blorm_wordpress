@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name: Blorm
-Plugin URI: https://themecoder.de/
-Description: My boilerplate for WordPress Plugins
-Author: Thomas Weichselbaumer
-Author URI: http://netzberufler.de
+Plugin Name: BlormIO
+Plugin URI: https://blorm.io
+Description: A social content network in your wordpress installation. Please do the following steps: <br>1) register on <a href="https://blorm.io/register ">https://blorm.io/register</a> <br>2) define API key <br>3) activate plugin in your site with API-Key
+Author: Florian Kuhlmann
+Author URI: https://blorm.io/about
 Version: 1.0
-Text Domain: plugin-boilerplate
+Text Domain: plugin-blormio
 Domain Path: /languages/
 License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Plugin Boilerplate
-Copyright(C) 2016, Thomas Weichselbaumer - kontakt@themecoder.de
+Plugin BlormIO
+Copyright(C) 2021, Florian Kuhlmann - service@blorm.io
 
 */
 
