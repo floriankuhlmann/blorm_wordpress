@@ -37,6 +37,7 @@ jobs:
           cp -R assets/icons blorm/assets
           cp -R assets/images blorm/assets
           cp -R assets/js blorm/assets
+          cp -R assets/font blorm/assets
           cp -R config blorm
           cp -R lib blorm
           cp blorm.php blorm
