@@ -1,5 +1,6 @@
 <?php
 
+// modify the css-classes of the posts
 add_filter( 'post_class', 'blorm_created_class',10,3);
 function blorm_created_class (array $classes, $class, $post_id) {
 
@@ -23,6 +24,10 @@ function blorm_created_class (array $classes, $class, $post_id) {
             array_push($classes, 'blormwidget-on-image-post');
     }
 
+    // add the standard 'post' class for layout-consistence
+    if (isset($a["blorm_create"]) || isset($a["blorm_reblog_activity_id"]))
+        array_push($classes, 'post');
+
     return $classes;
 }
 
@@ -30,22 +35,101 @@ function blorm_created_class (array $classes, $class, $post_id) {
 add_action( 'pre_get_posts', 'blorm_add_posttype_blorm_to_loop' );
 function blorm_add_posttype_blorm_to_loop( $query ) {
 
-
     $options_config = get_option( 'blorm_plugin_options_frontend' );
     $options_cat = get_option( 'blorm_plugin_options_category' );
 
     if (isset($options_config['display_config'])) {
-        if ($options_config['display_config'] === 'display_config_widget') return $query;
+
+        switch ($options_config['display_config']) {
+
+            case "display_config_widget":
+                return $query;
+                break;
+
+            case "display_config_category":
+                // category
+                if (isset($options_cat['blorm_category_show_reblogged'])) {
+                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                        $query->set( 'post_type', array( 'blormpost' ));
+                        return $query;
+                    }
+                }
+                break;
+
+            case "display_config_loop":
+                if ($query->is_main_query()) {
+                    $query->set('post_type', array('post', 'blormpost'));
+                    return $query;
+                }
+                break;
+
+            case "display_config_loop_and_widget":
+                if ($query->is_main_query()) {
+                    $query->set('post_type', array('post', 'blormpost'));
+                    return $query;
+                }
+                break;
+
+            case "display_config_loop_and_category":
+                // category
+                if (isset($options_cat['blorm_category_show_reblogged'])) {
+                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                        $query->set( 'post_type', array( 'blormpost' ));
+                        return $query;
+                    }
+                }
+                // main query
+                $query->set( 'post_type', array( 'post', 'blormpost' ));
+                return $query;
+                break;
+
+            case "display_config_category_and_widget":
+                // category
+                if (isset($options_cat['blorm_category_show_reblogged'])) {
+                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                        $query->set( 'post_type', array( 'blormpost' ));
+                        return $query;
+                    }
+                }
+                if ($query->is_main_query()) {
+                    return $query;
+                }
+                break;
+
+            case "display_config_loop_and_category_and_widget":
+                if (isset($options_cat['blorm_category_show_reblogged'])) {
+                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                        $query->set( 'post_type', array( 'blormpost' ));
+                        return $query;
+                    }
+                }
+                // main query
+                if ($query->is_main_query()) {
+                    $query->set('post_type', array('post', 'blormpost'));
+                    return $query;
+                }
+                break;
+        }
     }
 
-    if (isset($options_cat['blorm_category_show_reblogged'])) {
-        if ($options_cat['blorm_category_show_reblogged'] !== 'no-category-selected') return $query;
+    /*if (isset($options_cat['blorm_category_show_reblogged'])) {
+
+        if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+            $query->set( 'post_type', array( 'blormpost' ));
+            return $query;
+        }
+
+        /*if( $query->is_main_query() && $query->is_home() && $options_cat['blorm_category_show_reblogged'] !== 'no-category-selected') {
+            $query->set( 'cat', '-'.$options_cat['blorm_category_show_reblogged'] );
+            return $query;
+        }
     }
 
-    if (!$query->is_main_query())
+    if ($query->is_main_query()) {
+
         return $query;
+    }*/
 
-    $query->set( 'post_type', array( 'post', 'blormpost' ));
     return $query;
 }
 
@@ -53,8 +137,8 @@ function blorm_add_posttype_blorm_to_loop( $query ) {
  *
  * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
  */
-add_action( 'pre_get_posts', 'blorm_remove_posts_from_home_page' );
-function blorm_remove_posts_from_home_page( $query ) {
+//add_action( 'pre_get_posts', 'blorm_remove_posts_from_home_page' );
+/*function blorm_remove_posts_from_home_page( $query ) {
 
     $options = get_option( 'blorm_plugin_options_category' );
 
@@ -64,7 +148,26 @@ function blorm_remove_posts_from_home_page( $query ) {
     }
 
     return $query;
-}
+}*/
+
+/*
+ *
+ * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
+ */
+//add_action( 'pre_get_posts', 'blorm_add_posts_to_loop_by_category' );
+/*function blorm_add_posts_to_loop_by_category( $query ) {
+
+    $options = get_option( 'blorm_plugin_options_category' );
+
+    if (isset( $options['blorm_category_show_reblogged'] )) {
+        if( $query->is_category($options['blorm_category_show_reblogged'])) {
+            $query->set( 'post_type', array( 'blormpost' ));
+        }
+    }
+
+    return $query;
+}*/
+
 
 add_action( 'the_posts', 'blorm_mod_the_posts' );
 function blorm_mod_the_posts($posts) {
@@ -134,7 +237,7 @@ function blorm_mod_the_posts($posts) {
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
                     if (isset($a["blorm_reblog_activity_id"])) {
-                        $post->post_title = 'Rebloged: '. $post->post_title;
+                        $post->post_title = '<span class="material-icons">content_copy</span>'.$post->post_title;
                     }
 
                     $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';

@@ -53,7 +53,7 @@ function blorm_plugin_options_page_submit() {
 					$category = get_category( $options['blorm_category_show_reblogged'] );
 				}
 
-				$recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id'));
+				$recent_posts_with_meta = wp_get_recent_posts(array('meta_key' => 'blorm_reblog_activity_id', 'post_type' => 'blormpost'));
 
 				if (!empty($category)) {
 	                foreach ($recent_posts_with_meta as $post) {
@@ -75,6 +75,7 @@ function blorm_plugin_options_page_submit() {
 	                    wp_set_post_categories( $post['ID'], array( $_POST['blorm_plugin_options_category']['blorm_category_show_reblogged']), true );
                     }
 				}
+
 				// update the user cache
                 blorm_cron_getstream_user_exec();
 				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
@@ -92,8 +93,8 @@ function blorm_render_options_page() {
         settings_fields( 'blorm-plugin-section' );
         do_settings_sections( 'blorm-plugin-api-section' );
         do_settings_sections( 'blorm-plugin-display-config-section' );
-        do_settings_sections( 'blorm-plugin-frontend-section' );
-        do_settings_sections( 'blorm-plugin-category-section' ); ?>
+        do_settings_sections( 'blorm-plugin-category-section' );
+        do_settings_sections( 'blorm-plugin-frontend-section' );?>
         <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
     </form>
     <?php
@@ -195,11 +196,14 @@ function blorm_plugin_setting_display_config() {
     echo "<p>Select the place to show the posts.<br><br></p>";
     echo "<select id='blorm_plugin_options_frontend-display_config_menue' name='blorm_plugin_options_frontend[display_config]'>\n
             <option value='do-not-show'>Do not show anything</option>\n
-            <option value='display_config_loop' ".$isSelected('display_config_loop').">loop only</option>\n
+            <option value='display_config_loop' ".$isSelected('display_config_loop').">main loop only</option>\n
             <option value='display_config_widget' ".$isSelected('display_config_widget').">widget only</option>\n
-            <option value='display_config_loop_and_widget' ".$isSelected('display_config_loop_and_widget').">loop and widget</option>\n
+            <option value='display_config_category' ".$isSelected('display_config_category').">category only</option>\n
+            <option value='display_config_loop_and_widget' ".$isSelected('display_config_loop_and_widget').">main loop and widget</option>\n
+            <option value='display_config_loop_and_category' ".$isSelected('display_config_loop_and_category').">main loop and category</option>\n
+            <option value='display_config_category_and_widget' ".$isSelected('display_config_category_and_widget').">category and widget</option>\n
+            <option value='display_config_loop_and_category_and_widget' ".$isSelected('display_config_loop_and_category_and_widget').">main loop and category and widget</option>\n
            </select>";
-
 }
 
 /*

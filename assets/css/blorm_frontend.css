@@ -1,12 +1,44 @@
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(../font/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 0.8em;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1em;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+}
+
 
 .type-blormpost {
 
 }
 
-.blorm-post-content-container {
+/*.blorm-post-content-container {
     margin: 0 !important;
     padding: 0 !important;
-}
+}*/
 
 .blormpost .blorm-icon {
     height: 1em;
@@ -125,6 +157,12 @@
 
 .blormWidget div {
     /* border:1px solid green;*/
+}
+
+.blormWidget .blormWidgetContainerMenu ul,
+.blormWidget .blormWidgetContainerMenu li,
+.blormWidget .blormWidgetContainerMenu ol {
+    font-size: 1em !important;
 }
 
 .blormWidget .FloatRight {
@@ -310,10 +348,11 @@
     font-size: 14px;
     color: #333;
     width: 100%;
-    position: absolute;
-    top: 25px;
+    /*position: absolute;
+    top: 25px;*/
     display: block;
     height: 25px;
+    line-height: 25px;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a {

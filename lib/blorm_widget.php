@@ -24,6 +24,17 @@ class DisplayWidget extends \WP_Widget
      * @param array $instance Saved values from database.
      */
     public function widget( $args, $instance ) {
+
+        $options = get_option( 'blorm_plugin_options_frontend' );
+
+        if (isset( $options['display_config'] )) {
+            if( $options['display_config'] ==  "do-not-show" ||
+                $options['display_config'] ==  "display_config_loop" ||
+                $options['display_config'] ==  "display_config_category" ||
+                $options['display_config'] ==  "display_config_loop_and_category"
+            ) return;
+        }
+
         echo $args['before_widget'];
         if ( ! empty( $instance['title'] ) ) {
             echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
@@ -31,7 +42,6 @@ class DisplayWidget extends \WP_Widget
         if ( ! empty( $instance['numberOfPosts'] ) ) {
             $posts = $this->generateWidgetOutput($instance);
         }
-
 
         echo $args['after_widget'];
     }

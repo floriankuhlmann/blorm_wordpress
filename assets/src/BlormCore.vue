@@ -226,6 +226,30 @@ export default {
                 }
            );
         },
+
+        /**
+         * postDelete
+         * @param activityId
+         */
+        postDelete: function (activityId) {
+            let promiseObj = new Promise (function(fullfill, reject) {
+                axios.get(restapiVars.root+'blormapi/v1/blogpost/delete/'+activityId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': restapiVars.nonce,}
+                    }
+                ).then(function (response) {
+                    console.log(response);
+                    fullfill(response);
+                }).catch(error => {
+                    console.log(error)
+                    reject(error);
+                });
+            });
+            return promiseObj;
+        },
+
         /**
          * postShare
          * @param verb
@@ -306,6 +330,53 @@ export default {
             //Returns Promise object
             return promiseObj;
         },
+
+        /**
+         * reblogUndo
+         * @param activityId
+         */
+        reblogUndo: function (activityId) {
+            let promiseObj = new Promise (function(fullfill, reject) {
+                axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/reblog/'+activityId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': restapiVars.nonce,}
+                    }
+                ).then(function (response) {
+                    console.log(response);
+                    fullfill(response);
+                }).catch(error => {
+                    console.log(error)
+                    reject(error);
+                });
+            });
+            return promiseObj;
+        },
+
+        /**
+         * shareUndo
+         * @param activityId
+         */
+        shareUndo: function (activityId) {
+            let promiseObj = new Promise (function(fullfill, reject) {
+                axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/share/'+activityId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': restapiVars.nonce,}
+                    }
+                ).then(function (response) {
+                    console.log(response);
+                    fullfill(response);
+                }).catch(error => {
+                    console.log(error)
+                    reject(error);
+                });
+            });
+            return promiseObj;
+        },
+
         /**
          * postComment
          * @param commentText
