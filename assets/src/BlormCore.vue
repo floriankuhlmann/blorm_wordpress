@@ -10,6 +10,9 @@ export default {
     },
 
     mounted() {
+        console.log("feedTimeline user id");
+        console.log(this.$store.state.user.id);
+
         this.feedTimeline();
         this.getFollowersOfUser(this.$store.state.user.id);
         this.getFollowingUsers(this.$store.state.user.id);
