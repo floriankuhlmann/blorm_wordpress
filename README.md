@@ -1,5 +1,4 @@
-###blorm.io 
-####Das erste dezentrale soziale content Netzwerk (als Plugin für deine Webseite (wordpress)).
+# about blorm.io 
 
 Make your website part of a social network – simply by installing the BLORM plugin. After installation, your social news feed will appear in your admin area, where you will follow other BLORM users, add your own posts to the network or share content from it directly on your site. With BLORM, you as an author can easily distribute your content to other websites and thus increase the reach of your articles. Or. You give voices that are important to you space on your platform by shareing their posts with your audience.
 Or. You give voices that are important to you space on your platform by shareing their posts with your audience.
