@@ -131,8 +131,10 @@ class blorm_menue_bar {
 
             this.listcontent = new Array();
             socialData.forEach(function (item, index, arr) {
-                console.log(socialData);
                 if (item.kind === "reblog") {
+                    this.listcontent[index] = {name:item.data.publisher.Name, link:item.data.publisher.Url };
+                }
+                if (item.kind === "share") {
                     this.listcontent[index] = {name:item.data.publisher.Name, link:item.data.publisher.Url };
                 }
                 if (item.kind === "comment") {
@@ -142,8 +144,7 @@ class blorm_menue_bar {
             let li = document.createElement("li");
             li.innerHTML = "Post is " + ContentType +" on:";
             ul.appendChild(li);
-
-            for (content of this.listcontent) {
+            for (let content of this.listcontent) {
                 let li = document.createElement("li");
                 let a = document.createElement('a');
                 a.href = content.link;
@@ -176,7 +177,7 @@ class blorm_menue_bar {
     }
 
     InitHandler() {
-        console.log("init handler");
+        console.log("init handler for post id: " + this.blormPost.PostId);
         // mouse event for the powerbar when mouse on icons
         this.handlePlusSocialBars = this.blormWidget.getElementsByClassName("blormWidgetPlusSocialBarEventHandler");
         let SocialBar;
@@ -266,7 +267,6 @@ class blorm_menue_bar {
         }
 
         if (md.mobile() !== null) {
-
             this.handleLayerLogo.addEventListener(
                 "click",
                 function () {
@@ -294,6 +294,7 @@ class blorm_menue_bar {
             this.handleLayerRebloged.addEventListener(
                 "click",
                 function () {
+
                     if ( _this.SocialStatus === "rebloged") {
                         _this.Powerbar.style.display = "none";
                         _this.SocialStatus = "invisible";
@@ -552,8 +553,6 @@ class blorm_menue_bar {
 
     AddMenueToImage(imgEl) {
 
-        console.log(imgEl.parentNode);
-
         let imgElLink = imgEl.parentNode.getAttribute('href');
         imgEl.parentNode.removeAttribute('href');
 
@@ -658,7 +657,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (!BlormPostContainer.classList.contains("post-thumbnail")) {
                             BlormPostLink.href = postData.TeaserUrl;
                         }
-
                     });
                 }
             }
@@ -701,10 +699,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // second possibility add the widget to the content
         if (BlormPost.classList.contains("blormwidget-add-to-content")) {
             var allBlormWidgets = BlormPost.getElementsByClassName("blormWidget");
-            console.log(allBlormWidgets);
             Array.from(allBlormWidgets).forEach(function(BlormWidget){
-                console.log("post");
-                console.log(postData);
                 if (Object.keys(postData).length !== 0) {
                     blormMenuBar = new blorm_menue_bar(postData);
                     BlormWidget.appendChild(blormMenuBar.GetMenue());
