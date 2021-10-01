@@ -554,10 +554,6 @@ class blorm_menue_bar {
     AddMenueToImage(imgEl) {
 
         let imgElLink = imgEl.parentNode.getAttribute('href');
-        imgEl.parentNode.removeAttribute('href');
-
-        let imgLink = document.createElement('a');
-        imgLink.href = imgElLink;
 
         // new image wrapper div
         let divWrapper = document.createElement('div');
@@ -567,16 +563,10 @@ class blorm_menue_bar {
         imgEl.parentNode.insertBefore(divWrapper, imgEl);
         divWrapper.appendChild(imgEl);
 
-        // insert the link before the image + image in the link
-        imgEl.parentNode.insertBefore(imgLink, imgEl);
-        imgLink.appendChild(imgEl);
-
         // the div layer for the blormwidget with the menue
         let divLayerWidget = document.createElement('div');
         divLayerWidget.classList.add("blormWidgetImagelayerWidget");
         divLayerWidget.append(blormMenuBar.GetWidget());
-
-        imgLink.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
 
         let divLayerBlormIconImg = document.createElement('img');
         divLayerBlormIconImg.src = blormapp.postConfig.blormAssets + "/images/blorm_icon_network.png";
@@ -588,16 +578,30 @@ class blorm_menue_bar {
         divLayerBlormIcon.classList.add("topleft");
         divLayerBlormIcon.append(divLayerBlormIconImg);
 
-        // put a link on the div layer blorm icon
-        let divLayerBlormIconLink = document.createElement('a');
-        divLayerBlormIconLink.href = imgElLink;
-        divLayerBlormIconLink.append(divLayerBlormIcon);
+        // check if there is a link on the image. if not everything ist fine ans easy
+        if (imgElLink == null) {
+            imgEl.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
+            imgEl.parentNode.insertBefore(divLayerBlormIcon, imgEl.nextSibling);
+        // if there is a link on the image we have to modify a little bit so the link is not laying over the widget
+        } else {
+            let imgLink = document.createElement('a');
+            imgEl.parentNode.removeAttribute('href');
+            imgLink.href = imgElLink;
 
-        imgLink.parentNode.insertBefore(divLayerBlormIconLink, imgEl.nextSibling);
-        imgLink.appendChild(imgEl);
+            // insert the link before the image + image in the link
+            imgEl.parentNode.insertBefore(imgLink, imgEl);
+            imgLink.appendChild(imgEl);
 
+            imgLink.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
+            // put a link on the div layer blorm icon
+            let divLayerBlormIconLink = document.createElement('a');
+            divLayerBlormIconLink.href = imgElLink;
+            divLayerBlormIconLink.append(divLayerBlormIcon);
+
+            imgLink.parentNode.insertBefore(divLayerBlormIconLink, imgEl.nextSibling);
+            imgLink.appendChild(imgEl);
+        }
     }
-
 
     setPosition(element) {
         if (this.positionTop !== 0) {
@@ -640,7 +644,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     console.log("web-app init");
 
-    // add blormwidgets to the loop
+    // reblogged posts are custom post type 'blormpost' and can be dicovered by the css class type-blormpost
     var allBlormPosts = document.getElementsByClassName("type-blormpost");
     Array.from(allBlormPosts).forEach(function(BlormPost){
         let BlormPostContainer = BlormPost.getElementsByClassName("blorm-post-content-container")[0];
@@ -671,17 +675,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (Object.keys(post).length !== 0) {
 
-                    // if the post is a reblog and not a shared post we want to change the urls to the origin post
-                    if (BlormPostContainer.classList.contains("blorm_reblog-post-data")) {
-                        let BlormPostLinks = BlormPost.getElementsByTagName('a');
-                        if (BlormPostLinks.length > 0) {
-                            Array.from(BlormPostLinks).forEach(function (BlormPostLink) {
-                                BlormPostLink.href = post.TeaserUrl;
-                                //console.log(BlormPostLink);
-                            });
-                        }
-                    }
-
                     // this is the menue bar inside the image container
                     blormMenuBar = new blorm_menue_bar(post)
 
@@ -691,7 +684,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         // img element that will be wrapped
                         var imgEl = BlormPost.getElementsByTagName('img')[0];
                         blormMenuBar.AddMenueToImage(imgEl);
-
                     }
                 }
         };
@@ -708,6 +700,52 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     });
 
+
+    // reblogged posts are custom post type 'blormpost' and can be dicovered by the css class type-blormpost
+    var allBlormPosts = document.getElementsByClassName("blorm-shared");
+    Array.from(allBlormPosts).forEach(function(BlormPost){
+        let BlormPostContainer = BlormPost.getElementsByClassName("blorm-post-content-container")[0];
+        console.log(BlormPostContainer);
+
+        let id = BlormPostContainer.dataset.postid;
+        let postData = getPostById(id);
+        console.log(postData);
+
+        // integrate the widget in the posts. first way put the widget on the image
+        if (BlormPost.classList.contains("blormwidget-on-image-post")) {
+            // the container holds the data
+            let BlormPostContainer = BlormPost.getElementsByClassName("blorm-post-content-container")[0];
+            let id = BlormPostContainer.dataset.postid;
+            post = getPostById(id);
+
+            if (Object.keys(post).length !== 0) {
+
+                // this is the menue bar inside the image container
+                blormMenuBar = new blorm_menue_bar(post)
+
+                if( BlormPost.getElementsByTagName('img').length > 0) {
+                    // there is an image
+
+                    // img element that will be wrapped
+                    var imgEl = BlormPost.getElementsByTagName('img')[0];
+                    blormMenuBar.AddMenueToImage(imgEl);
+                }
+            }
+        };
+
+        // second possibility add the widget to the content
+        if (BlormPost.classList.contains("blormwidget-add-to-content")) {
+            var allBlormWidgets = BlormPost.getElementsByClassName("blormWidget");
+            Array.from(allBlormWidgets).forEach(function(BlormWidget){
+                if (Object.keys(postData).length !== 0) {
+                    blormMenuBar = new blorm_menue_bar(postData);
+                    BlormWidget.appendChild(blormMenuBar.GetMenue());
+                }
+            }, postData);
+        };
+    });
+
+
     // add blormwidgets to the wordpress-widget-box
     var allBlormDisplayPostsWidgetElements = document.getElementsByClassName("blorm-display-posts-widget-element");
     Array.from(allBlormDisplayPostsWidgetElements).forEach(function(BlormPost){
@@ -718,7 +756,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (Object.keys(post).length !== 0) {
 
-            // if the post is a reblog and not a shared post we want to change the urls to the origin post
+            // if the post is a reblog we want to change the urls to the origin post
             let BlormPostLinks = BlormPost.getElementsByTagName('a');
             if (BlormPostLinks.length > 0) {
                 Array.from(BlormPostLinks).forEach(function (BlormPostLink) {
