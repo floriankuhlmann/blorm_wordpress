@@ -133,6 +133,9 @@ function blorm_mod_the_posts($posts) {
 
     foreach ($posts as $post) {
 
+
+
+
         $a = get_post_meta($post->ID);
 
         $acivityId = "";
@@ -170,7 +173,7 @@ function blorm_mod_the_posts($posts) {
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
                     //if (isset($a["blorm_reblog_activity_id"])) {
-                        $post->post_title = '<span class="material-icons">content_copy</span>'. $post->post_title;
+                    $post->post_title = '<span class="material-icons">content_copy</span>'. $post->post_title;
                     //}
                     $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget"></span>'.$post->post_content.'</div>';
                 }
@@ -179,7 +182,7 @@ function blorm_mod_the_posts($posts) {
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
                     //if (isset($a["blorm_reblog_activity_id"])) {
-                        $post->post_title = '<span class="material-icons">content_copy</span>'. $post->post_title;
+                    $post->post_title = '<span class="material-icons">content_copy</span>'. $post->post_title;
                     //}
                     $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget"></span></div>';
                 }
@@ -189,19 +192,24 @@ function blorm_mod_the_posts($posts) {
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
                     //if (isset($a["blorm_reblog_activity_id"])) {
-                        $post->post_title = '<span class="material-icons">content_copy</span>'.$post->post_title;
+                    $post->post_title = '<span class="material-icons">content_copy</span>'.$post->post_title;
                     //}
                     $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+
                 }
             }
+            $post->post_title = $post->post_title.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
+            $post->post_content = $post->post_content.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
+            $post->post_excert = $post->post_excert.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
+
+
         }
     }
 
+
+
     return $posts;
 }
-
-
-
 
 /*
  *
