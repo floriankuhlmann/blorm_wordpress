@@ -127,10 +127,10 @@
     background-size: cover;
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
+/*.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
     width: 75%;
     height: 75%;
-}
+}*/
 
 .blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget,
 .blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget,
@@ -215,8 +215,16 @@
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetContainerDisplay {
     display: block;
-    height: 52px;
+    /*height: 52px;*/
 }
+
+/*@media only screen
+and (max-device-width: 860px) {
+    .blormWidget .blormWidgetContainerMenu .blormWidgetContainerDisplay {
+        display: block;
+        height: 52px;
+    }
+}*/
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus {
     display: block;
