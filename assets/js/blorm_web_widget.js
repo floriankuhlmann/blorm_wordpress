@@ -421,19 +421,19 @@ class blorm_menue_bar {
         const markupContainerDisplayPlusSocial = `
                                 <ul class="blormWidgetPlusSocialBar">
                                     <li class="blormWidgetPlusSocialBarIcon blormWidgetPlusSocialBarEventHandler blormWidgetPlusSocialBarRebloged">
-                                        <img src="${this.blormAssets}/icons/editor-copy-2-duplicate-glyph.png" alt="reblogged" >
+                                        <span class="material-icons">filter_none</span>
                                     </li>
                                     <li class="blormWidgetPlusSocialBarText">
                                         <span class="blormWidgetPlusSocialBarRebloggedCount">${this.ReblogedCount}</span>
                                     </li>
                                     <li class="blormWidgetPlusSocialBarIcon blormWidgetPlusSocialBarEventHandler blormWidgetPlusSocialBarShared">
-                                        <img src="${this.blormAssets}/icons/circle-sync-backup-2-glyph.png" alt="shared" >
+                                        <span class="material-icons">sync</span>
                                     </li>
                                     <li class="blormWidgetPlusSocialBarText">
                                         <span class="blormWidgetPlusSocialBarSharedCount">${this.SharedCount}</span>
                                     </li>
                                     <li class="blormWidgetPlusSocialBarIcon blormWidgetPlusSocialBarEventHandler blormWidgetPlusSocialBarComments">
-                                        <img src="${this.blormAssets}/icons/other-review-comment-glyph.png" alt="comments">
+                                        <span class="material-icons">chat</span>
                                     </li>
                                     <li class="blormWidgetPlusSocialBarText">
                                         <span class="blormWidgetPlusSocialBarCommentsCount">${this.CommentsCount}</span>
@@ -589,12 +589,11 @@ class blorm_menue_bar {
         divLayerBlormIcon.append(divLayerBlormIconImg);
 
         // check if there is a link on the image. if not everything ist fine ans easy
-        if (imgElOrigLink == null) {
+        if (imgElOrigLinkHref == null) {
             imgEl.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
             imgEl.parentNode.insertBefore(divLayerBlormIcon, imgEl.nextSibling);
             // if there is a link on the image we have to modify a little bit so the link is not laying over the widget
         } else {
-
             // we rebuild the links on the images and layers to prevent the link from laying over the blorm widget what would cause problems on mobile click events
             let imgLink = document.createElement('a');
             imgElOrigLink.removeAttribute('href');
@@ -669,11 +668,11 @@ document.addEventListener("DOMContentLoaded", function() {
         let id = BlormPostContainer.dataset.postid;
         let postData = getPostById(id);
 
-        console.log("start init post type-blormpost id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
+        console.log("__ start init post type-blormpost id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
 
 
         // exchange all links in the blorm posts
-        if (Object.keys(postData).length !== 0) {
+        /*if (Object.keys(postData).length !== 0) {
             // if the post is a reblog and not a shared post we want to change the urls to the origin post
             if (BlormPost.classList.contains("blorm-rebloged")) {
                 let BlormPostLinks = BlormPost.getElementsByTagName('a');
@@ -685,7 +684,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 }
             }
-        }
+        }*/
 
         // integrate the widget in the posts. first way put the widget on the image
         if (BlormPost.classList.contains("blormwidget-on-image-post")) {
@@ -698,7 +697,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     // img element that will be wrapped
                     var imgEl = BlormPost.getElementsByTagName('img')[0];
                     blormMenuBar.AddMenueToImage(imgEl);
-                    return;
+                    //return;
                 }
             }
         };
@@ -719,7 +718,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }, postData);
         };
 
-        console.log("finished init post type-blormpost id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
+        console.log("_ finished init post type-blormpost id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
 
     });
 
@@ -730,6 +729,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // the container holds the data
         let id = BlormPost.dataset.postid;
         post = getPostById(id);
+
+        console.log("__ start init posts type-blormpost in widget id:" + post.PostId + " for website: "+post.OriginWebsiteName);
+
 
         if (Object.keys(post).length !== 0) {
 
@@ -751,6 +753,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 blormMenuBar.AddMenueToImage(imgEl);
             }
         }
+
+        console.log("_ finished init post type-blormpost in widget id:" + post.PostId + " for website: "+post.OriginWebsiteName);
+
+
     });
 
     // reblogged posts are custom post type 'blormpost' and can be dicovered by the css class type-blormpost
@@ -762,7 +768,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let id = BlormPostContainer.dataset.postid;
             let postData = getPostById(id);
 
-            console.log("start init post blorm-shared id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
+            console.log("__ start init post blorm-shared id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
 
             // integrate the widget in the posts. first way put the widget on the image
             if (BlormPost.classList.contains("blormwidget-on-image-post")) {
@@ -802,7 +808,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }, postData);
             };
 
-            console.log("finished init post blorm-shared id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
+            console.log("_ finished init post blorm-shared id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
 
         }
     });
