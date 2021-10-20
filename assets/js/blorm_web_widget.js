@@ -735,14 +735,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (Object.keys(post).length !== 0) {
 
-            // if the post is a reblog we want to change the urls to the origin post
-            let BlormPostLinks = BlormPost.getElementsByTagName('a');
-            if (BlormPostLinks.length > 0) {
-                Array.from(BlormPostLinks).forEach(function (BlormPostLink) {
-                    BlormPostLink.href = post.TeaserUrl;
-                });
-            }
-
             // this is the menue bar inside the image container
             blormMenuBar = new blorm_menue_bar(post)
             if( BlormPost.getElementsByTagName('img').length > 0) {

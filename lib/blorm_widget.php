@@ -136,19 +136,23 @@ class DisplayWidget extends \WP_Widget
                 $acivityId = $a['blorm_reblog_activity_id'][0];
             }
 
+            if (isset($a["blorm_reblog_teaser_url"])) {
+                $post_url = $a['blorm_reblog_teaser_url'][0];
+            }
+
             //echo $blormpost->post_content;
             echo "<div class='blorm-display-posts-widget-element ".$instance['cssClassPost']."' data-postid='".$blormpost->ID."' data-activityid='".$acivityId."'>";
-            echo "<div class='blorm-display-posts-widget-element-title'><span class=\"material-icons\">content_copy</span><a href='#'>".get_the_title($blormpost)."</a></div>";
+            echo "<div class='blorm-display-posts-widget-element-title'><span class=\"material-icons\">content_copy</span><a href='".$post_url."'>".get_the_title($blormpost)."</a></div>";
 
             if (isset($instance['showImage'])) {
                 if ($instance['showImage'] ) {
-                    echo "<div class='blorm-display-posts-widget-element-image'><a href='#'>".get_the_post_thumbnail($blormpost)."</a></div>";
+                    echo "<div class='blorm-display-posts-widget-element-image'><a href='".$post_url."'>".get_the_post_thumbnail($blormpost)."</a></div>";
                 }
             }
 
             if (isset($instance['showExcert'])) {
                 if ($instance['showExcert']) {
-                    echo "<div class='blorm-display-posts-widget-element-excert'><a href='#'>" . get_the_excerpt($blormpost) . "</a></div>";
+                    echo "<div class='blorm-display-posts-widget-element-excert'><a href='".$post_url."'>".get_the_excerpt($blormpost) . "</a></div>";
                 }
             }
 
