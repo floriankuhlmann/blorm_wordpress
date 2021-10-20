@@ -125,7 +125,13 @@ class DisplayWidget extends \WP_Widget
 
         $blormposts = get_posts(array('post_type' => 'blormpost','numberposts' => $instance['numberOfPosts']));
 
-        echo "<div class='blormDisplayPostsWidget ".$instance['cssClassWidget']."'>";
+        $cssClassWidget = "";
+        $cssClassPost = "";
+
+        if ( !isset($instance['cssClassWidget'])) $cssClassWidget = $instance['cssClassWidget'];
+        if ( !isset($instance['cssClassPost'])) $cssClassPost = $instance['cssClassPost'];
+
+        echo "<div class='blormDisplayPostsWidget ".$cssClassWidget."'>";
         foreach ($blormposts as $blormpost) {
 
             $a = get_post_meta($blormpost->ID);
@@ -141,7 +147,7 @@ class DisplayWidget extends \WP_Widget
             }
 
             //echo $blormpost->post_content;
-            echo "<div class='blorm-display-posts-widget-element ".$instance['cssClassPost']."' data-postid='".$blormpost->ID."' data-activityid='".$acivityId."'>";
+            echo "<div class='blorm-display-posts-widget-element ".$cssClassPost."' data-postid='".$blormpost->ID."' data-activityid='".$acivityId."'>";
             echo "<div class='blorm-display-posts-widget-element-title'><span class=\"material-icons\">content_copy</span><a href='".$post_url."'>".get_the_title($blormpost)."</a></div>";
 
             if (isset($instance['showImage'])) {

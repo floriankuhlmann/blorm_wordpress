@@ -129,6 +129,10 @@ function blorm_created_class (array $classes, $class, $post_id) {
 add_action( 'the_posts', 'blorm_mod_the_posts' );
 function blorm_mod_the_posts($posts) {
 
+    if (is_admin() || is_single()) {
+        return $posts;
+    }
+
     $options = get_option("blorm_plugin_options_frontend");
 
     foreach ($posts as $post) {
@@ -197,50 +201,12 @@ function blorm_mod_the_posts($posts) {
 
                 }
             }
+
             $post->post_title = $post->post_title.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
             $post->post_content = $post->post_content.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
             $post->post_excert = $post->post_excert.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
-
-
         }
     }
-
-
 
     return $posts;
 }
-
-/*
- *
- * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
- */
-//add_action( 'pre_get_posts', 'blorm_remove_posts_from_home_page' );
-/*function blorm_remove_posts_from_home_page( $query ) {
-
-    $options = get_option( 'blorm_plugin_options_category' );
-
-    if (isset( $options['blorm_category_show_reblogged'] )) {
-        if( $query->is_main_query() && $query->is_home() )
-            $query->set( 'cat', '-'.$options['blorm_category_show_reblogged'] );
-    }
-
-    return $query;
-}*/
-
-/*
- *
- * if there is a category for showing the blorm posts lets remove the rebloged post from the mainloop
- */
-//add_action( 'pre_get_posts', 'blorm_add_posts_to_loop_by_category' );
-/*function blorm_add_posts_to_loop_by_category( $query ) {
-
-    $options = get_option( 'blorm_plugin_options_category' );
-
-    if (isset( $options['blorm_category_show_reblogged'] )) {
-        if( $query->is_category($options['blorm_category_show_reblogged'])) {
-            $query->set( 'post_type', array( 'blormpost' ));
-        }
-    }
-
-    return $query;
-}*/
