@@ -175,9 +175,10 @@ function blorm_register_settings_display_config() {
 function blorm_plugin_display_config_section_text() {
     echo "<p>Decide how to display the rebloged posts:
             <ul>
-            <li><i>loop only</i> - as regular posts in the loop on your homepage or in a category</li>
-             <li><i>widget only</i> - in the blorm widget, please do not forget to activate the widget</li>
-             <li><i>loop and widget</i> - or both variants.</li></ul></p>";
+            <li><i>main loop only</i> - as regular posts in the loop - in most cases used on your homepage</li>
+             <li><i>widget only</i> - in the blorm widget, please do not forget to <a href='/wp-admin/widgets.php'>activate the widget</a></li>
+             <li><i>category</i> - select a category to show the posts. Do not forget to select the category!</li>
+             <li><i>and combination</i> - show posts in different locations</li></ul></p>";
 }
 
 function blorm_plugin_setting_display_config() {
@@ -222,6 +223,13 @@ function blorm_register_settings_frontend_section() {
 		'blorm_plugin_frontend_section_text',
 		'blorm-plugin-frontend-section' );
 
+    add_settings_field(
+        'blorm_plugin_setting_add_blorm_icon_to_title',
+        'Add the blorm icon to shared titles',
+        'blorm_plugin_setting_add_blorm_icon_to_title',
+        'blorm-plugin-frontend-section',
+        'blorm-plugin-frontend-section');
+
 	add_settings_field(
 		'blorm_plugin_setting_add_blorm_widget',
 		'Blorm social widget',
@@ -244,6 +252,28 @@ function blorm_plugin_api_section_text() {
 	echo '<p>Here you can set all the options for using the API</p>';
 }
 
+
+function blorm_plugin_setting_add_blorm_icon_to_title() {
+    $options = get_option( 'blorm_plugin_options_frontend' );
+
+    $value = "";
+    if (isset( $options['blorm_icon_to_title'] )) {
+        $value = $options['blorm_icon_to_title'];
+    }
+
+    $isSelected = function($option_value) use ($value){
+        if ($value == $option_value) {
+            return "selected";
+        }
+    };
+
+    echo "<select id='blorm-plugin-options-frontend-blorm-icon-to-title' name='blorm_plugin_options_frontend[blorm_icon_to_title]'>\n
+            <option value='add_blorm_icon_to_title' ".$isSelected('add_blorm_icon_to_title').">Add icon to title</option>\n
+            <option value='add_blorm_icon_not_to_title' ".$isSelected('add_blorm_icon_not_to_title').">Do not add icon to title</option>\n
+            </select>";
+
+}
+
 function blorm_plugin_setting_add_blorm_widget() {
 
 	$options = get_option( 'blorm_plugin_options_frontend' );
@@ -259,7 +289,11 @@ function blorm_plugin_setting_add_blorm_widget() {
 		}
 	};
 
-	echo "<p>Select the position of the blorm social widget for your shared posts.<br><br></p>";
+	echo "<p>Select the position of the blorm social widget for your shared posts. 
+             <br>You can try to automaticaly render it on 
+             <br>1) an image 
+             <br>2) behind|before title|content
+             <br>or you insert the php code: <code>blorm_display_widget()</code> manually in your template.<br><br></p>";
 	echo "<select id='blorm_plugin_options_frontend-position_widget_menue' name='blorm_plugin_options_frontend[position_widget_menue]'>\n
             <option value='-'>Do not render</option>\n
             <option value='add_blorm_info_on_image' ".$isSelected('add_blorm_info_on_image').">on image</option>\n
@@ -267,8 +301,8 @@ function blorm_plugin_setting_add_blorm_widget() {
             <option value='add_blorm_info_after_content' ".$isSelected('add_blorm_info_after_content').">after content</option>\n
             <option value='add_blorm_info_before_title' ".$isSelected('add_blorm_info_before_title').">before title</option>\n
             <option value='add_blorm_info_after_title' ".$isSelected('add_blorm_info_after_title').">after title</option>\n
+            <option value='add_blorm_info_on_theme_tag' ".$isSelected('add_blorm_info_on_theme_tag').">insert blorm_display_widget() code in theme</option>\n
            </select>";
-
 }
 
 function blorm_plugin_setting_add_blorm_widget_position() {
