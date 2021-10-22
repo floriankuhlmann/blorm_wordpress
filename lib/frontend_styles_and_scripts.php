@@ -22,7 +22,7 @@ function enqueue_blorm_frontend_theme_style() {
         $catId = $options['blorm_category_show_reblogged'];
     }
 
-    if (is_home() || is_single() || is_category($catId)) {
+    if (!is_admin()) {
         wp_enqueue_style ('blorm-theme-style', plugins_url('blorm/assets/css/blorm_frontend.css'));
     }
 }
@@ -36,7 +36,7 @@ function enqueue_blorm_frontend_js() {
         $catId = $options['blorm_category_show_reblogged'];
     }
 
-    if (is_home() || is_single() || is_category($catId)) {
+    if (!is_admin()) {
         wp_enqueue_script( 'blorm-mobile-detect', plugins_url( 'blorm/assets/js/mobile-detect.min.js' ) );
         wp_enqueue_script( 'blorm-theme-js', plugins_url( 'blorm/assets/js/blorm_web_widget.js' ) );
         wp_add_inline_script( 'blorm-theme-js', getBlormFrontendConfigJs(), 'before' );
