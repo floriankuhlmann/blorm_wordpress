@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", function() {
     Array.from(BlormPosts).forEach(function(BlormPost){
 
         // the 'blorm-post-data'-container holds the relevant postdata we need to connect with the remote data
-        let BlormPostContainer = BlormPost.getElementsByClassName("blormWidget")[0];
-        if (typeof BlormPostContainer !== "undefined") {
-            let postId = BlormPostContainer.dataset.postid;
+        let BlormWidget = BlormPost.getElementsByClassName("blormWidget")[0];
+        if (typeof BlormWidget !== "undefined") {
+            let postId = BlormWidget.dataset.postid;
             let postData = blormapp.getPostById(postId);
 
             // integrate the widget in the posts. first way put the widget on the image

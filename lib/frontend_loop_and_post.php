@@ -2,7 +2,11 @@
 
 //https://developer.wordpress.org/plugins/post-types/working-with-custom-post-types/
 add_action( 'pre_get_posts', 'blorm_add_posttype_blorm_to_loop' );
-function blorm_add_posttype_blorm_to_loop( $query ) {
+/**
+ * @param $query
+ * @return mixed
+ */
+function blorm_add_posttype_blorm_to_loop($query ) {
 
     if (is_admin()) {
         return $query;
@@ -90,6 +94,12 @@ function blorm_add_posttype_blorm_to_loop( $query ) {
 
 // modify the css-classes of the posts
 add_filter( 'post_class', 'blorm_created_class',10,3);
+/**
+ * @param array $classes
+ * @param $class
+ * @param $post_id
+ * @return array
+ */
 function blorm_created_class (array $classes, $class, $post_id) {
 
     $options = get_option("blorm_plugin_options_frontend");
@@ -101,6 +111,9 @@ function blorm_created_class (array $classes, $class, $post_id) {
     if (isset($a["blorm_create"])) {
         array_push($classes, 'blorm-shared');
 
+        /**
+         * @deprecated
+         **/
         if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
             array_push($classes, 'blormwidget-on-image-post');
         } else {
@@ -111,6 +124,9 @@ function blorm_created_class (array $classes, $class, $post_id) {
     if (isset($a["blorm_reblog_activity_id"])) {
         array_push($classes, 'blorm-rebloged');
 
+        /**
+         * @deprecated
+         **/
         if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
             array_push($classes, 'blormwidget-on-image-post');
         } else {
@@ -127,6 +143,10 @@ function blorm_created_class (array $classes, $class, $post_id) {
 
 
 add_action( 'the_posts', 'blorm_mod_the_posts' );
+/**
+ * @param $posts
+ * @return mixed
+ */
 function blorm_mod_the_posts($posts) {
 
     if (is_admin() || is_single()) {
@@ -206,6 +226,9 @@ if ( ! function_exists( 'blorm_display_widget' ) && ! is_admin() ) :
     /**
      *
      *
+     */
+    /**
+     * @param int $id
      */
     function blorm_display_widget($id = 0) {
 
