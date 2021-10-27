@@ -55,15 +55,11 @@
     padding-right: 0.5rem;
 }*/
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper,
-.blorm-shared .blormWidgetImageWrapper,
-.blormpost .blormWidgetImageWrapper {
+.blormWidgetImageWrapper {
     position: relative;
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon {
+.blormWidgetImagelayerBlormIcon {
     position: absolute;
     width: 50%;
     height: 50%;
@@ -72,41 +68,31 @@
     background-size: cover;
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topleft {
+.blormWidgetImagelayerBlormIcon.topleft {
     top:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_top_sw.png");
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.topright {
+.blormWidgetImagelayerBlormIcon.topright {
     top:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_top_sw.png");
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomleft {
+.blormWidgetImagelayerBlormIcon.bottomleft {
     bottom:0;
     left:0;
     background-image: url("../images/blorm_icon_bubble_left_bottom_sw.png");
 }
 
-.blorm-display-posts-widget-element  .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon.bottomright {
+.blormWidgetImagelayerBlormIcon.bottomright {
     bottom:0;
     right:0;
     background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg {
+.blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg{
     position: absolute;
     width: 20%;
     height: auto;
@@ -114,9 +100,7 @@
     left: 10px;
 }
 
-.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerWidget,
-.blormpost .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget {
     position: absolute;
     bottom:0;
     right:0;
@@ -146,15 +130,15 @@
 
 .blorm-display-posts-widget-element .blorm-display-posts-widget-element-title {
     font-weight: bold;
-    padding-bottom: 0.5em;
+    padding: 0.5em;
 }
 
 .blorm-display-posts-widget-element .blorm-display-posts-widget-element-image {
-    padding-bottom: 0.5em;
+    padding: 0.5em;
 }
 
-.blorm-display-posts-widget-element .blorm-display-posts-widget-element-excert {
-    padding-bottom: 0.5em;
+.blorm-display-posts-widget-element .blorm-display-posts-widget-element-excerpt {
+    padding: 0.5em;
 }
 
 
@@ -389,13 +373,15 @@ and (max-device-width: 860px) {
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a {
     font-size: 14px;
     color:#000;
-    text-decoration: underline grey;
+    text-decoration: none !important;
+    box-shadow: 0 0 0 0;
 }
 
 .blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a:hover {
     font-size: 14px;
     color:#000;
-    text-decoration: underline black;
+    text-decoration: none !important;
+    box-shadow: 0 0 0 0;
 }
 
 @media only screen

@@ -25,6 +25,9 @@ class DisplayWidget extends \WP_Widget
      */
     public function widget( $args, $instance ) {
 
+
+        wp_enqueue_script( 'blorm-widget-init', plugins_url( 'blorm/assets/js/blorm_init_wp_widget.js'));
+
         $options = get_option( 'blorm_plugin_options_frontend' );
 
         if (isset( $options['display_config'] )) {
@@ -90,11 +93,11 @@ class DisplayWidget extends \WP_Widget
             <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'showImage' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'showImage' ) ); ?>" type="checkbox" <?php echo esc_attr( $showImage ); ?>>
         </p>
         <?php
-            $showExcert = ! empty( $instance['showExcert'] ) ? "checked" : "";
+            $showExcerpt = ! empty( $instance['showExcerpt'] ) ? "checked" : "";
         ?>
         <p>
-            <label for="<?php echo esc_attr( $this->get_field_id( 'showExcert' ) ); ?>"><?php esc_attr_e( 'Show excert of posts:', 'text_domain' ); ?></label>
-            <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'showExcert' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'showExcert' ) ); ?>" type="checkbox" <?php echo esc_attr( $showExcert ); ?>>
+            <label for="<?php echo esc_attr( $this->get_field_id( 'showExcerpt' ) ); ?>"><?php esc_attr_e( 'Show excerpt of posts:', 'text_domain' ); ?></label>
+            <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'showExcerpt' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'showExcerpt' ) ); ?>" type="checkbox" <?php echo esc_attr( $showExcerpt ); ?>>
         </p>
         <?php
     }
@@ -116,7 +119,7 @@ class DisplayWidget extends \WP_Widget
         $instance['cssClassWidget'] = ( ! empty( $new_instance['cssClassWidget'] ) ) ? sanitize_text_field( $new_instance['cssClassWidget'] ) : '';
         $instance['cssClassPost'] = ( ! empty( $new_instance['cssClassPost'] ) ) ? sanitize_text_field( $new_instance['cssClassPost'] ) : '';
         $instance['showImage'] = $new_instance['showImage'];
-        $instance['showExcert'] = $new_instance['showExcert'];
+        $instance['showExcerpt'] = $new_instance['showExcerpt'];
 
         return $instance;
     }
@@ -132,33 +135,29 @@ class DisplayWidget extends \WP_Widget
         if ( !empty($instance['cssClassWidget'])) $cssClassWidget = $instance['cssClassWidget'];
         if ( !empty($instance['cssClassPost'])) $cssClassPost = $instance['cssClassPost'];
 
-        echo "<div class='blormDisplayPostsWidget ".$cssClassWidget."'>";
+        echo "<div class='blorm-display-posts-widget ".$cssClassWidget."'>";
         foreach ($blormposts as $blormpost) {
 
             $a = get_post_meta($blormpost->ID);
 
             $acivityId = "";
-            $post_class = "blorm-post-data";
-            if (isset($a["blorm_reblog_activity_id"])) {
-                $acivityId = $a['blorm_reblog_activity_id'][0];
-            }
-
-            if (isset($a["blorm_reblog_teaser_url"])) {
-                $post_url = $a['blorm_reblog_teaser_url'][0];
-            }
+            $showImage = "off";
+            $showExcerpt = "off";
+            if (isset($a["blorm_reblog_activity_id"])) $acivityId = $a['blorm_reblog_activity_id'][0];
+            if (isset($a["blorm_reblog_teaser_url"])) $post_url = $a['blorm_reblog_teaser_url'][0];
+            if (isset($instance['showImage'])) $showImage = $instance['showImage'];
+            if (isset($instance['showExcerpt'])) $showExcerpt = $instance['showExcerpt'];
 
             //echo $blormpost->post_content;
             echo "<div class='blorm-display-posts-widget-element ".$cssClassPost."' data-postid='".$blormpost->ID."' data-activityid='".$acivityId."'>";
             echo "<div class='blorm-display-posts-widget-element-title'><span class=\"material-icons\">content_copy</span><a href='".$post_url."'>".get_the_title($blormpost)."</a></div>";
 
-
-            if ($instance['showImage'] == "on" ) {
+            if ($showImage == "on" ) {
                 echo "<div class='blorm-display-posts-widget-element-image'><a href='".$post_url."'>".get_the_post_thumbnail($blormpost)."</a></div>";
             }
 
-
-            if ($instance['showExcert'] == "on" ) {
-                echo "<div class='blorm-display-posts-widget-element-excert'><a href='".$post_url."'>".get_the_excerpt($blormpost) . "</a></div>";
+            if ($showExcerpt == "on" ) {
+                echo "<div class='blorm-display-posts-widget-element-excerpt'><a href='".$post_url."'>".get_the_excerpt($blormpost) . "</a></div>";
             }
 
             echo "</div>";

@@ -165,41 +165,36 @@ function blorm_mod_the_posts($posts) {
             // modify title and content
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_before_title' ) {
-                    $post->post_title = '<span class="blormWidget"></span>'.$post->post_title;
-                    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+                    $post->post_title = '<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_title;
                 }
             }
 
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_after_title' ) {
-                    $post->post_title = $post->post_title .'<span class="blormWidget"></span>';
-                    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+                    $post->post_title = $post->post_title .'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
                 }
             }
 
             // modify content
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_before_content' ) {
-                    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"><span class="blormWidget"></span>'.$post->post_content.'</div>';
+                    $post->post_content = '<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>'.$post->post_content;
                 }
             }
 
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_after_content' ) {
-                    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'<span class="blormWidget"></span></div>';
+                    $post->post_content = $post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
+
                 }
             }
 
             // modify content to place on image
             if ( isset( $options['position_widget_menue']) ) {
                 if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
-                    $post->post_content = '<div class="blorm-post-content-container '.$post_class.'" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'">'.$post->post_content.'</div>';
+                    $post->post_content = $post->post_content.'<span class="blormWidget" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
                 }
             }
-
-            $post->post_title = $post->post_title.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
-            $post->post_content = $post->post_content.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
-            $post->post_excert = $post->post_excert.'<span class="blorm-post-data" data-postid="'.$post->ID.'" data-activityid="'.$acivityId.'"></span>';
         }
     }
 
@@ -212,26 +207,17 @@ if ( ! function_exists( 'blorm_display_widget' ) && ! is_admin() ) :
      *
      *
      */
-    function blorm_display_widget() {
+    function blorm_display_widget($id = 0) {
 
-        $a = get_post_meta(get_the_ID());
+        if ($id == 0) $id = get_the_ID();
+        $a = get_post_meta($id);
 
         $acivityId = "";
-        $post_class = "blorm-post-data";
-        if (isset($a["blorm_reblog_activity_id"])) {
-            $post_class= "blorm-reblog-post-data";
-            $acivityId = $a['blorm_reblog_activity_id'][0];
-            $material_icon = "flip_to_back";
-        }
-
-        if (isset($a["blorm_create_activity_id"])) {
-            $post_class= "blorm-create-post-data";
-            $acivityId = $a['blorm_create_activity_id'][0];
-            $material_icon = "flip_to_front";
-        }
+        if (isset($a["blorm_reblog_activity_id"])) $acivityId = $a['blorm_reblog_activity_id'][0];
+        if (isset($a["blorm_create_activity_id"])) $acivityId = $a['blorm_create_activity_id'][0];
 
         if (isset($a["blorm_reblog_activity_id"]) || isset($a["blorm_create_activity_id"])) {
-            echo "<span class=\"blormWidget\"></span>";
+            echo '<span class="blormWidget blormwidget-template-tag" data-postid="'.$id.'" data-activityid="'.$acivityId.'"></span>';
         }
 
     }

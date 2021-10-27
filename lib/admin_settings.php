@@ -92,9 +92,13 @@ function blorm_render_options_page() {
     <form action="<?php menu_page_url( 'blorm-plugin' ) ?>" method="post">
         <?php
         settings_fields( 'blorm-plugin-section' );
+        echo "<hr>";
         do_settings_sections( 'blorm-plugin-api-section' );
+        echo "<hr>";
         do_settings_sections( 'blorm-plugin-display-config-section' );
+        echo "<hr>";
         do_settings_sections( 'blorm-plugin-category-section' );
+        echo "<hr>";
         do_settings_sections( 'blorm-plugin-frontend-section' );?>
         <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
     </form>
@@ -136,6 +140,7 @@ function blorm_register_settings_api() {
 
 function blorm_plugin_frontend_section_text() {
     echo '<p>Here you can set all the options for using the Plugin on the web</p>';
+
 }
 
 function blorm_plugin_setting_api_key() {
@@ -219,7 +224,7 @@ function blorm_register_settings_frontend_section() {
 
 	add_settings_section(
 		'blorm-plugin-frontend-section',
-		'Website display settings',
+		'Blorm social widget display settings',
 		'blorm_plugin_frontend_section_text',
 		'blorm-plugin-frontend-section' );
 
@@ -236,6 +241,20 @@ function blorm_register_settings_frontend_section() {
 		'blorm_plugin_setting_add_blorm_widget',
 		'blorm-plugin-frontend-section',
 		'blorm-plugin-frontend-section' );
+
+    add_settings_field(
+        'blorm_plugin_setting_add_special_css_class_post',
+        'Use special css class for post teasers',
+        'blorm_plugin_setting_add_special_css_class_post',
+        'blorm-plugin-frontend-section',
+        'blorm-plugin-frontend-section');
+
+    add_settings_field(
+        'blorm_plugin_setting_add_special_css_class_post_img',
+        'Use special css class for img in posts teasers',
+        'blorm_plugin_setting_add_special_css_class_post_img',
+        'blorm-plugin-frontend-section',
+        'blorm-plugin-frontend-section');
 
 	add_settings_field(
 		'blorm_plugin_setting_add_blorm_widget_position',
@@ -293,7 +312,7 @@ function blorm_plugin_setting_add_blorm_widget() {
              <br>You can try to automaticaly render it on 
              <br>1) an image 
              <br>2) behind|before title|content
-             <br>or you insert the php code: <code>blorm_display_widget()</code> manually in your template.<br><br></p>";
+             <br>or 3) you insert the php code: <code>blorm_display_widget()</code> manually in your template.<br><br></p>";
 	echo "<select id='blorm_plugin_options_frontend-position_widget_menue' name='blorm_plugin_options_frontend[position_widget_menue]'>\n
             <option value='-'>Do not render</option>\n
             <option value='add_blorm_info_on_image' ".$isSelected('add_blorm_info_on_image').">on image</option>\n
@@ -303,6 +322,36 @@ function blorm_plugin_setting_add_blorm_widget() {
             <option value='add_blorm_info_after_title' ".$isSelected('add_blorm_info_after_title').">after title</option>\n
             <option value='add_blorm_info_on_theme_tag' ".$isSelected('add_blorm_info_on_theme_tag').">insert blorm_display_widget() code in theme</option>\n
            </select>";
+}
+
+function blorm_plugin_setting_add_special_css_class_post() {
+    $options = get_option( 'blorm_plugin_options_frontend' );
+
+    // css class
+    $value_special_css_class_for_post = "";
+    if (isset( $options['special_css_class_for_post'] )) {
+        $value_special_css_class_for_post = $options['special_css_class_for_post'];
+    }
+
+    echo "<p>Blorm tries to discover posts on your website automaticaly.</p>";
+    echo "<p>If your theme is NOT using the wordpress standard css-classes for styling an article or post you may define here one of your css-classes.<br><br></p>";
+    echo "<input type=\"text\" id=\"blorm_plugin_options_frontend-special_css_class_for_post\" name=\"blorm_plugin_options_frontend[special_css_class_for_post]\" value=\"".$value_special_css_class_for_post."\">";
+
+}
+
+function blorm_plugin_setting_add_special_css_class_post_img() {
+    $options = get_option( 'blorm_plugin_options_frontend' );
+
+    // css class
+    $value_special_css_class_for_post_img = "";
+    if (isset( $options['special_css_class_for_post_img'] )) {
+        $value_special_css_class_for_post_img = $options['special_css_class_for_post_img'];
+    }
+
+    echo "<p>When you decide to render social widget on image, the plugin tries to discover the first image or thumbnail automatic.</p>";
+    echo "<p>If this fails you may define here a css-classes to use on the image-tag.<br><br></p>";
+    echo "<input type=\"text\" id=\"blorm_plugin_options_frontend-special_css_class_for_post_img\" name=\"blorm_plugin_options_frontend[special_css_class_for_post_img]\" value=\"".$value_special_css_class_for_post_img."\">";
+
 }
 
 function blorm_plugin_setting_add_blorm_widget_position() {
