@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     let BlormPosts = blormapp.getAllBlormPosts();
-
     Array.from(BlormPosts).forEach(function(BlormPost){
 
         // the 'blorm-post-data'-container holds the relevant postdata we need to connect with the remote data

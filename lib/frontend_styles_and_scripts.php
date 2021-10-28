@@ -260,7 +260,7 @@ function add_getstream_data_to_head() {
         $blormPostConfig->specialCssClassForPostImg = $options['special_css_class_for_post_img'];
     }
 
-    echo '\n<script type="text/javascript">
+    echo '<script type="text/javascript">
             var blormapp = {
 			postConfig: '.json_encode($blormPostConfig, JSON_UNESCAPED_UNICODE).',
             blormPosts: '.json_encode($aGetStreamCreatedData, JSON_UNESCAPED_UNICODE).',
