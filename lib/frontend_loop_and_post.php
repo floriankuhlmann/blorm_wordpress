@@ -227,7 +227,7 @@ function blorm_custom_excerpt( $output, $post ) {
 
     if ( isset( $options['position_widget_menue']) ) {
         if ( $options['position_widget_menue'] === 'add_blorm_info_on_image' ) {
-            return;
+            return $output;
         }
     }
 
