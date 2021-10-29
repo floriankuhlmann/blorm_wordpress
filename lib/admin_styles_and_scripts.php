@@ -48,7 +48,7 @@ function getConfigJs() {
     $jsdata =   "var blogurl = '".CONFIG_BLORM_BLOGURL."';\n";
     $jsdata .=  "var blogdomain = '".CONFIG_BLORM_BLOGDOMAIN."';\n";
     $jsdata .=  "var ajaxapi = blogdomain+ajaxurl;\n";
-    $jsdata .=  "var templateUrl = '".plugins_url()."';\n";
+    $jsdata .=  "var pluginUrl = '".plugins_url()."';\n";
     $jsdata .=  "var blormPluginUrl = '".plugins_url()."/blorm';\n";
     // user data fallback definiton
     // account: is the logged in blorm-account connected to the api via the key

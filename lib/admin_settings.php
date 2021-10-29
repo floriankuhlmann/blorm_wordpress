@@ -79,6 +79,8 @@ function blorm_plugin_options_page_submit() {
                 // update the user and frontend cache
                 blorm_cron_getstream_user_exec();
                 blorm_cron_getstream_user_public_exec();
+                blorm_cron_getstream_update_followers_exec();
+                blorm_cron_getstream_update_following_users_exec();
 				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
 			}
 		}

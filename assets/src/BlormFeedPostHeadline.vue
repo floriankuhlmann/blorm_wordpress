@@ -44,7 +44,7 @@
             },
             renderIcon: function() {
                 let icon = "";
-                let imgsrc = templateUrl+"/blorm/assets/icons/";
+                let imgsrc = blormPluginUrl+"/assets/icons/";
                 switch (this.post.object.verb) {
                     case "share":
                         icon = "circle-sync-backup-1-glyph.png";

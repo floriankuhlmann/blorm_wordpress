@@ -44,9 +44,11 @@ define( 'PLUGIN_BLORM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Plugin Root File.
 define( 'PLUGIN_BLORM_FILE', __FILE__ );
 
+require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
+
 // configuration and code for the frontend rendering
+require_once plugin_dir_path( __FILE__ ) . 'lib/cache_and_cron.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_styles_and_scripts.php';
-require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_cache_and_cron.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_loop_and_post.php';
 
 // blormpost, widget and ajax api
@@ -56,7 +58,6 @@ require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_widget.php';
 
 // the admin area
 if (is_admin()) {
-    require_once plugin_dir_path( __FILE__ ) . 'lib/user.php';
     require_once plugin_dir_path( __FILE__ ) . 'lib/admin_settings.php';
 
     $blormUserAccountData = getUserAccountDataFromBlorm();

@@ -10,9 +10,10 @@ export default {
     },
 
     mounted() {
-        console.log("feedTimeline user id");
+        console.log("blorm | feedTimeline user id:");
         console.log(this.$store.state.user.id);
-
+        jQuery("#wpcontent").css("background-color","#000000");
+        jQuery("#wpcontent .wrap h1").css("color","#fff");
         this.feedTimeline();
         this.getFollowersOfUser(this.$store.state.user.id);
         this.getFollowingUsers(this.$store.state.user.id);
@@ -31,7 +32,13 @@ export default {
             this.getFollowingUsers(userId);
             this.getUserData(userId);
             //this.$store.commit('setUserData', x.data);
-
+            jQuery( "#BlormDashboardWidgetFeed" ).css("background-color","#ffffff");
+            jQuery( "#BlormDashboardWidgetUserProfile" ).css("background-color","#ffffff");
+            jQuery( "#BlormDashboardWidgetFollowers" ).css("background-color","#ffffff");
+            jQuery( "#BlormDashboardWidgetFollowing").css("background-color","#ffffff");
+            jQuery( "#BlormDashboardWidgetNewPost" ).css("display","none");
+            jQuery( "#BlormDashboardWidgetSearchUser" ).css("display","none");
+            jQuery( "#BlormDashboardWidgetFeed .blormImage").attr('src', blormPluginUrl+"/assets/images/blorm_logo_world_FFFF94.png");
         },
         isAccountDataOnDisplay: function() {
             return (this.$store.state.user.blormhandle === this.$store.state.account.blormhandle);
@@ -54,11 +61,13 @@ export default {
                 // check for errors in the data
                 if (value.object.data.error) {
                     data.error = true;
+                    data.activityId = value.id;
                     data.errortype = value.object.data.error;
                     return data;
                 }
                 if (typeof(value.object.data.data) == "undefined") {
                     data.error = true;
+                    data.activityId = value.id;
                     data.errortype = "data_undefined";
                     return data;
                 }
@@ -91,7 +100,6 @@ export default {
                     return data;
                 }
             });
-            console.log(postData);
             return postData;
         },
         /**

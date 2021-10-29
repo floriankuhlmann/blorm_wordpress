@@ -40,7 +40,19 @@
         props: [],
         computed: {
             posts () {
-                return this.$store.state.feed;
+                let posts = [];
+                Array.from(this.$store.state.feed).forEach(function(post){
+
+                    if (post.error === false ) {
+                       posts.push(post);
+                    }
+                    if (post.error === true ) {
+                        console.log("feed-error: post is not vaild:");
+                        console.log(post.activityId );
+                        console.log(post.errortype);
+                    }
+                });
+                return posts;
             },
             getBlormHandle () {
               return this.$store.state.user.blormhandle;
