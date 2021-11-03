@@ -108,8 +108,10 @@ export default {
         feedTimeline: function() {
 
             document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+            let limit = this.$store.state.feedLimit;
+            console.log(limit);
             axios.get(
-                restapiVars.root+'blormapi/v1/feed/timeline',
+                restapiVars.root+'blormapi/v1/feed/timeline?limit='+limit+'&offset='+this.$store.state.feedOffset,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -122,13 +124,17 @@ export default {
                     if(!this.isResponseStatusOk(response)) {
                         return
                     }
-
+                console.log("feeddata");
+                console.log(response);
                     if (response.data.length > 0) {
                         postData = this.processFeedData(response.data);
                     }
 
                     if ( postData.length > 0) {
                         this.$store.commit('setFeed', postData);
+                        this.$store.commit('setFeedOffset', postData.length + this.$store.state.feedOffset);
+                        console.log("feeedOffset");
+                        console.log(this.$store.state.feedOffset);
                         document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
 
                     }

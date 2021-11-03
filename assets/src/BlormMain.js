@@ -22,6 +22,8 @@ const store = createStore({
         followersOfUser: {},
         recentPosts: blormapp.recentPosts,
         feed: {},
+        feedLimit: 5,
+        feedOffset: 0,
         isAuthenticated: false,
     },
     mutations: {
@@ -36,6 +38,12 @@ const store = createStore({
         },
         setFeed (state, f) {
             state.feed = f;
+        },
+        setFeedLimit (state, f) {
+            state.feedLimit = f;
+        },
+        setFeedOffset (state, f) {
+            state.feedOffset = f;
         },
         isAuthenticated(state, f) {
             state.isAuthenticated = f;
