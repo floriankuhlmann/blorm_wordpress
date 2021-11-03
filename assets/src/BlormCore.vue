@@ -108,10 +108,8 @@ export default {
         feedTimeline: function() {
 
             document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
-            let limit = this.$store.state.feedLimit;
-            console.log(limit);
             axios.get(
-                restapiVars.root+'blormapi/v1/feed/timeline?limit='+limit+'&offset='+this.$store.state.feedOffset,
+                restapiVars.root+'blormapi/v1/feed/timeline?limit='+this.$store.state.feedLimit+'&offset='+this.$store.state.feedOffset,
                 {
                     headers: {
                         'Content-Type': 'application/json',

@@ -77,8 +77,11 @@ function rest_blormapi_handler(WP_REST_Request $request) {
         'data_format' => 'body',
     );
     $params = $request->get_params();
-    $response = wp_remote_request(CONFIG_BLORM_APIURL ."/". $params['restparameter'], $args);
+    $requestURL = CONFIG_BLORM_APIURL ."/". $params['restparameter'];
+    if ($returnObj->query !== null) $requestURL .= $returnObj->query;
 
+    error_log("requestURL".$requestURL);
+    $response = wp_remote_request($requestURL, $args);
 
     // check after wp_remote_request (delete)
     postRequestLocalPostsUpdate($request,$response);
@@ -95,13 +98,28 @@ function preRequestLocalPostsUpdate(&$request) {
     $returnObj = new stdClass();
     $returnObj->status = "continue";
     $returnObj->data = null;
-
-    //error_log("pretRequestLocalPostsUpdate restparameter: ".$parameter["restparameter"]);
+    $returnObj->query = null;
 
     switch($parameter["restparameter"]) {
 	    case (preg_match('/^(feed\/timeline)\/?$/', $parameter["restparameter"]) ? true : false) :
-            //error_log("feed\/timeline: ".$parameter["restparameter"]);
-		    break;
+            error_log("feed\/timeline: ".$parameter["restparameter"]);
+
+            $query = "";
+            if (isset($parameter["limit"])) {
+                error_log("timeline limit");
+                $query = "limit=" . $parameter["limit"];
+            }
+
+            if (isset($parameter["offset"])) {
+                error_log("timeline offset");
+                $query .= "&offset=" . $parameter["offset"];
+            }
+
+            if (isset($parameter["offset"]) || isset($parameter["limit"])) {
+                $returnObj->query = "?".$query;
+            }
+            return $returnObj;
+            break;
 
         //READ
         case (preg_match('/^(user\/data)\/?$/', $parameter["restparameter"]) ? true : false) :

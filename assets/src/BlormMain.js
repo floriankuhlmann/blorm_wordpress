@@ -22,7 +22,7 @@ const store = createStore({
         followersOfUser: {},
         recentPosts: blormapp.recentPosts,
         feed: {},
-        feedLimit: 5,
+        feedLimit: 25,
         feedOffset: 0,
         isAuthenticated: false,
     },
