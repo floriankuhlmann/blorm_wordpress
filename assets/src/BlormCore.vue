@@ -9,7 +9,7 @@ export default {
         const store = useStore()
     },
 
-    mounted() {
+    mounted: function () {
         console.log("blorm | feedTimeline user id:");
         console.log(this.$store.state.user.id);
         jQuery("#wpcontent").css("background-color","#000000");
@@ -56,6 +56,7 @@ export default {
             console.log(e)
         },
         processFeedData: function(posts) {
+            console.log(posts);
             let postData = posts.map(function (value) {
                 var data = {};
                 // check for errors in the data
@@ -97,6 +98,40 @@ export default {
                     data.ownReactions = value.own_reactions;
                     data.reactionCounts = value.reaction_counts;
                     data.latestReactions = value.latest_reactions;
+
+                    data.comments = {
+                        hasReactions: false,
+                    };
+                    if (typeof value.latest_reactions.comment !== "undefined") {
+                        data.comments = {
+                            hasReactions: true,
+                            noOfReactions: value.reaction_counts.comment,
+                            theReactions: value.latest_reactions.comment,
+                        }
+                    }
+
+                    data.reblogs = {
+                        hasReactions: false,
+                    };
+                    if (typeof value.latest_reactions.reblog !== "undefined") {
+                        data.reblogs = {
+                            hasReactions: true,
+                            noOfReactions: value.reaction_counts.reblog,
+                            theReactions: value.latest_reactions.reblog,
+                        }
+                    }
+
+                    data.shares = {
+                        hasReactions: false,
+                    };
+                    if (typeof value.latest_reactions.share !== "undefined") {
+                        data.shares = {
+                            hasReactions: true,
+                            noOfReactions: value.reaction_counts.share,
+                            theReactions: value.latest_reactions.share,
+                        }
+                    }
+
                     return data;
                 }
             });
@@ -105,11 +140,23 @@ export default {
         /**
          * get the timeline
          */
-        feedTimeline: function() {
+        feedTimeline: function(offSet) {
+
+            // reload after undoReblog, undoShare, reblog, share: the offset is ste to 0 to load the updated feed
+            if (typeof offSet !== "undefined") {
+                //console.log(offSet);
+                this.$store.commit('setFeedOffset', offSet);
+            }
+
+            // if undefined we want the offset
+            if (typeof offSet === "undefined") {
+                offSet = this.$store.state.feedOffset;
+            }
 
             document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             axios.get(
-                restapiVars.root+'blormapi/v1/feed/timeline?limit='+this.$store.state.feedLimit+'&offset='+this.$store.state.feedOffset,
+                restapiVars.root+'blormapi/v1/feed/timeline?limit='+this.$store.state.feedLimit+'&offset='+offSet,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -122,8 +169,8 @@ export default {
                     if(!this.isResponseStatusOk(response)) {
                         return
                     }
-                console.log("feeddata");
-                console.log(response);
+                    //console.log("feeddata");
+                    //console.log(response);
                     if (response.data.length > 0) {
                         postData = this.processFeedData(response.data);
                     }
@@ -150,6 +197,7 @@ export default {
         feedUser: function(userId) {
 
             document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             axios.get(
                 restapiVars.root+'blormapi/v1/feed/user/'+userId,
                 {
@@ -185,6 +233,9 @@ export default {
          * @param createJSONObj
          */
         postCreate: function(createJSONObj) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let $this = this;
             return new Promise (
                 function(success, error) {
@@ -247,6 +298,9 @@ export default {
          * @param activityId
          */
         postDelete: function (activityId) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let promiseObj = new Promise (function(fullfill, reject) {
                 axios.get(restapiVars.root+'blormapi/v1/blogpost/delete/'+activityId,
                     {
@@ -272,6 +326,9 @@ export default {
          * @param post
          */
         postShare: function(verb, event, post) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let promiseObj = new Promise (function(fullfill, reject) {
                 var shareJSONObj = {
                     "@context": "https://www.w3.org/ns/activitystreams",
@@ -309,6 +366,9 @@ export default {
          * @param post
          */
         postReblog: function(verb, event, post) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let promiseObj = new Promise (function(fullfill, reject) {
                 var shareJSONObj = {
                     "@context": "https://www.w3.org/ns/activitystreams",
@@ -351,6 +411,9 @@ export default {
          * @param activityId
          */
         reblogUndo: function (activityId) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let promiseObj = new Promise (function(fullfill, reject) {
                 axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/reblog/'+activityId,
                     {
@@ -374,6 +437,9 @@ export default {
          * @param activityId
          */
         shareUndo: function (activityId) {
+
+            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+
             let promiseObj = new Promise (function(fullfill, reject) {
                 axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/share/'+activityId,
                     {
@@ -430,7 +496,7 @@ export default {
                     jQuery( ".BlormFeed_Action--comment button" ).prop('disabled', false);
 
                     // update the feed
-                    $this.feedTimeline();
+                    $this.feedTimeline(0);
                 }).catch(function (error) {
                     console.log(error);
             });

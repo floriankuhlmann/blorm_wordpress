@@ -4,6 +4,8 @@ import { createApp } from 'vue'
 import { createStore } from 'vuex'
 import jquery from 'jquery';
 
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import BlormCore from './BlormCore.vue'
 import BlormFeed from './BlormFeed.vue'
 import BlormFollowersOfUser from './BlormFollowersOfUser.vue'
@@ -54,6 +56,7 @@ const store = createStore({
 const blormWPApp = createApp(BlormCore);
 
 blormWPApp.use(store);
+blormWPApp.use(ElementPlus)
 blormWPApp.component('blorm-feed', BlormFeed);
 blormWPApp.component('blorm-followers-of-user', BlormFollowersOfUser);
 blormWPApp.component('blorm-following-users', BlormFollowingUsers);

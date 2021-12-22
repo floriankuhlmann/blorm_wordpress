@@ -2,6 +2,8 @@ const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const { VueStyleLoader } = require("vue-style-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 const webpack = require('webpack');
 
 module.exports = (env = {}) => ({
@@ -19,6 +21,11 @@ module.exports = (env = {}) => ({
                 test: /\.vue$/,
                 loader: 'vue-loader'
             },
+            {
+                include: /node_modules/,
+                test: /\.mjs$/,
+                type: 'javascript/auto'
+            },
             // this will apply to both plain `.css` files
             // AND `<style>` blocks in `.vue` files
             {
@@ -35,6 +42,9 @@ module.exports = (env = {}) => ({
         },
     },
     plugins: [
+        Components({
+            resolvers: [ElementPlusResolver()],
+        }),
         new VueLoaderPlugin(),
         new MiniCssExtractPlugin({
             filename: "[name].css"

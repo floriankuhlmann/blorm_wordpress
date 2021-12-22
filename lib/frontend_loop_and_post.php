@@ -8,6 +8,12 @@ add_action( 'pre_get_posts', 'blorm_add_posttype_blorm_to_loop' );
  */
 function blorm_add_posttype_blorm_to_loop($query ) {
 
+    if (function_exists( 'is_shop')) {
+        if (is_shop() ) {
+            return $query;
+        }
+    }
+
     if (is_admin()) {
         return $query;
     }
@@ -26,64 +32,80 @@ function blorm_add_posttype_blorm_to_loop($query ) {
             case "display_config_category":
                 // category
                 if (isset($options_cat['blorm_category_show_reblogged'])) {
-                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
-                        $query->set( 'post_type', array( 'blormpost' ));
-                        return $query;
+                    if (is_category($options_cat['blorm_category_show_reblogged'])) {
+                        if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                            $query->set( 'post_type', array( 'blormpost' ));
+                            return $query;
+                        }
                     }
                 }
                 break;
 
             case "display_config_loop":
-                if ($query->is_main_query()) {
-                    $query->set('post_type', array('post', 'blormpost'));
-                    return $query;
-                }
-                break;
-
+                /*                if ($query->is_main_query()) {
+                                    $query->set('post_type', array('post', 'blormpost'));
+                                    return $query;
+                         q       }
+                                break;
+                */
             case "display_config_loop_and_widget":
-                if ($query->is_main_query()) {
-                    $query->set('post_type', array('post', 'blormpost'));
-                    return $query;
+                if (is_home()) {
+                    if ($query->is_main_query()) {
+                        $query->set('post_type', array('post', 'blormpost'));
+                        return $query;
+                    }
                 }
                 break;
 
             case "display_config_loop_and_category":
                 // category
                 if (isset($options_cat['blorm_category_show_reblogged'])) {
-                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
-                        $query->set( 'post_type', array('post', 'blormpost' ));
-                        return $query;
+                    if (is_category($options_cat['blorm_category_show_reblogged'])) {
+                        if ($query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                            $query->set('post_type', array('post', 'blormpost'));
+                            return $query;
+                        }
                     }
                 }
                 // main query
-                $query->set( 'post_type', array( 'post', 'blormpost' ));
+                if (is_home()) {
+                    $query->set('post_type', array('post', 'blormpost'));
+                }
                 return $query;
                 break;
 
             case "display_config_category_and_widget":
                 // category
                 if (isset($options_cat['blorm_category_show_reblogged'])) {
-                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
-                        $query->set( 'post_type', array('post', 'blormpost' ));
-                        return $query;
+                    if (is_category($options_cat['blorm_category_show_reblogged'])) {
+                        if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                            $query->set( 'post_type', array('post', 'blormpost' ));
+                            return $query;
+                        }
                     }
                 }
-                if ($query->is_main_query()) {
-                    return $query;
+                if (is_home()) {
+                    if ($query->is_main_query()) {
+                        return $query;
+                    }
                 }
                 break;
 
             case "display_config_loop_and_category_and_widget":
                 if (isset($options_cat['blorm_category_show_reblogged'])) {
-                    if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
-                        $query->set( 'post_type', array('post', 'blormpost' ));
-                        return $query;
+                    if (is_category($options_cat['blorm_category_show_reblogged'])) {
+                        if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
+                            $query->set( 'post_type', array('post', 'blormpost' ));
+                            return $query;
+                        }
                     }
                 }
                 // main query
-                if ($query->is_main_query()) {
-                    $query->set('post_type', array('post', 'blormpost'));
-                    return $query;
+                if (is_home()) {
+                    if ($query->is_main_query()) {
+                        $query->set('post_type', array('post', 'blormpost'));
+                        return $query;
+                    }
                 }
                 break;
         }
@@ -249,7 +271,6 @@ function blorm_custom_excerpt( $output, $post ) {
     return $output;
 }
 add_filter( 'get_the_excerpt', 'blorm_custom_excerpt', 10, 3 );
-
 
 if ( ! function_exists( 'blorm_display_widget' ) && ! is_admin() ) :
     /**

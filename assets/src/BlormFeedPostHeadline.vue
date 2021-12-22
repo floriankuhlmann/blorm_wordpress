@@ -47,6 +47,7 @@
                 let imgsrc = blormPluginUrl+"/assets/icons/";
                 switch (this.post.object.verb) {
                     case "share":
+                        //             <span class="material-icons">sync</span>
                         icon = "circle-sync-backup-1-glyph.png";
                         break;
                     case "reblog":
@@ -98,7 +99,7 @@
                 let $this = this;
                 let responsePromise = this.$root.postDelete(activityId);
                 responsePromise.then(function() {
-                    $this.$root.feedTimeline();
+                    $this.$root.feedTimeline(0);
                 }, function (response) {
                     $this.logError(response);
                 });
@@ -107,7 +108,7 @@
                 let $this = this;
                 let responsePromise = this.$root.reblogUndo(activityId);
                 responsePromise.then(function() {
-                    $this.$root.feedTimeline();
+                    $this.$root.feedTimeline(0);
                 }, function (response) {
                     $this.logError(response);
                 });
@@ -116,7 +117,7 @@
                 let $this = this;
                 let responsePromise = this.$root.shareUndo(activityId);
                 responsePromise.then(function() {
-                    $this.$root.feedTimeline();
+                    $this.$root.feedTimeline(0);
                 }, function (response) {
                     $this.logError(response);
                 });

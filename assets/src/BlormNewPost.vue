@@ -1,4 +1,11 @@
 <template>
+    <div class="BlormContentBoxWhite">
+        <div class="row">
+            <div class="col s12">
+                What happened on your platform? Why don't you share it now?
+            </div>
+        </div>
+    </div>
     <div class="BlormWidgetContainer">
         <div id="BlormNewPost" class="BlormWidgetFormNewPost">
             <form @submit.prevent="submit_new_post" enctype="multipart/form-data">
@@ -135,7 +142,7 @@
                     $this.headline = null;
                     $this.text = null;
                     $this.file = null;
-                    $this.$root.feedTimeline();
+                    $this.$root.feedTimeline(0);
                     postSelect.val(0).prop('selected', true);
                     postWidget.style.animation = "newPostInAnimation 1s ease 0s 1 normal forwards";
                     postEnabler.prop('disabled', false);

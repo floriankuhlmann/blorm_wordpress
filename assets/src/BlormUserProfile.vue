@@ -1,8 +1,11 @@
 <template>
     <div class="BlormWidgetContainer">
+        <!-- <div id="BlormNotifications" class="BlormNotifications BlormContentBoxWhite">
+            <h4><span class="material-icons">person</span><span class="BlormContentTextBox">{{userData.blormhandle}}</span></h4>
+        </div>-->
         <!-- App -->
-        <div id="BlormUserProfile" class="BlormUserProfile">
-            <div class="BlormUserProfileBox">
+        <div id="BlormUserProfile" class="BlormUserProfile BlormContentBoxWhite">
+            <div>
                 <div id="BlormUserProfileNameBox" class="BlormUserProfileNameBox">
                     <b>Name:</b><br> {{userData.name}}<br>
                     <b>Handle:</b><br> {{userData.blormhandle}}
@@ -30,7 +33,11 @@
 </template>
 
 <script>
+    import BlormNotificationFeed from "./BlormNotificationFeed.vue";
     export default {
+        components: {
+            BlormNotificationFeed,
+        },
         computed: {
             userData () {
                 return this.$store.state.user;

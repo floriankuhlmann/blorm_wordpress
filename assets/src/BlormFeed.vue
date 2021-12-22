@@ -1,13 +1,12 @@
 <template>
     <div class="BlormWidgetContainer">
-        <div class="BlormFeedHeader">
+      <!-- <div class="BlormFeedHeader BlormContentBoxWhite">
             <div class="row">
                 <div class="col s12">
-                    What happened on your platform? Why don't you share it now?
-                    <img :src="getIconUrl" class="blormIcon">
+                    <blorm-notification-feed></blorm-notification-feed>
                 </div>
             </div>
-        </div>
+        </div>-->
         <div id="BlormFeed" class="Blormfeed">
             <div class="row">
                 <div v-if="feedHasPosts" class="col s12">
@@ -26,10 +25,12 @@
 
 <script>
     import blormfeedpost from "./BlormFeedPost.vue";
+    //import BlormNotificationFeed from "./BlormNotificationFeed.vue";
 
     export default {
         components: {
             blormfeedpost,
+            //BlormNotificationFeed,
         },
         data() {
             return {
@@ -79,5 +80,8 @@
     background-color: rgb(252, 252, 252);
     text-align: left;
     font-weight: bold;
+}
+#dashboard-widgets .postbox-container {
+    width: 33%;
 }
 </style>

@@ -105,6 +105,11 @@ function add_getstream_data_to_head() {
     $bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
 
     if ($bodyObjects == null) {
+        blorm_cron_getstream_user_public_exec();
+        $bodyObjects = json_decode(get_option( 'blorm_getstream_cached_post_data' ));
+    }
+
+    if ($bodyObjects == null) {
         echo "\n<script type=\"text/javascript\">\n";
         echo "console.log('BLORM ERROR: could not load blorm frontend data from cache');\n";
         echo "var blormapp = {postConfig: {},\n blormPosts: {}\n, reblogedPosts: {}\n}\n";
