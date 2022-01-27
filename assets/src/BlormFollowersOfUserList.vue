@@ -1,6 +1,6 @@
 <template>
     <div class="BlormFollowersOfUserListUser">
-        <div v-on:click="showUser"  class="BlormFollowersOfUserListUserImg">
+        <div v-on:click="loadUserPage"  class="BlormFollowersOfUserListUserImg">
             <span v-if="follower.Person.photo_url.length">
                 <img v-bind:src="follower.Person.photo_url">
             </span>
@@ -13,7 +13,7 @@
     export default {
         props: ['follower'],
         methods:  {
-            showUser: function () {
+            loadUserPage: function () {
                 console.log(this.follower.Person.id);
                 this.$root.loadUserPage(this.follower.Person.id);
             },

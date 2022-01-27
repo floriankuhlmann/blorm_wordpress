@@ -1,5 +1,5 @@
 <template>
-    <div class="BlormFeedAction" :data-activityid="post.activityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">
+    <div class="BlormFeedAction" :data-activityid="post.activityId" :data-originactivityid="post.originActivityId" :data-objectiri="post.object.iri" :data-objecttype="post.object.type">
         <hr>
         <button v-on:click="postShare($event)">share in timline</button> | <button v-on:click="postReblog($event)">reblog</button>
         <hr>

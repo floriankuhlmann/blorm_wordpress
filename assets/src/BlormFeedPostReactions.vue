@@ -104,7 +104,8 @@
                 return this.post.comments.hasReactions;
             },
             handleClick(tab, event) {
-                console.log(tab, event)
+              this.logMsgToCons("BlormFeedPostReaction tab:", tab);
+              this.logMsgToCons("BlormFeedPostReaction event:", event);
             },
         },
     }

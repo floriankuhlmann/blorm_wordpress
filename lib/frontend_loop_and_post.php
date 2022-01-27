@@ -34,7 +34,7 @@ function blorm_add_posttype_blorm_to_loop($query ) {
                 if (isset($options_cat['blorm_category_show_reblogged'])) {
                     if (is_category($options_cat['blorm_category_show_reblogged'])) {
                         if( $query->is_category($options_cat['blorm_category_show_reblogged'])) {
-                            $query->set( 'post_type', array( 'blormpost' ));
+                            $query->set( 'post_type', array('nav_menu_item', 'post',  'blormpost' ));
                             return $query;
                         }
                     }

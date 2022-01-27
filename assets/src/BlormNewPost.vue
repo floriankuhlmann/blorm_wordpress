@@ -21,7 +21,6 @@
                         <label for="headline">Headline</label>
                         <input v-model="headline" id="headline" type="text" class="validate">
                         <span class="helper-text headline" data-error="wrong"></span>
-
                     </div>
                     <div class="textarea-wrap margin-bottom-10" id="description-wrap">
                         <label for="teasertext" >Your teasertext</label>

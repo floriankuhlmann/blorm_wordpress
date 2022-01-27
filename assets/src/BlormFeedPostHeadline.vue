@@ -1,32 +1,32 @@
 <template>
-    <div class="blorm-feed-post-headline">
+    <div class="BlormFeedPostHeadline">
         <div style="margin-bottom: 0.5rem;">
             <i style="color:grey">{{renderDate}}</i>
         </div>
         <div>
-            <img :src="renderIcon" style="height: 1.5rem; margin-bottom:-0.5rem; margin-right: 0.5rem;">
-            <template v-if="isOwner">
-                <b>{{renderUser}} {{renderAction}}</b>
+            <img :src="renderIcon" style="height: 1rem; margin-bottom:-0.25rem; margin-right: 0.25rem;">
+            <template v-if="isAccount">
+                <b>Thank you for {{renderAction}}</b>
             </template>
             <template v-else>
                 <b><span v-on:click="feedUser()" class="BlormFeedHeadlineUser">{{renderUser}}</span> {{renderAction}}</b>
             </template>
         </div>
     </div>
-    <span v-if="isOwner">
+    <span v-if="isAccount">
         <template v-if="post.object.verb === 'create'">
             <div class="BlormFeedEdit--Mod">
-                <button v-on:click="postDelete(post.activityId)">delete</button>
+                <button v-on:click="undoPost('delete',post.activityId)">delete</button>
             </div>
         </template>
         <template v-if="post.object.verb === 'reblog'">
             <div class="BlormFeedEdit--Mod">
-                <button v-on:click="reblogUndo(post.activityId)">undo</button>
+                <button v-on:click="undoPost('delete',post.activityId)">undo</button>
             </div>
         </template>
         <template v-if="post.object.verb === 'share'">
             <div class="BlormFeedEdit--Mod">
-                <button v-on:click="shareUndo(post.activityId)">undo</button>
+                <button v-on:click="undoPost('delete',post.activityId)">undo</button>
             </div>
         </template>
     </span>
@@ -66,28 +66,40 @@
                 let action = "";
                 switch (this.post.object.verb) {
                     case "share":
-                        action = "shared this";
-                        break;
+                      if (this.isAccount) {
+                        action = "sharing:";
+                      } else {
+                        action = "shared:";
+                      }
+                      break;
                     case "reblog":
-                        action = "reblogged this";
-                        break;
+                      if (this.isAccount) {
+                        action = "rebloging:";
+                      } else {
+                        action = "rebloged:";
+                      }
+                      break;
                     case "create":
-                        action = "posted this";
-                        break;
+                      if (this.isAccount) {
+                        action = "posting:";
+                      } else {
+                        action = "posted:";
+                      }
+                      break;
                     default:
-                        action = "";
-                        break;
+                      action = "";
+                      break;
                 }
                 return action;
             },
             renderUser: function() {
-                if (this.post.isOwner) {
-                    return "You";
+                if (this.isAccount) {
+                    return "you";
                 }
                 return this.post.actor.name;
             },
-            isOwner: function() {
-                return this.post.isOwner;
+            isAccount: function() {
+              return this.$root.isAccountDataOnDisplay(this.post.actor.id);
             },
         },
         methods: {
@@ -95,32 +107,26 @@
                 console.log(this.post.actor.id);
                 this.$root.loadUserPage(this.post.actor.id);
             },
-            postDelete: function (activityId) {
-                let $this = this;
-                let responsePromise = this.$root.postDelete(activityId);
-                responsePromise.then(function() {
-                    $this.$root.feedTimeline(0);
-                }, function (response) {
-                    $this.logError(response);
-                });
-            },
-            reblogUndo: function (activityId) {
-                let $this = this;
-                let responsePromise = this.$root.reblogUndo(activityId);
-                responsePromise.then(function() {
-                    $this.$root.feedTimeline(0);
-                }, function (response) {
-                    $this.logError(response);
-                });
-            },
-            shareUndo: function (activityId) {
-                let $this = this;
-                let responsePromise = this.$root.shareUndo(activityId);
-                responsePromise.then(function() {
-                    $this.$root.feedTimeline(0);
-                }, function (response) {
-                    $this.logError(response);
-                });
+            undoPost: function (verb, activityId) {
+              let $this = this;
+              let responsePromise = new Promise(function() {
+                $this.$root.reloadAccountPage();
+              }, function (response) {
+                $this.logError(response);
+              });
+              switch(verb) {
+                case "delete":
+                  responsePromise = this.$root.postDelete(activityId);
+                  break;
+
+                case "reblog":
+                  responsePromise = this.$root.reblogUndo(activityId);
+                  break;
+
+                case "share":
+                  responsePromise = this.$root.shareUndo(activityId);
+                  break;
+              }
             },
             logError: function(response) {
                 this.$root.logError("reblogUndo", response);

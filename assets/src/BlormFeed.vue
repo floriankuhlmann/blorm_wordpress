@@ -1,12 +1,14 @@
 <template>
     <div class="BlormWidgetContainer">
-      <!-- <div class="BlormFeedHeader BlormContentBoxWhite">
-            <div class="row">
-                <div class="col s12">
-                    <blorm-notification-feed></blorm-notification-feed>
-                </div>
+        <div class="BlormFeedHeader BlormContentBoxWhite">
+            <div class="BlormFeedHeaderLeft">
+            &nbsp;   <a href="#"><span class="material-icons" v-on:click="reloadPage()">replay</span></a>
+                <a href="/wp-admin/admin.php?page=blorm-plugin"><span class="material-icons">settings</span></a>
             </div>
-        </div>-->
+            <div class="BlormFeedHeaderRight">
+                    <blorm-notification-feed></blorm-notification-feed>
+            </div>
+        </div>
         <div id="BlormFeed" class="Blormfeed">
             <div class="row">
                 <div v-if="feedHasPosts" class="col s12">
@@ -25,12 +27,12 @@
 
 <script>
     import blormfeedpost from "./BlormFeedPost.vue";
-    //import BlormNotificationFeed from "./BlormNotificationFeed.vue";
+    import BlormNotificationFeed from "./BlormNotificationFeed.vue";
 
     export default {
         components: {
             blormfeedpost,
-            //BlormNotificationFeed,
+            BlormNotificationFeed,
         },
         data() {
             return {
@@ -39,20 +41,28 @@
             };
         },
         props: [],
+        methods: {
+          reloadPage: function () {
+              this.$root.reloadAccountPage();
+          }
+        },
         computed: {
             posts () {
                 let posts = [];
+                //let $this = this;
                 Array.from(this.$store.state.feed).forEach(function(post){
 
                     if (post.error === false ) {
                        posts.push(post);
                     }
                     if (post.error === true ) {
+                      if (this.$store.state.logToConsole) {
                         console.log("feed-error: post is not vaild:");
                         console.log(post.activityId );
                         console.log(post.errortype);
+                      }
                     }
-                });
+                },this);
                 return posts;
             },
             getBlormHandle () {
@@ -73,6 +83,31 @@
 </script>
 
 <style lang="css">
+.BlormFeedHeader {
+  display: block;
+}
+.BlormFeedHeader div {
+  width: 50%;
+  display: inline-block;
+}
+
+.BlormFeedHeaderLeft {
+  text-align: left;
+}
+
+.BlormFeedHeaderLeft a {
+  font-size: 24px;
+}
+
+.BlormFeedHeaderRight a:hover,
+.BlormFeedHeaderLeft a:hover {
+  color: #3c434a;
+}
+
+.BlormFeedHeaderRight {
+  text-align: right;
+}
+
 .BlormfeedNoPostData {
     margin-bottom: 1rem;
     padding: 0.5rem 0.5rem 0.5rem 0.5rem;

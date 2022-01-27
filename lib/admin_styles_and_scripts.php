@@ -65,9 +65,7 @@ function getConfigJs() {
                         \"website_type\": \"*\",
                         \"website_id\": \"*\",
                     }
-                };\n
-                blormapp.user = blormapp.account;
-                ";
+                };\n";
 
     if ($blormUserAccountData->error != null) {
         $jsdata .= $userdata;
@@ -103,9 +101,7 @@ function getConfigJs() {
                         teasertext:\"".$teasertext."\"
                         },\n";
     }
-    $userdata .=  "]\n
-                };\n
-                blormapp.user = blormapp.account;\n";
+    $userdata .=  "]};\n";
 
     $jsdata .= $userdata;
 

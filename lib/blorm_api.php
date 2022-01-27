@@ -202,7 +202,7 @@ function preRequestLocalPostsUpdate(&$request) {
                 $thumbId = get_post_thumbnail_id($the_query[0]->ID);
                 delete_post_meta($thumbId, "_wp_attached_file");
                 delete_post_meta($thumbId, "_wp_attachment_metadata");
-                delete_post_meta($the_query[0]->I, "_thumbnail_id");
+                delete_post_meta($the_query[0]->ID, "_thumbnail_id");
 
                 // delete the thumbnail in post
                 wp_delete_post($thumbId);

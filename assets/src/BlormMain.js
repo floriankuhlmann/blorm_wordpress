@@ -19,14 +19,17 @@ import BlormUserName from './BlormUserName.vue'
 const store = createStore({
     state: {
         account: blormapp.account,
-        user: blormapp.user,
+        user: {},
         followingUsers: {},
         followersOfUser: {},
         recentPosts: blormapp.recentPosts,
         feed: {},
         feedLimit: 25,
         feedOffset: 0,
+        notifications: {},
+        notificationsRead: [],
         isAuthenticated: false,
+        logToConsole: true,
     },
     mutations: {
         setUserData (state, f) {
@@ -46,6 +49,12 @@ const store = createStore({
         },
         setFeedOffset (state, f) {
             state.feedOffset = f;
+        },
+        setNotifications (state, f) {
+            state.notifications = f;
+        },
+        addReadNotification (state, f) {
+            state.notificationsRead.push(f);
         },
         isAuthenticated(state, f) {
             state.isAuthenticated = f;

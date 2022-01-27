@@ -10,7 +10,7 @@
             return {}
         },
         mounted: function () {
-            console.log(this.reblogReaction);
+            //console.log(this.reblogReaction);
         },
         computed: {
             getblormhandle: function() {

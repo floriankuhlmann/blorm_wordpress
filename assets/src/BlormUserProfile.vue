@@ -1,7 +1,7 @@
 <template>
     <div class="BlormWidgetContainer">
-        <!-- <div id="BlormNotifications" class="BlormNotifications BlormContentBoxWhite">
-            <h4><span class="material-icons">person</span><span class="BlormContentTextBox">{{userData.blormhandle}}</span></h4>
+      <!-- <div id="BlormNotifications" class="BlormNotifications BlormContentBoxWhite">
+      <h4><span class="material-icons"></span><span class="BlormContentTextBox">Update</span></h4>
         </div>-->
         <!-- App -->
         <div id="BlormUserProfile" class="BlormUserProfile BlormContentBoxWhite">

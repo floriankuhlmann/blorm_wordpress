@@ -45,7 +45,7 @@
             },
             feedUser: function(id) {
                 console.log(feedUser);
-                this.$root.feedUser(id);
+                this.$root.loadUserPage(id);
             },
         }
     };

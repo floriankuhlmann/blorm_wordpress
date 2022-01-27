@@ -41,7 +41,7 @@
         },
         methods: {
             commentItemUserFeed: function() {
-                this.$root.loadUserPage(this.commentItem.user.id);
+                this.$root.loadPage(this.commentItem.user.id);
             },
         }
     };

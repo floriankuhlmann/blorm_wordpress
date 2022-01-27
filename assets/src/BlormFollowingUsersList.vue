@@ -1,6 +1,6 @@
 <template>
     <div class="BlormFollowListUser">
-        <div v-on:click="showUser" class="BlormFollowListUserImg">
+        <div v-on:click="loadUserPage" class="BlormFollowListUserImg">
             <span v-if="followingUser.Person.photo_url.length">
                 <img v-bind:src="followingUser.Person.photo_url">
             </span>
@@ -24,7 +24,7 @@
             },
         },
         methods:  {
-            showUser: function () {
+            loadUserPage: function () {
                 this.$root.loadUserPage(this.followingUser.Person.id);
             },
             confirmUnfollow: function() {

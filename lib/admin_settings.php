@@ -25,7 +25,67 @@ function blorm_plugin_options_page_submit() {
 	$blorm_plugin_options_api = array();
 	$blorm_plugin_options_frontend = array();
 
-    if ( isset( $_POST['_wpnonce'] ) && $_GET['page'] == 'blorm-plugin') {
+    // blorm-plugin-reset-cache-and-data-section
+    if ( isset( $_POST['_wpnonce'] ) && $_GET['page'] == 'blorm-plugin' && $_POST['option_page'] == 'blorm-plugin-reset-cache-and-data-section') {
+        if (isset( $_POST['deletereblog'] )) {
+            if ( $_POST['deletereblog'] == true ){
+                $blormPosts = get_posts(array('post_type' => 'blormpost'));
+                foreach ($blormPosts as $blormPost) {
+                    $id = $blormPost->ID;
+                    delete_post_meta($id,"blorm_reblog_teaser_image");
+                    delete_post_meta($id,"blorm_reblog_teaser_url");
+                    delete_post_meta($id,"blorm_reblog_object_iri");
+                    delete_post_meta($id,"blorm_reblog_activity_id");
+                    // delete the attached thumbnail in post meta
+                    $thumbId = get_post_thumbnail_id($id);
+                    delete_post_meta($thumbId, "_wp_attached_file");
+                    delete_post_meta($thumbId, "_wp_attachment_metadata");
+                    delete_post_meta($id, "_thumbnail_id");
+
+                    // delete the thumbnail in post
+                    wp_delete_post($thumbId);
+
+                    // delete the file in media
+                    wp_delete_attachment($id, true);
+
+                    // finaly delete the post
+                    wp_delete_post($id);
+                }
+
+                $recent_create_posts_by_meta = wp_get_recent_posts(array('meta_key' => 'blorm_create_activity_id'));
+                foreach ($recent_create_posts_by_meta as $post) {
+                    delete_post_meta( $post["ID"],"blorm_create_activity_id");
+                    delete_post_meta( $post["ID"],"blorm_create");
+                }
+            }
+        }
+
+        if (isset( $_POST['cacheposts'] )) {
+            if ( $_POST['cacheposts'] == true ){
+                update_option( 'blorm_getstream_cached_post_data', '');
+            }
+        }
+
+        if (isset( $_POST['cacheuser'] )) {
+            if ( $_POST['cacheuser'] == true ){
+                update_option( 'blorm_getstream_cached_user_data', '');
+                update_option( 'blorm_getstream_cached_following_users_data', '');
+                update_option( 'blorm_getstream_cached_followers_data', '');
+            }
+        }
+
+        if (isset( $_POST['cachereload'] )) {
+            if ( $_POST['cachereload'] == true ){
+                blorm_cron_getstream_user_exec();
+                blorm_cron_getstream_user_public_exec();
+                blorm_cron_getstream_update_followers_exec();
+                blorm_cron_getstream_update_following_users_exec();
+            }
+        }
+    }
+
+    // blorm-plugin-section
+    if ( isset( $_POST['_wpnonce'] ) && $_GET['page'] == 'blorm-plugin' && $_POST['option_page'] == 'blorm-plugin-section') {
 		if( wp_verify_nonce( $_POST['_wpnonce'], 'blorm-plugin-section-options' )) {
 
 			$blorm_plugin_options_api['api_key'] = trim($_POST['blorm_plugin_options_api']['api_key']);
@@ -43,7 +103,6 @@ function blorm_plugin_options_page_submit() {
 
 			// blorm_plugin_options_category[blorm_category_show_reblogged]
 			if (sizeof($_POST['blorm_plugin_options_category']) != 0) {
-
 
 				// get options
 				$options = get_option( 'blorm_plugin_options_category' );
@@ -77,10 +136,10 @@ function blorm_plugin_options_page_submit() {
 				}
 
                 // update the user and frontend cache
-                blorm_cron_getstream_user_exec();
+                /*blorm_cron_getstream_user_exec();
                 blorm_cron_getstream_user_public_exec();
                 blorm_cron_getstream_update_followers_exec();
-                blorm_cron_getstream_update_following_users_exec();
+                blorm_cron_getstream_update_following_users_exec();*/
 				update_option('blorm_plugin_options_category', $_POST['blorm_plugin_options_category']);
 			}
 		}
@@ -102,12 +161,18 @@ function blorm_render_options_page() {
         do_settings_sections( 'blorm-plugin-category-section' );
         echo "<hr>";
         do_settings_sections( 'blorm-plugin-frontend-section' );?>
-        <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
+        <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'SAVE' ); ?>" />
+    </form>
+    <br><br>
+    <form action="<?php menu_page_url( 'blorm-plugin' ) ?>" method="post">
+         <?php
+        settings_fields( 'blorm-plugin-reset-cache-and-data-section' );
+         echo "<hr>";
+         do_settings_sections( 'blorm-plugin-reset-cache-and-data-section' );?>
+            <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'RESET & DELETE' ); ?>" />
     </form>
     <?php
 }
-
-
 
 /*
  * https://developer.wordpress.org/reference/functions/add_settings_field/
@@ -116,14 +181,52 @@ function blorm_render_options_page() {
 /*
  *  api config
  */
+add_action( 'admin_init', 'blorm_reset_cache_and_data_section' );
+function blorm_reset_cache_and_data_section() {
 
+    // api key
+    add_settings_section(
+        'blorm-plugin-reset-cache-and-data-section',
+        'Reset cache and delete all Blorm data',
+        'blorm_plugin_reset_cache_and_data_section_text',
+        'blorm-plugin-reset-cache-and-data-section' );
+
+    add_settings_field(
+        'blorm_plugin_reset',
+        'Reset and delete:',
+        'blorm_plugin_reset',
+        'blorm-plugin-reset-cache-and-data-section',
+        'blorm-plugin-reset-cache-and-data-section' );
+
+}
+
+function blorm_plugin_reset_cache_and_data_section_text() {
+    echo "If you click here you can delete all blorm posts, cache and userdata on your local system.
+            <br><b>Please rethink twice before you click.</b>";
+}
+
+function blorm_plugin_reset() {
+
+    ?>
+    <input type="checkbox" id="deletereblog" name="deletereblog" value="true">
+    <label for="deletereblog"> Delete the rebloged posts</label><br>
+    <input type="checkbox" id="cacheposts" name="cacheposts" value="true">
+    <label for="cacheposts">Reset the posts data cache</label><br>
+    <input type="checkbox" id="cacheuser" name="cacheuser" value="true">
+    <label for="cacheuser">Reset the user data cache</label><br>
+    <input type="checkbox" id="cachereload" name="cachereload" value="true">
+    <label for="cacheuser">Reload cache data</label><br>
+    <?php
+
+}
+
+/*
+ *  api config
+ */
 add_action( 'admin_init', 'blorm_register_settings_api' );
 function blorm_register_settings_api() {
 
-    //register_setting( 'blorm-plugin-api-section', 'blorm_plugin_options_api', 'blorm_plugin_options_api_validate' );
-
     // api key
-
     add_settings_section(
             'blorm-plugin-api-section',
             'API Settings',
