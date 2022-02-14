@@ -3,7 +3,7 @@
         <span :class="{ blormNotificationElDropdownMenuIsRead: blormNotificationElDropdownMenuIsRead }">
         <i>
           <span v-on:click="showFeedUser()" class="blorm-notification-el-dropdown-menu-link">{{getUserName}}</span>
-        </i>{{getVerb}} your post&nbsp;
+        </i>{{getVerb}}
         <i>
           <span v-on:click="showSinglePost()" class="blorm-notification-el-dropdown-menu-link">{{getObject}}</span>
         </i>
@@ -57,11 +57,11 @@
           getVerb: function() {
             switch (this.notification.verb) {
               case "share":
-                return "shared";
+                return "shared your post&nbsp;";
               case "follow":
-                return "followed";
+                return "is following you now";
               case "reblog":
-                return "rebloged";
+                return "rebloged your post&nbsp;";
             }
           },
           getClassReadingStatus: function () {
