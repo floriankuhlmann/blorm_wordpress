@@ -32,6 +32,7 @@
             if (this.blormNotificationElDropdownMenuIsRead === false) {
               this.blormNotificationElDropdownMenuIsRead = true;
               this.$store.commit('addSeenNotification', this.notification.notificationGroupId);
+              this.$root.feedNotification();
               console.log(this.$store.state.notificationsRead);
               console.log(this.blormNotificationElDropdownMenuIsRead);
             }
@@ -57,11 +58,11 @@
           getVerb: function() {
             switch (this.notification.verb) {
               case "share":
-                return "shared your post&nbsp;";
+                return "shared your post ";
               case "follow":
                 return "is following you now";
               case "reblog":
-                return "rebloged your post&nbsp;";
+                return "rebloged your post ";
             }
           },
           getClassReadingStatus: function () {

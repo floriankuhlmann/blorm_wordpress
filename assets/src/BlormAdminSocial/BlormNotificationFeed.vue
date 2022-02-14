@@ -61,6 +61,7 @@
             let length = this.$store.state.notifications.length;
             if (length < 1) { length = "none"; }
             if (length > 9) { length = "9_plus"; }
+            if (length === "undefined") { length = "none"}
 
             return "filter_"+length;
 
