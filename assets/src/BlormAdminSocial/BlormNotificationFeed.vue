@@ -58,6 +58,10 @@
           },
           numberOfNotifications: function() {
 
+            if (this.$store.state.notifications.length === undefined) {
+              return "filter_none";
+            }
+
             let length = this.$store.state.notifications.length;
             if (length < 1) { length = "none"; }
             if (length > 9) { length = "9_plus"; }
