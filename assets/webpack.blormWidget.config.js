@@ -6,8 +6,8 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-    //mode: 'production',
-    mode: 'development',
+    mode: 'production',
+    //mode: 'development',
     entry: {
         blormwidget: "./src/BlormWidget/main.js",
     },
