@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 // add ajax methods
 

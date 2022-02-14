@@ -1,0 +1,325 @@
+// Define variable defaults
+$body-bg: #000;
+$body-color: #111;
+$popover-border-width: 1px;
+$popover-border-color: #fff;
+$popover-arrow-width: 20px;
+$popover-arrow-height: 20px;
+$popover-border-radius: 50;
+$popover-bg: #000;
+$popover-body-color: #fff;
+$popover-header-color: #ffff94;
+$popover-header-bg: #000;
+$popover-inner-border-radius: 0;
+$blorm-widget-font-size: 14px;
+$blorm-secondary-color: #ffff94;
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../font/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 0.8em;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1em;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.blormpost span.material-icons,
+.blorm-shared span.material-icons,
+.blorm-display-posts-widget-element-title span.material-icons {
+  padding-right: 0.1rem;
+}
+
+.blormWidgetImagelayerBlormIcon.topleft {
+  top:0;
+  left:0;
+  background-image: url("../images/blorm_icon_bubble_left_top_sw.png");
+}
+
+.blormWidgetImagelayerBlormIcon.topright {
+  top:0;
+  right:0;
+  background-image: url("../images/blorm_icon_bubble_right_top_sw.png");
+}
+
+.blormWidgetImagelayerBlormIcon.bottomleft {
+  bottom:0;
+  left:0;
+  background-image: url("../images/blorm_icon_bubble_left_bottom_sw.png");
+}
+
+.blormWidgetImagelayerBlormIcon.bottomright {
+  bottom:0;
+  right:0;
+  background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
+}
+
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.alignLeft{
+  background-image: url("../images/blorm_icon_bubble_left_bottom_sw.png");
+  background-position: left bottom;
+  left:0;
+}
+
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.alignRight{
+  background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
+  background-position: right bottom;
+  right:0;
+}
+
+
+.popover{
+  border: $popover-border-width dashed $popover-border-color;
+  border-radius: 0;
+  font-size: $blorm-widget-font-size;
+
+  .arrow {
+
+    &::before,
+    &::after {
+      border-style: dashed;
+      //background-color: $popover-header-bg;
+    }
+  }
+}
+
+.bs-popover-top > .arrow::after, .bs-popover-auto[x-placement^="top"] > .arrow::after {
+  border-top-color: #000;
+}
+
+.popover-header,
+.popover-body {
+  color: $popover-body-color;
+  background-color: $popover-header-bg;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  font-size: $blorm-widget-font-size;
+  h1,h2,h3,h4,h5,h6,p {
+    font-size: 1rem;
+  }
+}
+
+.popover-body a {
+  text-decoration: underline;
+  color: $blorm-secondary-color;
+}
+
+.blormWidgetImageWrapper {
+  position: relative;
+}
+
+.blormWidgetImagelayerBlormIcon {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg{
+  position: absolute;
+  width: 20% !important;
+  height: auto;
+  top: 10px !important;
+  left: 10px !important;
+}
+
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget {
+  position: absolute;
+  bottom:0;
+  padding: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.size5050 {
+  width: 50%;
+  height: 50%;
+}
+
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.size10050 {
+  width: 100%;
+  height: 50%;
+}
+
+.blorm-display-posts-widget-element .blorm-display-posts-widget-element-title {
+  font-weight: bold;
+  padding: 0.5em;
+}
+
+.blorm-display-posts-widget-element .blorm-display-posts-widget-element-image {
+  padding: 0.5em;
+}
+
+.blorm-display-posts-widget-element .blorm-display-posts-widget-element-excerpt {
+  padding: 0.5em;
+}
+
+// Then import Bootstrap an BootstrapVue SCSS files (order is important)
+.blormWidgetContainer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width:100%;
+  .material-icons {
+    font-size: 0.8rem;  /* Preferred icon size */
+    line-height: 1rem;
+  }
+
+}
+
+.blormWidgetContainerMenu {
+
+
+
+
+}
+
+
+.blormWidgetContainerMenu {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: $blorm-widget-font-size;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  font-weight: normal;
+
+  &.alignRight {
+    right:0;
+  }
+
+  &.alignLeft {
+    left:0;
+  }
+
+  .blormWidgetSocialReactions {
+    display: inline-flex;
+    flex-direction: row;
+    border: 1px black dashed;
+    font-size: 1rem;
+  }
+
+  .blormWidgetSocialReactions span{
+    padding: 0.05rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  .blormWidgetSocialReactions span.material-icons{
+    font-size: 1rem;
+    line-height: 1rem;
+  }
+
+ /*.material-icons {
+    font-size: 0.8rem;
+  }*/
+}
+
+
+.blormWidgetOrigin .blormWidgetOriginLink {
+  text-decoration: underline;
+  color: #000;
+  font-size: 0.8rem;
+}
+
+.blormWidgetContentLink {
+  font-size: $blorm-widget-font-size;
+  color: $popover-body-color;
+  text-decoration: none;
+}
+
+.blormWidgetContentLink:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+.alignRight .blormWidgetOrigin {
+  text-align: right;
+}
+
+.blormWidgetContentLinkBreak {
+  color: #fff;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
+}
+
+.blormWidgetContainer {
+  .blormWidgetContainerMenu {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
+.size10050 {
+  .blormWidgetContainer {
+    .blormWidgetContainerMenu {
+      margin:5px;
+    }
+  }
+}
+
+.size5050 {
+  .blormWidgetContainer {
+    .blormWidgetContainerMenu {
+      margin:10px;
+    }
+  }
+}
+
+.blormWidgetSocialReactions div{
+  cursor: pointer;
+  padding: 0.1rem 0.5rem 0.1rem 0.25rem;
+  transition: 0.6s;
+  display: inline-flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.blormWidgetSocialReactionsElementActive,
+.blormWidgetSocialReactions div:hover{
+  background-color: #000;
+  color: #ffff94;
+}
+
+.blormWidgetPlusLogoIcon {
+  width:2rem;
+  background-image: url("../images/blorm_icon_black_1.png");
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: center;
+}
+
+.blormWidgetPlusLogoIcon.active,
+.blormWidgetPlusLogoIcon:hover {
+  background-image: url("../images/blorm_icon_white_1.png");
+  background-color: #000;
+}
+
+.blormWidgetContainerMenu .blormWidgetOrigin {
+  height: 1rem;
+  line-height: 1rem;
+  display: inline;
+}

@@ -547,6 +547,7 @@ class blorm_menue_bar {
         // the div layer for the blormwidget with the menue
         let divLayerWidget = document.createElement('div');
         divLayerWidget.classList.add("blormWidgetImagelayerWidget");
+        /* get the menue widget */
         divLayerWidget.append(blormMenuBar.GetWidget());
 
         let divLayerBlormIconImg = document.createElement('img');

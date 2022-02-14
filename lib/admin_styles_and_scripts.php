@@ -19,7 +19,7 @@ function enqueue_blorm_admin_theme_style() {
     if (is_admin() && $pagenow == 'index.php') {
 
 
-        wp_enqueue_script('blorm-admin-theme-app', plugins_url('../assets/js/blorm_app.js', __FILE__), '','',true);
+        wp_enqueue_script('blorm-admin-theme-app', plugins_url('../assets/js/blormAdminSocialApp.js', __FILE__), '','',true);
 
         /* Wordpress API backbone.js */
         wp_enqueue_script('wp-api');

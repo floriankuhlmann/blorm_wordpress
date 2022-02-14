@@ -513,7 +513,7 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionTop = $options['position_widget_menue_adjust_positionTop'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionTop\">Move widget to the top: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionTop\">Widget margin-top: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionTop\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionTop]\" value=\"".$value_positionTop."\" maxlength=\"4\" size=\"4\">";
 
     // margin right
@@ -522,7 +522,7 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionRight = $options['position_widget_menue_adjust_positionRight'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionRight\">Move widget to the right: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionRight\">Widget margin-right: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionRight\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionRight]\" value=\"".$value_positionRight."\" maxlength=\"4\" size=\"4\">";
 
     // margin bottom
@@ -531,7 +531,7 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionBottom = $options['position_widget_menue_adjust_positionBottom'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\">Move widget to the bottom: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\">Widget margin-bottom: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionBottom\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionBottom]\" value=\"".$value_positionBottom."\" maxlength=\"4\" size=\"4\">";
 
     // margin left
@@ -540,7 +540,7 @@ function blorm_plugin_setting_add_blorm_widget_position() {
 		$value_positionLeft = $options['position_widget_menue_adjust_positionLeft'];
 	}
 
-	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\">Move widget to the left: </label>";
+	echo "<br><br><label for=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\">Widget margin-left: </label>";
 	echo "<input type=\"number\" id=\"blorm_plugin_options_frontend-position_widget_menue_adjust_positionLeft\" name=\"blorm_plugin_options_frontend[position_widget_menue_adjust_positionLeft]\" value=\"".$value_positionLeft."\" maxlength=\"4\" size=\"4\">";
 
 

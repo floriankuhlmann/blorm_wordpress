@@ -30,133 +30,50 @@
     font-feature-settings: 'liga';
 }
 
-
-/*.blormwidget-on-image-post a span.material-icons,
-.blormwidget-add-to-content a span.material-icons,*/
 .blormpost span.material-icons,
 .blorm-shared span.material-icons,
 .blorm-display-posts-widget-element-title span.material-icons {
-    padding-right: 0.5rem;
+    padding-right: 0.1rem;
 }
 
-/*.blorm-post-content-container {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.blormpost .blorm-icon {
-    height: 1em;
-    line-height: 1em;
-}
-
-.blormpost .blorm-icon img {
-    height: 0.75em;
-    width: auto;
-    padding-right: 0.5rem;
-}*/
-
-.blormWidgetImageWrapper {
-    position: relative;
-}
-
-div.blormWidgetImagelayerBlormIcon {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    background-position: right bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-div.blormWidgetImagelayerBlormIcon.topleft {
+.blormWidgetImagelayerBlormIcon.topleft {
     top:0;
     left:0;
-    background-image: url("../images/blorm_icon_bubble_left_top_sw.png");
+    background-image: url("../src/images/blorm_icon_bubble_left_top_sw.png");
 }
 
-div.blormWidgetImagelayerBlormIcon.topright {
+.blormWidgetImagelayerBlormIcon.topright {
     top:0;
     right:0;
-    background-image: url("../images/blorm_icon_bubble_right_top_sw.png");
+    background-image: url("../src/images/blorm_icon_bubble_right_top_sw.png");
 }
 
-div.blormWidgetImagelayerBlormIcon.bottomleft {
+.blormWidgetImagelayerBlormIcon.bottomleft {
     bottom:0;
     left:0;
-    background-image: url("../images/blorm_icon_bubble_left_bottom_sw.png");
+    background-image: url("../src/images/blorm_icon_bubble_left_bottom_sw.png");
 }
 
-div.blormWidgetImagelayerBlormIcon.bottomright {
+.blormWidgetImagelayerBlormIcon.bottomright {
     bottom:0;
     right:0;
-    background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
+    background-image: url("../src/images/blorm_icon_bubble_right_bottom_sw.png");
 }
 
-div.blormWidgetImagelayerBlormIcon img.blormWidgetImagelayerBlormIconImg{
-    position: absolute;
-    width: 20% !important;
-    height: auto;
-    top: 10px !important;
-    left: 10px !important;
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.alignLeft{
+    background-image: url("../src/images/blorm_icon_bubble_left_bottom_sw.png");
+    background-position: left bottom;
+    left:0;
 }
 
-div.blormWidgetImageWrapper .blormWidgetImagelayerWidget {
-    position: absolute;
-    bottom:0;
-    right:0;
-    padding: 0;
-    width: 50%;
-    height: 50%;
-    background-image: url("../images/blorm_icon_bubble_right_bottom_sw.png");
+.blormWidgetImageWrapper .blormWidgetImagelayerWidget.alignRight{
+    background-image: url("../src/images/blorm_icon_bubble_right_bottom_sw.png");
     background-position: right bottom;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-
-/*.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget {
-    width: 75%;
-    height: 75%;
-}*/
-
-/*.blorm-display-posts-widget-element .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget,
-.blorm-shared .blormWidgetImageWrapper .blormWidgetImagelayerWidget .blormWidget,
-.blormpost .blormWidgetImageWrapper */
-div.blormWidgetImagelayerWidget div.blormWidget {
-    position: absolute;
-    color: #000;
-    bottom: 10px;
-    right: 10px;
-}
-
-div.blorm-display-posts-widget-element div.blorm-display-posts-widget-element-title {
-    font-weight: bold;
-    padding: 0.5em;
-}
-
-div.blorm-display-posts-widget-element div.blorm-display-posts-widget-element-image {
-    padding: 0.5em;
-}
-
-div.blorm-display-posts-widget-element div.blorm-display-posts-widget-element-excerpt {
-    padding: 0.5em;
+    right:0;
 }
 
 
-div.blormWidget {
-    position: relative;
-    width:100%;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    color: #000;
-}
-
-
-div.blormWidget .blormWidgetContainerMenu ul,
-div.blormWidget .blormWidgetContainerMenu li,
-div.blormWidget .blormWidgetContainerMenu ol {
-    font-size: 1em !important;
-}
-
+/*
 div.blormWidget .FloatRight {
     float:right;
 }
@@ -185,18 +102,17 @@ div.blormWidget .BorderBottom {
     border-bottom: 1px solid black;
 }
 
+
 div.blormWidget .blormWidgetContainerMenu {
     right: 0;
     padding: 0;
     margin: 5px 0 0 0;
     position: relative;
-    width:200px;
     font-weight: normal;
 }
 
 div.blormWidget .blormWidgetContainerMenu .blormWidgetContainerDisplay {
     display: block;
-    /*height: 52px;*/
 }
 
 /*@media only screen
@@ -206,7 +122,7 @@ and (max-device-width: 860px) {
         height: 52px;
     }
 }*/
-
+/*
 div.blormWidget .blormWidgetContainerMenu .blormWidgetPlus {
     display: block;
     height: 27px;
@@ -252,6 +168,7 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPlusSocial .material-icons
     padding: 0px;
 }
 
+*/
 
 /*
 .blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusBlormInfo ul li img,
@@ -262,15 +179,13 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPlusSocial .material-icons
     width: auto;
     cursor: pointer;
 }*/
-
+/*
 div.blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocial ul li.blormWidgetPlusSocialBarText{
-    /*vertical-align: super;*/
     padding-right: 5px;
 }
 
 div.blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusLogoIcon {
     height: 25px;
-    /*float: right;*/
     padding: 1px 0 0 0;
     margin: 0;
 }
@@ -290,7 +205,6 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusSocia
 
 div.blormWidget .blormWidgetContainerMenu .blormWidgetPlus .blormWidgetPlusLogoIcon img {
     height: 18px;
-    /*margin-top: 2px;*/
     width: auto;
     line-height: 25px;
     cursor: pointer;
@@ -302,12 +216,13 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar {
     margin: 0px;
     width:300px;
     height:0px;
-    /*border:1px solid red;*/
     top: 0px;
     z-index:1000;
     cursor: pointer;
 }
 
+ */
+/*
 div.blormWidget .blormWidgetContainerMenu .blormWidgetPowerbar .blormWidgetPowerbarContent {
     position: relative;
     color:#fff;
@@ -364,7 +279,6 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPowerText {
     color: #333;
     width: 100%;
     /*position: absolute;
-    top: 25px;*/
     display: block;
     height: 25px;
     line-height: 25px;
@@ -383,7 +297,7 @@ div.blormWidget .blormWidgetContainerMenu .blormWidgetPowerText a:hover {
     text-decoration: none !important;
     box-shadow: 0 0 0 0;
 }
-
+*/
 @media only screen
 and (max-device-width: 860px) {
 

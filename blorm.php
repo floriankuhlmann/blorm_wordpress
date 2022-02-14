@@ -54,6 +54,7 @@ require_once plugin_dir_path( __FILE__ ) . 'lib/frontend_loop_and_post.php';
 // blormpost, widget and ajax api
 require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_post.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_api.php';
+require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_rest_api.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/blorm_widget.php';
 
 // the admin area

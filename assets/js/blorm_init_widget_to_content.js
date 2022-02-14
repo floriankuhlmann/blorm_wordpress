@@ -1,3 +1,7 @@
+/*
+**  Blorm Init Widget and add to content
+ */
+
 document.addEventListener("DOMContentLoaded", function() {
 
     function insertAfter(newNode, existingNode) {
@@ -5,7 +9,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     console.log("web-app init: mode content");
-
     let BlormPosts = blormapp.getAllBlormPosts();
 
     Array.from(BlormPosts).forEach(function(BlormPost){
@@ -17,11 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
             let postData = blormapp.getPostById(postId);
 
             if (Object.keys(postData).length !== 0) {
-                blormMenuBar = new blorm_menue_bar(postData);
+                //blormMenuBar = new blorm_menue_bar(postData);
                 if (BlormWidget.parentNode.getAttribute('href') !== null) {
-                    insertAfter(blormMenuBar.GetWidget(), BlormWidget.parentNode);
+                    insertAfter(blormWidgetBuilder.GetBlormWidgetContainerMenu(postData), BlormWidget.parentNode);
                 } else {
-                    BlormWidget.appendChild(blormMenuBar.GetMenue());
+                    BlormWidget.appendChild(blormWidgetBuilder.GetBlormWidgetContainerMenu(postData));
                     console.log("blorm | initialized post id:" + postData.PostId + " for website: "+postData.OriginWebsiteName);
                 }
             }

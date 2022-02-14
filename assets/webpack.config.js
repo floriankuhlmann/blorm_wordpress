@@ -8,11 +8,11 @@ const webpack = require('webpack');
 
 module.exports = (env = {}) => ({
     mode: 'development',
-    entry: path.resolve(__dirname, "./src/BlormMain.js"),
+    entry: path.resolve(__dirname, "./src/BlormAdminSocial/BlormMain.js"),
     output: {
         path: path.resolve(__dirname, "./js"),
         publicPath: "/wp-content/plugins/blorm/assets/js/",
-        filename: 'blorm_app.js',
+        filename: 'blormAdminSocialApp.js',
     },
     watch: true,
     module: {
