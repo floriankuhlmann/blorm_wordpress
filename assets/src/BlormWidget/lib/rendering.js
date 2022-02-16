@@ -38,12 +38,13 @@ export function GetBlormWidgetContainerMenu(blormPost) {
     return SetPosition(blormWidgetContainerMenu,blormapp.postConfig);
 }
 
-
 export function AddMenueToImage(imgEl, blormWidgetContainer) {
 
     // we want to put the thumbnail link on the image INSIDE our div. so we save it here for later usage (end of function)
     // this is little bit annyoing but needed to mak the blorm widget work for mobile click events
-    let imgElOrigLink = imgEl.parentNode;
+
+    // sometimes a thumbnail is wrapped in a div, so we have to look for the a href
+    let imgElOrigLink = checkParentNodeForLink(imgEl);
     let imgElOrigLinkHref = imgElOrigLink.getAttribute('href');
 
     // new image wrapper div
@@ -73,8 +74,6 @@ export function AddMenueToImage(imgEl, blormWidgetContainer) {
     if (divWrapper.offsetWidth >= 400) {
         divLayerWidget.classList.add("size5050");
     }
-    console.log("divWrapper.offsetWidth");
-    console.log(divWrapper.offsetWidth);
 
     /* get the menue widget */
     divLayerWidget.append(blormWidgetContainer);
@@ -126,4 +125,16 @@ function SetPosition(element, config) {
      element.style.marginLeft = config.positionLeft + config.positionUnit;
 
      return element;
+}
+
+function checkParentNodeForLink(node) {
+    // check for 5 parent nodes if it is a link - if the thumbnail is wrapped in more then 5 elememts everything is to late anyway
+    for (let i=0; i < 5; i++) {
+        if (node.getAttribute('href') !== null) {
+            // found a link return the element
+            return node;
+        }
+        node = node.parentNode;
+    }
+    return node;
 }
