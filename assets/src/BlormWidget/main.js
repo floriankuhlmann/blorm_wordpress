@@ -1,6 +1,5 @@
-import * as $ from 'jquery';
-import 'bootstrap';
-import '../../node_modules/bootstrap/scss/bootstrap.scss';
+//import 'bootstrap';
+//import '../../node_modules/bootstrap/scss/_popover.scss';
 import './blormwidget.scss';
 import * as rendering from './lib/rendering.js';
 

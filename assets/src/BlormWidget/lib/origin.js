@@ -1,5 +1,4 @@
-import * as $ from 'jquery';
-import 'bootstrap';
+
 
 export function GetOriginUrl(blormPost) {
 

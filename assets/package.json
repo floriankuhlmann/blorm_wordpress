@@ -4,9 +4,8 @@
     "build": "webpack --config webpack.config.js"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.2",
     "axios": "^0.21.2",
-    "bootstrap": "^4.6.1",
-    "bootstrap-vue": "^2.21.2",
     "css-loader": "^6.6.0",
     "element-plus": "*",
     "jquery": "^3.6.0",
@@ -26,7 +25,6 @@
     "@types/lodash-es": "^4.17.5",
     "@vue/compiler-sfc": "^3.0.0-beta.3",
     "babel-loader": "^8.2.2",
-    "bootstrap-sass": "^3.3.7",
     "file-loader": "^6.0.0",
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",

@@ -1,7 +1,9 @@
 import * as reactions from './reactions.js';
 import * as origin from './origin.js';
 
-
+/*
+** get the widget Menu inside the div.blormWidgetContainer
+ */
 export function GetBlormWidgetContainer(blormPost) {
 
     let blormWidgetContainer = document.createElement("div");
@@ -13,11 +15,9 @@ export function GetBlormWidgetContainer(blormPost) {
 }
 
 /*
-**
+** get the widget Menu without the div.blormWidgetContainer
  */
 export function GetBlormWidgetContainerMenu(blormPost) {
-
-    console.log("render post: "+blormPost.PostId);
 
     let blormWidgetContainerMenu = document.createElement("div");
     blormWidgetContainerMenu.classList.add("blormWidgetContainerMenu");
@@ -66,7 +66,7 @@ export function AddMenueToImage(imgEl, blormWidgetContainer) {
         divLayerWidget.classList.add("alignLeft");
     }
 
-    // TODO: CHECK SIZE OF  blormWidgetImageWrapper if smaller 300 add small class 100% width
+    // CHECK SIZE OF  blormWidgetImageWrapper if smaller 300 add small class 100% width
     if (divWrapper.offsetWidth < 400) {
         divLayerWidget.classList.add("size10050");
     }
@@ -104,12 +104,6 @@ export function AddMenueToImage(imgEl, blormWidgetContainer) {
         imgEl.parentNode.insertBefore(imgLink, imgEl);
         imgLink.appendChild(imgEl);
 
-        // TODO: PERHAPS
-        // add a link to the widget layer
-        //let divLayerWidgetLink = document.createElement('a');
-        //divLayerWidgetLink.href = imgElOrigLinkHref;
-        //divLayerWidgetLink.append(divLayerWidget);
-        //imgLink.parentNode.insertBefore(divLayerWidgetLink, imgEl.nextSibling);
         imgLink.parentNode.insertBefore(divLayerWidget, imgEl.nextSibling);
         // put a link on the div layer blorm icon
         let divLayerBlormIconLink = document.createElement('a');
