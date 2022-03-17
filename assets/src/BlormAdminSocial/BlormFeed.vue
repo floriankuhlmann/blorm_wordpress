@@ -43,7 +43,7 @@
         props: [],
         methods: {
           reloadPage: function () {
-              this.$root.reloadAccountPage();
+              this.$root.loadAccountPage();
           }
         },
         computed: {

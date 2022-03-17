@@ -1,5 +1,6 @@
 
 <script>
+import * as blormApi from './api/BlormApi';
 import axios from 'axios';
 import { useStore } from 'vuex'
 
@@ -9,12 +10,12 @@ export default {
         const store = useStore();
     },
     mounted: function () {
-      this.getWPPostData();
-
-      jQuery("#wpcontent").css("background-color","#000");
+      // on mounting the user is the account
       this.$store.commit('setUserData', this.$store.state.account);
       this.logMsgToCons("blorm | feedTimeline user id:", this.$store.state.user.id);
-      this.renderPage(this.$store.state.account.id);
+
+      // render the display page for the
+      this.renderPage();
       this.getFeedDataTimeline(0);
     },
     data: function() {
@@ -25,55 +26,32 @@ export default {
         }
     },
     methods: {
-      getWPPostData: function(verb, event, post) {
-
-
-          var shareJSONObj = {
-            "post_iri": {
-              "object_iri": "test",
-            }
-          };
-          axios.post(
-              restapiVars.root+'blormapi/v1//getWPPost',
-              shareJSONObj,
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-WP-Nonce': restapiVars.nonce,
-                }
-              }
-          ).then(response => {
-            this.logMsgToCons("WPPOST response", response);
-          }).catch(error => {
-            this.logMsgToCons("WPPOST  postShare error", error);
-          });
-
-
-      },
       /**
        * getUserData
        * @param userId
        * @returns {Promise<any>}
        */
-      renderPage: function(userId) {
-        let bgColor = "";
+      renderPage: function() {
+        this.changePageDesign();
         this.feedNotification();
-        this.getFollowersOfUser(userId);
-        this.getFollowingUsers(userId);
-        this.setUserData(userId);
-        if (!this.isAccountDataOnDisplay(userId)) {
-          bgColor = "FFFFFF";
-          jQuery("#BlormDashboardWidgetNewPost").css("display", "none");
-          jQuery("#BlormDashboardWidgetSearchUser").css("display", "none");
-        } else {
-          bgColor = "FFFF94";
+
+        this.getFollowersOfUser(this.$store.state.user.id);
+        this.getFollowingUsers(this.$store.state.user.id);
+        //this.setUserData(userId);
+      },
+      changePageDesign: function () {
+        let color = "";
+        if (this.isAccountDataOnDisplay()) {
+          color = "FFFF94";
           jQuery("#BlormDashboardWidgetNewPost").css("display", "block");
           jQuery("#BlormDashboardWidgetSearchUser").css("display", "block");
+        } else {
+          color = "FFFFFF";
+          jQuery("#BlormDashboardWidgetNewPost").css("display", "none");
+          jQuery("#BlormDashboardWidgetSearchUser").css("display", "none");
         }
-        this.changePageDesign(bgColor);
-      },
-      changePageDesign: function (color) {
-        jQuery("#wpcontent .wrap h1").css("color", "#"+color);
+        jQuery( "#wpcontent").css("background-color","#000");
+        jQuery( "#wpcontent .wrap h1").css("color", "#"+color);
         jQuery( "#BlormDashboardWidgetFeed" ).css("background-color", "#"+color);
         jQuery( "#BlormDashboardWidgetUserProfile" ).css("background-color", "#"+color);
         jQuery( "#BlormDashboardWidgetFollowers" ).css("background-color", "#"+color);
@@ -81,121 +59,144 @@ export default {
         jQuery( "#BlormDashboardWidgetFeed .blormImage").attr('src', blormPluginUrl+"/assets/images/blorm_logo_world_"+color+".png");
 
       },
-      reloadAccountPage: function() {
-        this.logMsgToCons("reloadAccountPage:", this.$store.state.account.name);
-        this.renderPage(this.$store.state.account.id);
+      /* the page when the account data ist displayed */
+      loadAccountPage: function() {
+        // reset the account data
         this.$store.commit('setUserData', this.$store.state.account);
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
         this.getFeedDataTimeline(0);
+        this.renderPage();
       },
-      loadUserPage: function(userId) {
-        this.logMsgToCons("loadUserPage:", userId);
-        this.renderPage(userId);
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
-        this.getFeedDataUser(userId);
+      /* the page when the user (followers) data ist displayed */
+      loadUserPage: function(user) {
+        this.$store.commit('setUserData', user);
+        this.getFeedDataUser(user.id);
+        this.renderPage();
       },
-      loadSinglePost: function(activityId) {
-        this.logMsgToCons("loadSinglePost with id:", activityId);
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+      /* a single post can be user or account */
+      loadSinglePost: function(activityId, user) {
+        this.$store.commit('setUserData', user);
+
+        this.renderPage();
         this.getSinglePostData(activityId);
       },
-      setUserData: function (userId) {
-        this.logMsgToCons("getUserData", userId);
+      loadUserData: function (userId) {
 
-        if (userId === "") {
-          this.$store.commit('setUserData', this.$store.state.account);
-          return;
-        }
+        let _this = this;
+        return new Promise (
+            function(successHandle, errorHandle) {
 
-        let responsePromise = this.getBlormApiData(restapiVars.root+'blormapi/v1/user/data/userid/'+userId);
-        responsePromise.then(
-            this.handleGetUserDataSuccess,
-            this.handleGetUserDataError
-        );
+              //console.log(userId);
+              let responsePromise = blormApi.getBlormApiData(restapiVars.root+'blormapi/v1/user/data/userid/'+userId);
+              // work the promise
+              responsePromise.then(
+                  function (response) {
+                    if(!_this.isResponseStatusOk(response)) {
+                      _this.logMsgToCons("ResponseStatusIsNotOk", response);
+                    }
+                    return response;
+                  }
+              ).then(
+                  function (response) {
 
-      },
-      handleGetUserDataSuccess: function (response) {
-        this.logMsgToCons("handleGetUserDataSuccess", response.data);
-        this.$store.commit('setUserData', response.data);
-      },
-      handleGetUserDataError: function (response) {
-        this.logMsgToCons("handleGetUserDataResponseError", response);
+                    if (response.data.id === undefined) {
+                      throw new Error("Error loading userdata: user not available");
+                    }
+
+                    //    constructor(id, name, blormHandle, photoUrl, websiteName, websiteUrl, websiteId, category, websiteType) {
+                    let user = new blormApi.User(
+                        response.data.id,
+                        response.data.name,
+                        response.data.blormhandle,
+                        response.data.photo_url,
+                        response.data.website_name,
+                        response.data.website_href,
+                        response.data.website_id,
+                        response.data.website_category,
+                        response.data.website_type,
+                    );
+
+                    _this.$store.commit('setUserData', user);
+                    _this.logMsgToCons("handleGetUserData Set:", _this.$store.state.user);
+                    return response;
+                  }
+              ).then(
+                  function (response) {
+                    successHandle(response);
+                  }
+              ).
+              catch(
+                  function (error) {
+                    _this.$store.commit('setUserData', _this.$store.state.account);
+                    _this.logMsgToCons("handleGetUserDataResponseError", "loadUserData error");
+                    errorHandle(error);
+                  }
+              );
+            } //function(successHandle, errorHandle)
+        ); //return new Promise
       },
       getSinglePostData: function(id) {
 
-        let responsePromise = this.getBlormApiData(restapiVars.root+'blormapi/v1/feed/byactivity/'+id);
+        this.timelineFadeOut();
+
+        let responsePromise = blormApi.getBlormApiData(restapiVars.root+'blormapi/v1/feed/byactivity/'+id);
+
+        // work the promise
         responsePromise.then(
-            this.handleGetSinglePostDataSuccess,
-            this.handleGetSinglePostDataError
+            response => {this.checkStatus(response); return response;}
+        ).then(
+            response => {
+
+              this.processFeedData(response.data);
+              // TODO: make renderpage independet from single api-calls.
+              this.renderPage(response.data[0].actor.id);
+              return response;
+
+            },
+            function(response) {}
+        ).finally(
+            response => {this.timelineFadeIn();}
         );
 
-      },
-      handleGetSinglePostDataSuccess: function (response) {
-        var postData = {};
-
-        // TODO return reponse.data[0].actior
-        this.logMsgToCons("handleGetSinglePostDataSuccess", response.data[0].actor.id);
-        if(!this.isResponseStatusOk(response)) {
-          this.logMsgToCons("ResponseStatusIsNotOk", response);
-          return
-        }
-
-        if (response.data.length > 0) {
-          postData = this.processFeedData(response.data);
-          this.renderPage(response.data[0].actor.id);
-        }
-
-        if ( postData.length > 0) {
-          this.$store.commit('setFeed', postData);
-          this.$store.commit('setFeedOffset', postData.length + this.$store.state.feedOffset);
-        }
-
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
-      },
-      handleGetSinglePostDataError: function(response) {
-        this.logMsgToCons("handleGetSinglePostDataError", response);
-        this.logMsgToCons("loadSinglePost error", error);
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
       },
       /**
        * * get the timeline
        */
+      checkStatus: function(response) {
+          if(!this.isResponseStatusOk(response)) {
+            this.logMsgToCons("ResponseStatusIsNotOk", response);
+          }
+          return response;
+      },
+      timelineFadeOut: function() {
+        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+      },
+      timelineFadeIn: function() {
+        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
+      },
       getFeedDataUser: function(userId) {
-        this.logMsgToCons("feedUser", userId);
-        //document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
 
-        axios.get(
-            restapiVars.root+'blormapi/v1/feed/user/'+userId,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': restapiVars.nonce,}
+        this.timelineFadeOut();
+        let responsePromise = blormApi.getBlormApiData(restapiVars.root+'blormapi/v1/feed/user/'+userId);
+
+        // work the promise
+        responsePromise.then(
+            response => {this.checkStatus(response); return response;}
+        ).then(
+            response => {
+              this.processFeedData(response.data);
+              return response;
             }
-        ).then(response => {
-              var postData = {};
-
-              if(!this.isResponseStatusOk(response)) {
-                return
-              }
-
-              if (response.data.length > 0) {
-                postData = this.processFeedData(response.data);
-              }
-
-              this.$store.commit('setFeed', postData);
-              document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
-
-            }
-        ).catch(error => {
-          this.logMsgToCons("feeduser error", error);
-          document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
-        });
+        ).finally(
+            response => {this.timelineFadeIn();}
+        );
       },
       /**
        * get the timeline
        */
       getFeedDataTimeline: function(offSet) {
-        this.logMsgToCons("feedTimeline offset:", offSet);
+
+        this.timelineFadeOut();
+
         // reload after undoReblog, undoShare, reblog, share: the offset is ste to 0 to load the updated feed
         if (typeof offSet !== "undefined") {
           this.logMsgToCons("feedTimeline feedOffset:", offSet);
@@ -207,185 +208,176 @@ export default {
           offSet = this.$store.state.feedOffset;
         }
 
-        document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+        let responsePromise = blormApi.getBlormApiData(restapiVars.root+'blormapi/v1/feed/timeline?limit='+this.$store.state.feedLimit+'&offset='+offSet);
 
-        axios.get(
-            restapiVars.root+'blormapi/v1/feed/timeline?limit='+this.$store.state.feedLimit+'&offset='+offSet,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': restapiVars.nonce,
-              }
+        // work the promise
+        responsePromise.then(
+            response => {this.checkStatus(response);return response}
+        ).then(
+            response => {
+              this.logMsgToCons("feedTimeline response", response);
+              this.processFeedData(response.data);
+              return response;
             }
-        ).then(response => {
+        ).finally(
+            response => {this.timelineFadeIn();}
+        );
+      },
+      feedNotification: function() {
+
+        let isRead = "read";
+        if (encodeURI(this.$store.state.notificationsRead.toString()) !== "") {
+          isRead = encodeURI(this.$store.state.notificationsRead.toString());
+        }
+
+        let isSeen = "seen";
+        if (encodeURI(this.$store.state.notificationsSeen.toString()) !== "") {
+          isSeen = encodeURI(this.$store.state.notificationsSeen.toString());
+        }
+
+        let responsePromise = blormApi.getBlormApiData(restapiVars.root+'blormapi/v1/feed/notification/'+isRead+"/"+isSeen);
+
+        responsePromise.then(
+            response => {this.checkStatus(response);return response;}
+        ).then(
+            response => {
               var postData = {};
-
-              if(!this.isResponseStatusOk(response)) {
-                return
-              }
-
-              this.logMsgToCons("feeddata", response);
-
               if (response.data.length > 0) {
-                postData = this.processFeedData(response.data);
+                postData = this.processNotificationFeedData(response.data);
+                this.$store.commit('setNotifications', postData.slice(0,10));
               }
-
-              if ( postData.length > 0) {
-                this.$store.commit('setFeed', postData);
-                this.$store.commit('setFeedOffset', postData.length + this.$store.state.feedOffset);
-                this.logMsgToCons("new feedOffset:", this.$store.state.feedOffset);
-                document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
-              }
+              return response;
             }
-        ).catch(error => {
-
-          this.logMsgToCons("feedTimeline error", error);
-          document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
-
-        });
+        ).then(
+            response => {this.timelineFadeIn();}
+        ).catch(
+            response => {this.timelineFadeIn();}
+        );
       },
       processFeedData: function(posts) {
-            this.logMsgToCons("processFeedData", posts);
-            let postData = [];
-            //posts.map(function (value) {
-            Array.from(posts).forEach(function(value){
 
-                var data = {};
-                // check for errors in the data
-                if (value.object.data.error) {
-                    data.error = true;
-                    data.activityId = value.id;
-                    data.errortype = value.object.data.error;
-                    return;
-                }
+        if (posts.length === 0) {
+          this.$store.commit('setFeed', []);
+          this.$store.commit('setFeedOffset', 0);
+          return;
+        }
 
-                if (typeof(value.object.data.data) == "undefined") {
-                    data.error = true;
-                    data.activityId = value.id;
-                    data.errortype = "data_undefined";
-                    return;
-                }
+        this.logMsgToCons("processFeedData", posts);
+        let postData = [];
+        Array.from(posts).forEach(function(value){
 
-                // if we have an referenced object
-                if (value.object) {
-                    data.error = false;
-                    data.teaser = true;
-                    data.activityId = value.id;
-                    data.originActivityId = value.id;
-                    if (typeof value.originId !== "undefined") {
-                      data.originActivityId = value.originId;
-                    }
-                    data.object = {
-                        iri: value.object.id,
-                        type: "teaser",
-                        verb: value.verb,
-                        time: value.time,
-                        headline: value.object.data.data.headline,
-                        text: value.object.data.data.text,
-                        image: value.object.data.data.image,
-                        url: value.object.data.data.url,
-                    };
-                    data.actor = {
-                        id: value.actor.id,
-                        name: value.actor.data.data.name,
-                        userName: value.actor.data.data.username,
-                        photoUrl: value.actor.data.data.photoUrl,
-                        website: value.actor.data.data.website,
-                    };
-                    data.isOwner = (this.$store.state.user.id === value.actor.id);
-                    data.ownReactions = value.own_reactions;
-                    data.reactionCounts = value.reaction_counts;
-                    data.latestReactions = value.latest_reactions;
+          // TODO: define data object and import
+          var data = {};
 
-                    data.comments = {
-                        hasReactions: false,
-                    };
-
-                    if (typeof value.latest_reactions !== "undefined") {
-                      if (typeof value.latest_reactions.comment !== "undefined") {
-                        data.comments = {
-                          hasReactions: true,
-                          noOfReactions: value.reaction_counts.comment,
-                          theReactions: value.latest_reactions.comment,
-                        }
-                      }
-
-                      data.reblogs = {
-                        hasReactions: false,
-                      };
-
-                      if (typeof value.latest_reactions.reblog !== "undefined") {
-                        data.reblogs = {
-                          hasReactions: true,
-                          noOfReactions: value.reaction_counts.reblog,
-                          theReactions: value.latest_reactions.reblog,
-                        }
-                      }
-
-                      data.shares = {
-                        hasReactions: false,
-                      };
-
-                      if (typeof value.latest_reactions.share !== "undefined") {
-                        data.shares = {
-                          hasReactions: true,
-                          noOfReactions: value.reaction_counts.share,
-                          theReactions: value.latest_reactions.share,
-                        }
-                      }
-                    }
-                    postData.push(data);
-                }
-            }, this);
-            return postData;
-        },
-        feedNotification: function() {
-          this.logMsgToCons("feedNotification", "start loading");
-          // TODO: get notification reads and add as parameter
-
-          let isRead = "read";
-          if (encodeURI(this.$store.state.notificationsRead.toString()) !== "") {
-            isRead = encodeURI(this.$store.state.notificationsRead.toString());
+          if (typeof(value.object) === "undefined") {
+            data.error = true;
+            data.activityId = "0"
+            data.errortype = "data_undefined";
+            return;
           }
 
-          let isSeen = "seen";
-          if (encodeURI(this.$store.state.notificationsSeen.toString()) !== "") {
-            isSeen = encodeURI(this.$store.state.notificationsSeen.toString());
+          // check for errors in the data
+          if (value.object.data.error) {
+            data.error = true;
+            data.activityId = value.id;
+            data.errortype = value.object.data.error;
+            return;
           }
 
-          axios.get(
-              restapiVars.root+'blormapi/v1/feed/notification/'+isRead+"/"+isSeen,
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-WP-Nonce': restapiVars.nonce,
+          if (typeof(value.object.data.data) == "undefined") {
+            data.error = true;
+            data.activityId = value.id;
+            data.errortype = "data_undefined";
+            return;
+          }
+
+          // if we have an referenced object
+          if (value.object) {
+            data.error = false;
+            data.teaser = true;
+            data.activityId = value.id;
+            data.originActivityId = value.id;
+            if (typeof value.originId !== "undefined") {
+              data.originActivityId = value.originId;
+            }
+            data.object = {
+              iri: value.object.id,
+              type: "teaser",
+              verb: value.verb,
+              time: value.time,
+              headline: value.object.data.data.headline,
+              text: value.object.data.data.text,
+              image: value.object.data.data.image,
+              url: value.object.data.data.url,
+            };
+            data.actor = {
+              id: value.actor.id,
+              name: value.actor.data.data.name,
+              userName: value.actor.data.data.username,
+              photoUrl: value.actor.data.data.photoUrl,
+              website: value.actor.data.data.website,
+            };
+            data.isOwner = (this.$store.state.user.id === value.actor.id);
+            data.ownReactions = value.own_reactions;
+            data.reactionCounts = value.reaction_counts;
+            data.latestReactions = value.latest_reactions;
+
+            data.comments = {
+              hasReactions: false,
+            };
+
+            if (typeof value.latest_reactions !== "undefined") {
+              if (typeof value.latest_reactions.comment !== "undefined") {
+                data.comments = {
+                  hasReactions: true,
+                  noOfReactions: value.reaction_counts.comment,
+                  theReactions: value.latest_reactions.comment,
                 }
               }
-          ).then(response => {
-                var postData = {};
 
-                if(!this.isResponseStatusOk(response)) {
-                  this.logMsgToCons("feedNotification ResponseStatusIsNotOk", response);
-                  return
+              data.reblogs = {
+                hasReactions: false,
+              };
+
+              if (typeof value.latest_reactions.reblog !== "undefined") {
+                data.reblogs = {
+                  hasReactions: true,
+                  noOfReactions: value.reaction_counts.reblog,
+                  theReactions: value.latest_reactions.reblog,
                 }
-
-                if (response.data.length > 0) {
-                  postData = this.processNotificationFeedData(response.data);
-                  this.$store.commit('setNotifications', postData.slice(0,10));
-                }
-
               }
-          ).catch(error => {
 
-            this.logMsgToCons("feedNotification error", error);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedInAnimation 1s ease 0s 1 normal forwards";
+              data.shares = {
+                hasReactions: false,
+              };
 
-          });
-        },
-        processNotificationFeedData: function(notifications) {
-          this.logMsgToCons("processNotificationFeedData input:", notifications);
+              if (typeof value.latest_reactions.share !== "undefined") {
+                data.shares = {
+                  hasReactions: true,
+                  noOfReactions: value.reaction_counts.share,
+                  theReactions: value.latest_reactions.share,
+                }
+              }
+            }
+            postData.push(data);
+          }
+        }, this);
+
+        if ( postData.length > 0) {
+          this.$store.commit('setFeed', postData);
+          this.$store.commit('setFeedOffset', postData.length + this.$store.state.feedOffset);
+        }
+        return postData;
+      },
+
+      processNotificationFeedData: function(notifications) {
+
+          if (!Array.isArray(notifications)) {
+            this.logMsgToCons("feedNotification ResponseStatusIsNotOk: data undefined", response);
+            return
+          }
+
           let notificationsRead = encodeURI(this.$store.state.notificationsRead.toString());
-          console.log(notificationsRead);
           let notificationsData = [];
 
           // notifications loop start
@@ -394,7 +386,6 @@ export default {
             // activities loop start
             let activities = [];
             Array.from(notification.activities).forEach(function(activity){
-              //this.$root.logMsgToCons("this.store.state.notifications:", activity.object);
               if (activity.object.error !== "ReferenceNotFound") {
                 let tempnot = {};
                 tempnot.activityId = activity.ActivityId;
@@ -422,112 +413,112 @@ export default {
           this.$root.logMsgToCons("processNotificationFeedData output:", notificationsData);
           return notificationsData;
         },
-        /**
-         * postCreate
-         * @param createJSONObj
-         */
-        postCreate: function(createJSONObj) {
-            this.logMsgToCons("postCreate", createJSONObj);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
 
-            let $this = this;
-            return new Promise (
-                function(success, error) {
-                    let bodyFormData = new FormData();
-                    bodyFormData.append('uploadfile', file);
-                    axios.post(
-                        restapiVars.root+'blormapi/v1/blogpost/create',
-                        createJSONObj,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                'X-WP-Nonce': restapiVars.nonce,
-                            }
-                        }
-                    ).then(function (response) {
-                        if(!$this.isResponseStatusOk(response)) {
-                          this.logMsgToCons("postCreate error", response);
-                          return
-                        }
-                        // on success, call fullfill method, to resolve
-                        success(response);
-                    }).catch(function (response) {
-                        error(response);
-                        this.logMsgToCons("postCreate", response);
-                        return false;
-                    });
-                }
-            );
-        },
+      /*** postCreate
+       ** @param createJSONObj
+       */
+      postCreate: function(createJSONObj) {
 
-        /**
-         * postFileUpload
-         * @param file
-         * @returns {Promise<any>}
-         */
-        postFileUpload: function(file) {
-           return new Promise (
-                function(success, error) {
-                    let bodyFormData = new FormData();
-                    bodyFormData.append('uploadfile', file);
-                    axios.post(
-                        restapiVars.root+'blormapi/v1/file/upload',
-                        bodyFormData,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                'X-WP-Nonce': restapiVars.nonce,
-                            }
-                        }
-                    ).then(function (response) {
-                        // on success, call fullfill method, to resolve
-                        success(response);
-                    }).catch(function (response) {
-                        this.logMsgToCons("postFileUpload error", response);
-                        error(response);
-                    });
-                }
-           );
-        },
+        this.timelineFadeOut();
+        let _this = this;
 
-        /**
-         * postDelete
-         * @param activityId
-         */
-        postDelete: function (activityId) {
-            this.logMsgToCons("postDelete", activityId);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
-
-            let promiseObj = new Promise (function(fullfill, reject) {
-                axios.get(restapiVars.root+'blormapi/v1/blogpost/delete/'+activityId,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-WP-Nonce': restapiVars.nonce,}
+        // TODO: REFACTORING THIS PROMIS AND THE CALLING METHODS IN BlormNewPost.vue
+        return new Promise (
+            function(success, error) {
+              axios.post(
+                  restapiVars.root+'blormapi/v1/blogpost/create',
+                  createJSONObj,
+                  {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                      'X-WP-Nonce': restapiVars.nonce,
                     }
-                ).then(function (response) {
-                    fullfill(response);
-                }).catch(error => {
-                    this.logMsgToCons("postDelete error", error);
-                    reject(error);
+                  }
+                  ).then(
+                    function (response) {_this.checkStatus(response);return response;}
+                  )
+                  .then(
+                      function (response) {
+                      // on success, call fullfill method, to resolve
+                      success(response);
+                  }).finally(
+                  function (response) {
+                    _this.timelineFadeIn();
+                  }).catch(function (response) {
+                    error(response);
+                    _this.logMsgToCons("postCreate", response);
+                    return false;
                 });
-            });
-            return promiseObj;
-        },
+            }
+        );
+      }, // postCreate
 
-        /**
-         * postShare
-         * @param verb
-         * @param event
-         * @param post
-         */
-        postShare: function(verb, event, post) {
+      /**
+       * postFileUpload
+       * @param file
+       * @returns {Promise<any>}
+       */
+      postFileUpload: function(file) {
+        return new Promise (
+            function(success, error) {
+              let bodyFormData = new FormData();
+              bodyFormData.append('uploadfile', file);
+              axios.post(
+                  restapiVars.root+'blormapi/v1/file/upload',
+                  bodyFormData,
+                        {
+                          headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'X-WP-Nonce': restapiVars.nonce,
+                          }
+                        }
+              ).then(function (response) {
+                // on success, call fullfill method, to resolve
+                success(response);
+              }).catch(function (response) {
+                this.logMsgToCons("postFileUpload error", response);
+                error(response);
+              });
+            }
+        );
+      },
+      /**
+       * postDelete
+       * @param activityId
+       */
+      postDelete: function (activityId) {
 
-            this.logMsgToCons("postShare", verb);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+        this.timelineFadeOut();
 
-            let promiseObj = new Promise (function(fullfill, reject) {
-                var shareJSONObj = {
+        let promiseObj = new Promise (function(fullfill, reject) {
+          axios.get(restapiVars.root+'blormapi/v1/blogpost/delete/'+activityId,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-WP-Nonce': restapiVars.nonce,}
+              }
+          ).then(function (response) {
+            fullfill(response);
+          }).catch(error => {
+            this.logMsgToCons("postDelete error", error);
+            reject(error);
+          });
+        });
+        return promiseObj;
+      },
+
+      /**
+       * postShare
+       * @param verb
+       * @param event
+       * @param post
+       */
+      postShare: function(verb, event, post) {
+
+        this.timelineFadeOut();
+
+        let promiseObj = new Promise (function(fullfill, reject) {
+          var shareJSONObj = {
                     "@context": "https://www.w3.org/ns/activitystreams",
                     "verb": verb,
                     "type": jQuery(event.target).parent().data('objecttype'),
@@ -563,10 +554,9 @@ export default {
          * @param post
          */
         postReblog: function(verb, event, post) {
-            this.logMsgToCons("postReblog", verb);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
 
-            let promiseObj = new Promise (function(fullfill, reject) {
+          this.timelineFadeOut();
+           let promiseObj = new Promise (function(fullfill, reject) {
                 var shareJSONObj = {
                     "@context": "https://www.w3.org/ns/activitystreams",
                     "verb": verb,
@@ -608,9 +598,7 @@ export default {
          * @param activityId
          */
         reblogUndo: function (activityId) {
-            this.logMsgToCons("reblogUndo", activityId);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
-
+          this.timelineFadeOut();
             let promiseObj = new Promise (function(fullfill, reject) {
                 axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/reblog/'+activityId,
                     {
@@ -619,7 +607,6 @@ export default {
                             'X-WP-Nonce': restapiVars.nonce,}
                     }
                 ).then(function (response) {
-                    console.log(response);
                     fullfill(response);
                 }).catch(error => {
                     this.logMsgToCons("reblogUndo error", error);
@@ -634,8 +621,7 @@ export default {
          * @param activityId
          */
         shareUndo: function (activityId) {
-            this.logMsgToCons("shareUndo", activityId);
-            document.getElementsByClassName("Blormfeed")[0].style.animation = "feedOutAnimation 1s ease 0s 1 normal forwards";
+          this.timelineFadeOut();
 
             let promiseObj = new Promise (function(fullfill, reject) {
                 axios.get(restapiVars.root+'blormapi/v1/blogpost/undo/share/'+activityId,
@@ -691,7 +677,7 @@ export default {
               jQuery( ".BlormFeed_Action--comment" ).css("opacity","1");
               jQuery( ".BlormFeed_Action--comment button" ).prop('disabled', false);
               // update the feed
-              this.reloadAccountPage();
+              this.loadAccountPage();
             }).catch(error => {
               this.logMsgToCons("postComment error", error);
             });
@@ -700,6 +686,7 @@ export default {
         getBlormApiData: function (url) {
             this.logMsgToCons("getBlormApiData", url);
             let promiseObj = new Promise( function( fullfill, reject) {
+                let _this = this;
                 axios.get( url,
                     {
                         headers: {
@@ -710,7 +697,7 @@ export default {
                 ).then(response => {
                     fullfill(response);
                 }).catch(error => {
-                    this.logMsgToCons("getBlormApiData error", error);
+                    _this.logMsgToCons("getBlormApiData error", error);
                     reject(error);
                 });
             });
@@ -722,7 +709,6 @@ export default {
          * @returns {Promise<any>}
          */
         userFollowing: function (blormhandle) {
-            this.logMsgToCons("userFollowing", blormhandle);
             return this.getBlormApiData(restapiVars.root+'blormapi/v1/user/follow/blormhandle/'+blormhandle);
         },
         /**
@@ -730,14 +716,12 @@ export default {
          * @param blormhandle
          */
         userUnFollowing: function (blormhandle) {
-            this.logMsgToCons("userUnFollowing", blormhandle);
             return this.getBlormApiData(restapiVars.root+'blormapi/v1/user/unfollow/blormhandle/'+blormhandle);
         },
         /**
          * getFollowingUsers
          */
         getFollowingUsers: function(userId) {
-            this.logMsgToCons("getFollowingUsers", userId);
             let responsePromise = this.getBlormApiData(restapiVars.root+'blormapi/v1/feed/following/timeline/'+userId);
             responsePromise.then(
                 this.handleGetFollowingUsersSuccess,
@@ -745,30 +729,63 @@ export default {
             );
         },
         handleGetFollowingUsersSuccess: function (response) {
-            this.logMsgToCons("handleGetFollowingUsersSuccess", response);
-            this.$store.commit('setFollowingUsers', response.data);
+          this.processUserData(response.data);
+          this.$store.commit('setFollowingUsers', this.processUserData(response.data));
         },
         /**
          * getFollowersOfUser
          */
         getFollowersOfUser: function(userId) {
-            this.logMsgToCons("getFollowersOfUser", userId);
-            let responsePromise = this.getBlormApiData(restapiVars.root+'blormapi/v1/feed/followers/user/'+userId);
+           let responsePromise = this.getBlormApiData(restapiVars.root+'blormapi/v1/feed/followers/user/'+userId);
             responsePromise.then(
                 this.handleGetFollowersOfUserSuccess,
                 this.handleResponseError
             );
         },
         handleGetFollowersOfUserSuccess: function (response) {
-            this.logMsgToCons("handleGetFollowersOfUserSuccess", response);
-            this.$store.commit('setFollowersOfUser', response.data);
+          this.$store.commit('setFollowersOfUser', this.processUserData(response.data));
         },
-        handleResponseError: function (response) {
+        processUserData: function(userDatas) {
+
+          let users = [];
+          Object.entries(userDatas).forEach( function(userData) {
+
+            // constructor(id, name, blormHandle, photoUrl, websiteName, websiteUrl, websiteId, category)
+            // check the input, we only want to have users with full data
+            if (userData[0] !== undefined &&
+                userData[1].Person.name !== undefined &&
+                userData[1].Person.blormhandle !== undefined &&
+                userData[1].Person.photo_url !== undefined &&
+                userData[1].Organizations[0].name !== undefined &&
+                userData[1].Organizations[0].url.Href !== undefined &&
+                userData[1].Organizations[0].id !== undefined &&
+                userData[1].Organizations[0].category !== undefined &&
+                userData[1].Organizations[0].type !== undefined
+            ) {
+              let user = new blormApi.User(
+                  userData[0],
+                  userData[1].Person.name,
+                  userData[1].Person.blormhandle,
+                  userData[1].Person.photo_url,
+                  userData[1].Organizations[0].name,
+                  userData[1].Organizations[0].url.Href,
+                  userData[1].Organizations[0].id,
+                  userData[1].Organizations[0].category,
+                  userData[1].Organizations[0].type,
+              );
+              users.push(user);
+            }
+          }); // usersData loop start
+
+        return users;
+      },
+
+      handleResponseError: function (response) {
             this.logMsgToCons("handleResponseError", response);
         },
-        isAccountDataOnDisplay: function(userId) {
+        isAccountDataOnDisplay: function() {
           //this.logMsgToCons("isAccountDataOnDisplay", (userId === this.$store.state.account.id));
-          return (userId === this.$store.state.account.id);
+          return (this.$store.state.user.id === this.$store.state.account.id);
         },
         isResponseStatusOk: function (response) {
           this.logMsgToCons("isResponseStatusOk", response);

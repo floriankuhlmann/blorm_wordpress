@@ -1,11 +1,11 @@
 <template>
     <div class="BlormFollowersOfUserListUser">
         <div v-on:click="loadUserPage"  class="BlormFollowersOfUserListUserImg">
-            <span v-if="follower.Person.photo_url.length">
-                <img v-bind:src="follower.Person.photo_url">
+            <span v-if="follower.photoUrl.length">
+                <img v-bind:src="follower.photoUrl">
             </span>
         </div>
-        <div class="name">{{follower.Person.name}}</div>
+        <div class="name">{{follower.name}}</div>
     </div>
 </template>
 
@@ -14,8 +14,8 @@
         props: ['follower'],
         methods:  {
             loadUserPage: function () {
-                console.log(this.follower.Person.id);
-                this.$root.loadUserPage(this.follower.Person.id);
+                console.log(this.follower.id);
+                this.$root.loadUserPage(this.follower);
             },
         },
     }

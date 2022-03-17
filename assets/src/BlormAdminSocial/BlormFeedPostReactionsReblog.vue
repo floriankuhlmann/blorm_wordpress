@@ -19,8 +19,18 @@
         },
         methods: {
             feedUser: function () {
-                console.log(this.reblogReaction.user.id);
-                this.$root.loadUserPage(this.reblogReaction.user.id);
+                //console.log(this.reblogReaction.user.id);
+                //this.$root.loadUserPage(this.reblogReaction.user);
+              let loadPromise = this.$root.loadUserData(this.reblogReaction.user.id);
+              loadPromise.then(
+                  response => {
+                    this.$root.loadUserPage(this.$store.state.user);
+                  },
+                  error => {
+                    alert(error);
+                    this.$root.loadAccountPage();
+                  }
+              );
             },
         },
     }

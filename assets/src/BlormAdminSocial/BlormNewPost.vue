@@ -141,7 +141,7 @@
                     $this.headline = null;
                     $this.text = null;
                     $this.file = null;
-                    $this.$root.getFeedDataTimeline(0);
+                    $this.$root.loadAccountPage();
                     postSelect.val(0).prop('selected', true);
                     postWidget.style.animation = "newPostInAnimation 1s ease 0s 1 normal forwards";
                     postEnabler.prop('disabled', false);

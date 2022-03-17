@@ -18,8 +18,18 @@
         },
         methods: {
             feedUser: function () {
-                console.log(this.shareReaction.user.id);
-                this.$root.loadUserPage(this.shareReaction.user.id);
+                //console.log(this.shareReaction.user.id);
+                //this.$root.loadUserPage(this.shareReaction.user.id);
+              let loadPromise = this.$root.loadUserData(this.shareReaction.user.id);
+              loadPromise.then(
+                  response => {
+                    this.$root.loadUserPage(this.$store.state.user);
+                  },
+                  error => {
+                    alert(error);
+                    this.$root.loadAccountPage();
+                  }
+              );
             },
         },
     }

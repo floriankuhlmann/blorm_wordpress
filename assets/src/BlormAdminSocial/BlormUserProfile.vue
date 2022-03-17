@@ -8,16 +8,16 @@
             <div>
                 <div id="BlormUserProfileNameBox" class="BlormUserProfileNameBox">
                     <b>Name:</b><br> {{userData.name}}<br>
-                    <b>Handle:</b><br> {{userData.blormhandle}}
+                    <b>Handle:</b><br> {{userData.blormHandle}}
                 </div>
                 <div id="BlormUserProfileImageBox" class="BlormUserProfileImageBox">
                     <div class="BlormUserProfileUserImage">
-                        <img :src="userData.photo_url" :alt="userData.blormhandle">
+                        <img :src="userData.photoUrl" :alt="userData.blormHandle">
                     </div>
                 </div>
                 <div id="BlormUserProfileInfoBox" class="BlormUserProfileInfoBox">
-                    <b>Website:</b><br><a :href="userData.website_href">{{userData.website_name}}</a><br>
-                    <b>Category:</b><br> {{userData.website_category}}
+                    <b>Website:</b><br><a :href="userData.websiteUrl">{{userData.websiteName}}</a><br>
+                    <b>Category:</b><br> {{userData.category}}
                 </div>
                 <div style="clear:both;"></div>
             </div>
@@ -40,9 +40,13 @@
         },
         computed: {
             userData () {
-                return this.$store.state.user;
+              console.log("this.$store.state.user");
+              console.log(this.$store.state.user);
+
+              return this.$store.state.user;
             },
             accountData () {
+                console.log(this.$store.state.user);
                 return this.$store.state.account;
             },
             getIconUrl () {
@@ -54,9 +58,9 @@
         },
         methods: {
             followUser: function () {
-                if (confirm("Do you really want to FOLLOW the account '"+this.$store.state.user.blormhandle+"'?\nPlease click 'OK' to follow.")) {
+                if (confirm("Do you really want to FOLLOW the account '"+this.$store.state.user.blormHandle+"'?\nPlease click 'OK' to follow.")) {
                     // Save it!
-                    let responsePromise = this.$root.userFollowing(this.$store.state.user.blormhandle);
+                    let responsePromise = this.$root.userFollowing(this.$store.state.user.blormHandle);
                     responsePromise.then(this.handleUnfollowSuccess, this.handleUnfollowError);
                 }
             },

@@ -38,11 +38,29 @@
             }
           },
           showFeedUser: function () {
-            this.$root.loadUserPage(this.notification.actor.id);
+            let loadPromise = this.$root.loadUserData(this.notification.actor.id);
+            loadPromise.then(
+                response => {
+                  this.$root.loadUserPage(this.$store.state.user);
+                  },
+                error => {
+                  alert(error);
+                  this.$root.loadAccountPage();
+                }
+            );
           },
           showSinglePost: function () {
+            let loadPromise = this.$root.loadUserData(this.notification.actor.id);
             this.$store.commit('addReadNotification', this.notification.notificationGroupId);
-            this.$root.loadSinglePost(this.notification.activityId, this.notification.actor.id);
+            loadPromise.then(
+                response => {
+                  this.$root.loadSinglePost(this.notification.activityId, this.$store.state.user);
+                },
+                error => {
+                  alert(error);
+                  this.$root.loadAccountPage();
+                }
+            );
           },
         },
         computed: {

@@ -21,12 +21,12 @@
         </template>
         <template v-if="post.object.verb === 'reblog'">
             <div class="BlormFeedEdit--Mod">
-                <button v-on:click="undoPost('delete',post.activityId)">undo</button>
+                <button v-on:click="undoPost('reblogundo',post.activityId)">undo</button>
             </div>
         </template>
         <template v-if="post.object.verb === 'share'">
             <div class="BlormFeedEdit--Mod">
-                <button v-on:click="undoPost('delete',post.activityId)">undo</button>
+                <button v-on:click="undoPost('shareundo',post.activityId)">undo</button>
             </div>
         </template>
     </span>
@@ -99,34 +99,48 @@
                 return this.post.actor.name;
             },
             isAccount: function() {
-              return this.$root.isAccountDataOnDisplay(this.post.actor.id);
+              return this.$root.isAccountDataOnDisplay();
             },
         },
         methods: {
             feedUser: function() {
-                console.log(this.post.actor.id);
-                this.$root.loadUserPage(this.post.actor.id);
+              let loadPromise = this.$root.loadUserData(this.post.actor.id);
+              loadPromise.then(
+                  response => {
+                    this.$root.loadUserPage(this.$store.state.user);
+                  },
+                  error => {
+                    alert(error);
+                    this.$root.loadAccountPage();
+                  }
+              );
             },
             undoPost: function (verb, activityId) {
               let $this = this;
-              let responsePromise = new Promise(function() {
-                $this.$root.reloadAccountPage();
-              }, function (response) {
-                $this.logError(response);
-              });
+              //let responsePromise = new Promise(function (a){}, function (b){});
+              let responsePromise = {};
               switch(verb) {
                 case "delete":
                   responsePromise = this.$root.postDelete(activityId);
                   break;
 
-                case "reblog":
+                case "reblogundo":
                   responsePromise = this.$root.reblogUndo(activityId);
                   break;
 
-                case "share":
+                case "shareundo":
                   responsePromise = this.$root.shareUndo(activityId);
                   break;
               }
+              responsePromise.then(
+                  response => {
+                      $this.$root.loadAccountPage();
+                  },
+                  error => {
+                    $this.logError(response);
+                  }
+              );
+
             },
             logError: function(response) {
                 this.$root.logError("reblogUndo", response);

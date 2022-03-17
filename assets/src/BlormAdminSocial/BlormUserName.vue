@@ -7,10 +7,10 @@ export default {
     props: ['fillWordSecondPerson','fillWordThirdPerson'],
     computed: {
         displayName () {
-            if (this.$store.state.user.blormhandle === this.$store.state.account.blormhandle ) {
+            if (this.$store.state.user.blormHandle === this.$store.state.account.blormHandle ) {
                return  "you" + this.getFillWordSecondPerson();
             } else {
-                return this.$store.state.user.blormhandle + this.getFillWordThirdPerson();
+                return this.$store.state.user.blormHandle + this.getFillWordThirdPerson();
             }
         }
     },

@@ -57,7 +57,7 @@
             if (this.post.object.verb === 'create') {
               window.open(this.post.object.url, "_blank", "");
             } else {
-              this.$root.loadSinglePost(this.post.originActivityId);
+              this.$root.loadSinglePost(this.post.originActivityId, this.post.actor);
             }
           }
         },

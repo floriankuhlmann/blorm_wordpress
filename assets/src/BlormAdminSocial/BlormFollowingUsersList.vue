@@ -1,11 +1,11 @@
 <template>
     <div class="BlormFollowListUser">
         <div v-on:click="loadUserPage" class="BlormFollowListUserImg">
-            <span v-if="followingUser.Person.photo_url.length">
-                <img v-bind:src="followingUser.Person.photo_url">
+            <span v-if="followingUser.photoUrl.length">
+                <img v-bind:src="followingUser.photoUrl">
             </span>
         </div>
-        <div class="name">{{followingUser.Person.blormhandle}}</div>
+        <div class="name">{{followingUser.blormHandle}}</div>
         <span v-if="isAccountDataOnDisplay">
             <div v-on:click="confirmUnfollow"><img :src="getIconUrl" class="blormIcon"></div>
         </span>
@@ -20,24 +20,24 @@
                 return blormPluginUrl + "/assets/icons/circle-close-delete-remove-glyph.png";
             },
             isAccountDataOnDisplay: function () {
-                return (this.$store.state.user.blormhandle === this.$store.state.account.blormhandle)
+                return (this.$store.state.user.blormHandle === this.$store.state.account.blormHandle)
             },
         },
         methods:  {
             loadUserPage: function () {
-                this.$root.loadUserPage(this.followingUser.Person.id);
+                this.$root.loadUserPage(this.followingUser);
             },
             confirmUnfollow: function() {
-                if (confirm("Do you really want to UNFOLLOW the account '"+this.followingUser.Person.blormhandle+"'?\nPlease click 'OK' to unfollow.")) {
+                if (confirm("Do you really want to UNFOLLOW the account '"+this.followingUser.blormHandle+"'?\nPlease click 'OK' to unfollow.")) {
                     // Save it!
-                    let responsePromise = this.$root.userUnFollowing(this.followingUser.Person.blormhandle);
+                    let responsePromise = this.$root.userUnFollowing(this.followingUser.blormHandle);
                     responsePromise.then(this.handleUnfollowSuccess, this.handleUnfollowError);
                 }
             },
             handleUnfollowSuccess: function (response) {
                 jQuery("#usernamefollow").val("");
                 jQuery(".BlormFeedbackBox").css('display','inline');
-                jQuery(".BlormFeedbackBoxText").html( "You unfollowed <br>'"+this.followingUser.Person.blormhandle+"'." );
+                jQuery(".BlormFeedbackBoxText").html( "You unfollowed <br>'"+this.followingUser.blormHandle+"'." );
                 this.$root.getFollowingUsers(this.$store.state.user.id);
             },
             handleUnfollowError: function (response) {

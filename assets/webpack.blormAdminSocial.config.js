@@ -7,8 +7,8 @@ const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 const webpack = require('webpack');
 
 module.exports = (env = {}) => ({
-    //mode: 'development',
-    mode: 'production',
+    mode: 'development',
+    //mode: 'production',
     entry: path.resolve(__dirname, "./src/BlormAdminSocial/BlormMain.js"),
     output: {
         path: path.resolve(__dirname, "./js"),

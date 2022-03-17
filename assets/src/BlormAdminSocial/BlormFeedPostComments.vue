@@ -45,7 +45,17 @@
             },
             feedUser: function(id) {
                 console.log(feedUser);
-                this.$root.loadUserPage(id);
+                //this.$root.loadUserPage(id);
+              let loadPromise = this.$root.loadUserData(id);
+              loadPromise.then(
+                  response => {
+                    this.$root.loadUserPage(this.$store.state.user);
+                  },
+                  error => {
+                    alert(error);
+                    this.$root.loadAccountPage();
+                  }
+              );
             },
         }
     };
