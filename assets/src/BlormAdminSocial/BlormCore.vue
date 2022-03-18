@@ -318,6 +318,7 @@ export default {
               website: value.actor.data.data.website,
             };
             data.isOwner = (this.$store.state.user.id === value.actor.id);
+            data.isAccountOwner = (this.$store.state.account.id === value.actor.id);
             data.ownReactions = value.own_reactions;
             data.reactionCounts = value.reaction_counts;
             data.latestReactions = value.latest_reactions;

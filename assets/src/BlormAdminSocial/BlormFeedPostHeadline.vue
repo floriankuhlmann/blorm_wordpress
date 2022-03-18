@@ -5,7 +5,7 @@
         </div>
         <div>
             <img :src="renderIcon" style="height: 1rem; margin-bottom:-0.25rem; margin-right: 0.25rem;">
-            <template v-if="isAccount">
+            <template v-if="post.isAccountOwner">
                 <b>Thank you for {{renderAction}}</b>
             </template>
             <template v-else>
@@ -13,7 +13,7 @@
             </template>
         </div>
     </div>
-    <span v-if="isAccount">
+    <span v-if="post.isAccountOwner">
         <template v-if="post.object.verb === 'create'">
             <div class="BlormFeedEdit--Mod">
                 <button v-on:click="undoPost('delete',post.activityId)">delete</button>
@@ -66,21 +66,21 @@
                 let action = "";
                 switch (this.post.object.verb) {
                     case "share":
-                      if (this.isAccount) {
+                      if (this.post.isAccountOwner) {
                         action = "sharing:";
                       } else {
                         action = "shared:";
                       }
                       break;
                     case "reblog":
-                      if (this.isAccount) {
+                      if (this.post.isAccountOwner) {
                         action = "rebloging:";
                       } else {
                         action = "rebloged:";
                       }
                       break;
                     case "create":
-                      if (this.isAccount) {
+                      if (this.post.isAccountOwner) {
                         action = "posting:";
                       } else {
                         action = "posted:";
@@ -93,7 +93,7 @@
                 return action;
             },
             renderUser: function() {
-                if (this.isAccount) {
+                if (this.post.isAccountOwner) {
                     return "you";
                 }
                 return this.post.actor.name;
